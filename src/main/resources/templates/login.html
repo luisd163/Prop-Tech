@@ -33,7 +33,8 @@
         }
 
         .login-container {
-            background: var(--blanco);
+            background: rgba(26, 35, 50, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             width: 100%;
@@ -61,7 +62,7 @@
         .logo {
             font-size: 32px;
             font-weight: bold;
-            color: var(--primario);
+            color: var(--blanco);
             margin-bottom: 10px;
         }
 
@@ -70,7 +71,7 @@
         }
 
         .login-subtitle {
-            color: var(--secundario);
+            color: #b8c8de;
             font-size: 14px;
         }
 
@@ -79,7 +80,7 @@
         }
 
         .form-label {
-            color: var(--primario);
+            color: var(--blanco);
             font-weight: 500;
             margin-bottom: 8px;
         }
@@ -147,10 +148,21 @@
         }
 
         .form-check-label {
-            color: var(--primario);
+            color: var(--blanco);
             font-size: 14px;
             cursor: pointer;
             margin-left: 8px;
+        }
+
+        .form-check-label a {
+            color: var(--acento);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-check-label a:hover {
+            color: #ffb27f;
+            text-decoration: underline;
         }
 
         .forgot-password {
@@ -167,7 +179,7 @@
         }
 
         .forgot-password a:hover {
-            color: var(--primario);
+            color: #ffb27f;
             text-decoration: underline;
         }
 
@@ -179,7 +191,7 @@
         }
 
         .login-footer p {
-            color: var(--secundario);
+            color: #b8c8de;
             font-size: 14px;
             margin: 0;
         }
@@ -192,7 +204,7 @@
         }
 
         .login-footer a:hover {
-            color: var(--primario);
+            color: #ffb27f;
         }
 
         .error-message {

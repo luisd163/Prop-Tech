@@ -43,6 +43,15 @@ public class LoginController {
     }
 
     /**
+     * Muestra la página principal del asesor (GET)
+     */
+    @GetMapping("/home")
+    public String showAsesorHome(Model model) {
+        model.addAttribute("titulo", "Panel Asesor");
+        return "home-asesor";
+    }
+
+    /**
      * Procesa el formulario de login (POST)
      * Recibe: email, password y opcional rememberMe
      */
