@@ -8,6 +8,7 @@ public class PropTechApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PropTechApplication.class, args);
+
 	}
 
 }
