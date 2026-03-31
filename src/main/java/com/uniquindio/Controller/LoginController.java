@@ -25,7 +25,6 @@ public class LoginController {
 
     /**
      * Muestra la página de login (GET)
-     * Acceso: http://localhost:8080/login
      */
     @GetMapping("/login")
     public String showLoginPage(Model model) {
@@ -36,7 +35,6 @@ public class LoginController {
 
     /**
      * Muestra la página de registro (GET)
-     * Acceso: http://localhost:8080/registro
      */
     @GetMapping("/registro")
     public String showRegisterPage(Model model) {
