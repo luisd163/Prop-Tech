@@ -1,5 +1,10 @@
 package com.uniquindio.Controller;
 
+import com.uniquindio.Model.Asesor;
+import com.uniquindio.Model.Usuario;
+import com.uniquindio.Service.LoginService;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class LoginController {
     
     ControladorPrincipal controladorPrincipal;
+    LoginService loginService;
 
     public LoginController() {
         this.controladorPrincipal = ControladorPrincipal.getInstancia();
+        this.loginService = new LoginService();
     }   
 
     /**
@@ -43,15 +50,6 @@ public class LoginController {
     }
 
     /**
-     * Muestra la página principal del asesor (GET)
-     */
-    @GetMapping("/home")
-    public String showAsesorHome(Model model) {
-        model.addAttribute("titulo", "Panel Asesor");
-        return "home-asesor";
-    }
-
-    /**
      * Procesa el formulario de login (POST)
      * Recibe: email, password y opcional rememberMe
      */
@@ -60,6 +58,7 @@ public class LoginController {
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam(required = false) boolean rememberMe,
+            HttpSession session,
             Model model) {
         
         // Validar que no estén vacíos
@@ -70,10 +69,16 @@ public class LoginController {
 
         //  validar datos
         try {
-            // Simular validación (reemplazar con lógica real)
-            if (validarCredenciales(email, password)) {
-                // Usuario válido, redirigir al dashboard
-                return "redirect:/home";
+            Usuario usuario = loginService.iniciarSesion(email, password);
+
+            if (usuario != null) {
+                if (usuario.getTipo() == Usuario.TipoUsuario.ASESOR) {
+                    session.setAttribute("asesorSesion", (Asesor) usuario);
+                    return "redirect:/home";
+                }
+
+                model.addAttribute("error", "El usuario autenticado no es asesor");
+                return "login";
             } else {
                 // Credenciales inválidas
                 model.addAttribute("error", "Correo o contraseña incorrectos");
@@ -84,14 +89,5 @@ public class LoginController {
             model.addAttribute("error", "Error en el sistema: " + e.getMessage());
             return "login";
         }
-    }
-
-    /**
-     * Método para validar credenciales (reemplazar con lógica real)
-     */
-    private boolean validarCredenciales(String email, String password) {
-        // REEMPLAZAR CON LÓGICA REAL (consultar BD, comparar contraseña)
-        // Por ahora: solo validar formato de email
-        return email.contains("@") && password.length() >= 6;
     }
 }

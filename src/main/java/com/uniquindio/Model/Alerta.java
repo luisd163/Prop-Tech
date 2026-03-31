@@ -17,6 +17,7 @@ public class Alerta {
 	private NivelAlerta nivel;
 	private LocalDateTime fecha;
 	private String entidadRelacionada;
+	private String asesorId;
 
 	public enum TipoAlerta {
 		VISITA,

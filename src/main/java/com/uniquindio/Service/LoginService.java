@@ -6,11 +6,12 @@ import com.uniquindio.Model.Cliente;
 import com.uniquindio.Repositorio.*;
 
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @NoArgsConstructor
 public class LoginService {
 
-    private AsesorRepositorio asesorRepositorio;
     private ClienteRepositorio clienteRepositorio;
 
     /**
@@ -22,14 +23,19 @@ public class LoginService {
      */
     public Usuario iniciarSesion(String correo, String contrasena) {
         // Intentar buscar como Cliente
-        Cliente cliente = clienteRepositorio.obtenerCliente(correo);
-        if (cliente != null && validarContrasena(cliente.getContrasena(), contrasena)) {
-            return cliente; // Cliente implementa Usuario
+        if (clienteRepositorio != null) {
+            Cliente cliente = clienteRepositorio.obtenerCliente(correo);
+            if (cliente != null && validarContrasena(cliente.getContrasena(), contrasena)) {
+                return cliente; // Cliente implementa Usuario
+            }
         }
 
         // Intentar buscar como Asesor
-        Asesor asesor = asesorRepositorio.obtenerAsesor(correo);
-        if (asesor != null && validarContrasena(asesor.getContrasena(), contrasena)) {
+        // asesor de prueba
+        Asesor asesor = new Asesor("321", "Luis", "luisdanielgomez23@gmail.com", "123", "123", "Casas", 15.0);
+        if (asesor != null
+                && asesor.getCorreo().equalsIgnoreCase(correo)
+                && validarContrasena(asesor.getContrasena(), contrasena)) {
             return asesor; // Asesor implementa Usuario
         }
 
@@ -44,6 +50,6 @@ public class LoginService {
      * @return true si coincide, false en caso contrario
      */
     private boolean validarContrasena(String contrasenaAlmacenada, String contrasenaIngresada) {
-        return contrasenaAlmacenada.equals(contrasenaIngresada);
+        return contrasenaAlmacenada != null && contrasenaAlmacenada.equals(contrasenaIngresada);
     }
 }

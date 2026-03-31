@@ -2,6 +2,7 @@ package com.uniquindio.Repositorio;
 
 import com.uniquindio.Model.Asesor;
 
+
 public class AsesorRepositorio {
 
     // Devuelve un asesor si existe
@@ -10,4 +11,5 @@ public class AsesorRepositorio {
         throw new UnsupportedOperationException("Unimplemented method 'buscarAsesor'");
     }
     
+
 }
