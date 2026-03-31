@@ -2,29 +2,38 @@ package com.uniquindio.Model;
 
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Asesor {
+public class Asesor implements Usuario {
 
-	private Cliente cliente;
-	private Inmueble inmueble;
-	private LocalDate fecha;
-	private LocalTime hora;
-	private String asesorAsignado;
-	private EstadoVisita estadoVisita;
-	private String observacionesPosteriores;
+	private String identificacion;
+	private String nombre;
+	private String correo;
+	private String telefono;
+	private String contrasena;
+	private String especialidad;
+	private double comisionPorcentaje;
 
-	public enum EstadoVisita {
-		PENDIENTE,
-		CONFIRMADA,
-		REALIZADA,
-		CANCELADA,
-		REPROGRAMADA
+	@Override
+	public String getCorreo() {
+		return correo;
+	}
+
+	@Override
+	public String getNombre() {
+		return nombre;
+	}
+
+	@Override
+	public String getIdentificacion() {
+		return identificacion;
+	}
+
+	@Override
+	public TipoUsuario getTipo() {
+		return TipoUsuario.ASESOR;
 	}
 }

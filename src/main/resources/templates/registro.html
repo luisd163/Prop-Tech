@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prop-Tech - Registrarse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primario: #1a2332;
+            --secundario: #5a6b7d;
+            --acento: #ff8c42;
+            --fondo: #f5f5f5;
+            --blanco: #ffffff;
+            --disponible: #2ecc71;
+            --no-disponible: #e74c3c;
+            --reservado: #f39c12;
+            --en-proceso: #3498db;
+            --vip: #9b59b6;
+            --cancelado: #95a5a6;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primario) 0%, var(--secundario) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: var(--blanco);
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 550px;
+            padding: 50px 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primario);
+            margin-bottom: 10px;
+        }
+
+        .logo span {
+            color: var(--acento);
+        }
+
+        .register-subtitle {
+            color: var(--secundario);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            color: var(--primario);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border: 2px solid var(--fondo);
+            border-radius: 6px;
+            padding: 12px 15px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--acento);
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: var(--secundario);
+            opacity: 0.7;
+        }
+
+        .form-select {
+            border: 2px solid var(--fondo);
+            border-radius: 6px;
+            padding: 12px 15px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-select:focus {
+            border-color: var(--acento);
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.1);
+            outline: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, var(--acento) 0%, #ff7a1f 100%);
+            border: none;
+            color: var(--blanco);
+            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 6px;
+            width: 100%;
+            margin-top: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 140, 66, 0.3);
+            color: var(--blanco);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .form-check {
+            margin: 20px 0;
+        }
+
+        .form-check-input {
+            border-color: var(--secundario);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--acento);
+            border-color: var(--acento);
+        }
+
+        .form-check-input:focus {
+            border-color: var(--acento);
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.1);
+        }
+
+        .form-check-label {
+            color: var(--primario);
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--fondo);
+        }
+
+        .register-footer p {
+            color: var(--secundario);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .register-footer a {
+            color: var(--acento);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .register-footer a:hover {
+            color: var(--primario);
+        }
+
+        .error-message {
+            background-color: #ffe5e5;
+            color: var(--no-disponible);
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--no-disponible);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background-color: #e5ffe5;
+            color: var(--disponible);
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--disponible);
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: var(--secundario);
+            margin-top: 8px;
+            padding: 10px;
+            background-color: var(--fondo);
+            border-radius: 5px;
+        }
+
+        .password-requirements ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .password-requirements li {
+            margin: 4px 0;
+        }
+
+        .requirement-valid {
+            color: var(--disponible);
+        }
+
+        .requirement-invalid {
+            color: var(--no-disponible);
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <!-- Header -->
+        <div class="register-header">
+            <div class="logo">Prop<span>Tech</span></div>
+            <p class="register-subtitle">Crea tu cuenta para comenzar</p>
+        </div>
+
+        <!-- Messages -->
+        <div class="error-message" id="errorMessage" th:if="${error}">
+            <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+        </div>
+        <div class="success-message" id="successMessage" th:if="${message}">
+            <i class="bi bi-check-circle"></i> <span th:text="${message}"></span>
+        </div>
+
+        <!-- Form -->
+        <form th:action="@{/register}" method="post" class="register-form" id="registerForm">
+            <!-- Nombres -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="nombre" 
+                        name="nombre" 
+                        placeholder="Tu nombre"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="apellido" 
+                        name="apellido" 
+                        placeholder="Tu apellido"
+                        required>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input 
+                    type="email" 
+                    class="form-control" 
+                    id="email" 
+                    name="email" 
+                    placeholder="ejemplo@correo.com"
+                    required>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="form-group">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input 
+                    type="tel" 
+                    class="form-control" 
+                    id="telefono" 
+                    name="telefono" 
+                    placeholder="+57 300 000 0000"
+                    required>
+            </div>
+
+            <!-- Tipo de Usuario -->
+            <div class="form-group">
+                <label for="tipoUsuario" class="form-label">Tipo de Usuario</label>
+                <select class="form-select" id="tipoUsuario" name="tipoUsuario" required>
+                    <option value="">Selecciona tu rol...</option>
+                    <option value="asesor">Asesor Inmobiliario</option>
+                    <option value="cliente_venta">Cliente (Venta)</option>
+                    <option value="cliente_arriendo">Cliente (Arriendo)</option>
+                    <option value="propietario">Propietario</option>
+                </select>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Mínimo 8 caracteres"
+                    required>
+                <div class="password-requirements">
+                    <strong>Requisitos:</strong>
+                    <ul>
+                        <li class="requirement-invalid" id="req-length">Al menos 8 caracteres</li>
+                        <li class="requirement-invalid" id="req-uppercase">Una letra mayúscula</li>
+                        <li class="requirement-invalid" id="req-number">Un número</li>
+                        <li class="requirement-invalid" id="req-special">Un carácter especial (!@#$%)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Confirmar Contraseña -->
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    placeholder="Repite tu contraseña"
+                    required>
+            </div>
+
+            <!-- Términos y Condiciones -->
+            <div class="form-check">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="terminos" 
+                    name="terminos"
+                    required>
+                <label class="form-check-label" for="terminos">
+                    Acepto los <a href="#" style="color: var(--acento); text-decoration: none;">términos y condiciones</a> de Prop-Tech
+                </label>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="form-check">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="newsletter" 
+                    name="newsletter">
+                <label class="form-check-label" for="newsletter">
+                    Deseo recibir ofertas y actualizaciones por correo
+                </label>
+            </div>
+
+            <!-- Register Button -->
+            <button type="submit" class="btn btn-register">
+                <i class="bi bi-person-plus"></i> Crear Cuenta
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="register-footer">
+            <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validar requisitos de contraseña
+        const passwordInput = document.getElementById('password');
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            // Requisito: al menos 8 caracteres
+            const hasLength = password.length >= 8;
+            document.getElementById('req-length').className = hasLength ? 'requirement-valid' : 'requirement-invalid';
+            
+            // Requisito: letra mayúscula
+            const hasUppercase = /[A-Z]/.test(password);
+            document.getElementById('req-uppercase').className = hasUppercase ? 'requirement-valid' : 'requirement-invalid';
+            
+            // Requisito: número
+            const hasNumber = /[0-9]/.test(password);
+            document.getElementById('req-number').className = hasNumber ? 'requirement-valid' : 'requirement-invalid';
+            
+            // Requisito: carácter especial
+            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+            document.getElementById('req-special').className = hasSpecial ? 'requirement-valid' : 'requirement-invalid';
+        });
+
+        // Validar que las contraseñas coincidan
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const registerForm = document.getElementById('registerForm');
+
+        registerForm.addEventListener('submit', function(e) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                e.preventDefault();
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = 'Las contraseñas no coinciden';
+                errorDiv.className = 'error-message show';
+                return false;
+            }
+        });
+
+        // Auto-hide success messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const successMessage = document.getElementById('successMessage');
+            if (successMessage && successMessage.classList.contains('show')) {
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
