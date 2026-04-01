@@ -8,19 +8,32 @@ import lombok.*;
 @Builder
 public class Inmueble {
 
-	private String codigo;
-	private String direccion;
-	private String ciudad;
-	private String barrio;
+	private String codigo, direccion, ciudad, barrio, asesorResponsable;
 	private TipoInmueble tipoInmueble;
 	private Finalidad finalidad;
-	private double precio;
-	private double area;
-	private int numeroHabitaciones;
-	private int numeroBanos;
+	private double precio, area;
+	private int numeroHabitaciones, numeroBanos;
 	private EstadoInmueble estadoInmueble;
 	private Disponibilidad disponibilidad;
-	private String asesorResponsable;
+
+	@Override
+	public String toString() {
+		return "Inmueble {\n" +
+				"  Código: " + codigo + "\n" +
+				"  Dirección: " + direccion + "\n" +
+				"  Ciudad: " + ciudad + "\n" +
+				"  Barrio: " + barrio + "\n" +
+				"  Asesor responsable: " + asesorResponsable + "\n" +
+				"  Tipo inmueble: " + tipoInmueble + "\n" +
+				"  Finalidad: " + finalidad + "\n" +
+				"  Precio: " + precio + "\n" +
+				"  Área: " + area + "\n" +
+				"  Número de habitaciones: " + numeroHabitaciones + "\n" +
+				"  Número de baños: " + numeroBanos + "\n" +
+				"  Estado inmueble: " + estadoInmueble + "\n" +
+				"  Disponibilidad: " + disponibilidad + "\n" +
+				"}";
+	}
 
 	public enum TipoInmueble {
 		APARTAMENTO,
