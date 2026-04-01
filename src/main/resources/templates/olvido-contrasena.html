@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prop-Tech - Recuperar contraseña</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style th:inline="css">
+        :root {
+            --primario: #1a2332;
+            --secundario: #5a6b7d;
+            --acento: #ff8c42;
+            --fondo: #f5f5f5;
+            --blanco: #ffffff;
+            --disponible: #2ecc71;
+            --no-disponible: #e74c3c;
+        }
+
+        body {
+            background: linear-gradient(135deg, rgba(26, 35, 50, 0.85) 0%, rgba(90, 107, 125, 0.85) 100%), url([[@{/img/Edificio-login.jpg}]]);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .reset-container {
+            background: rgba(26, 35, 50, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 520px;
+            padding: 50px 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reset-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--blanco);
+            margin-bottom: 10px;
+        }
+
+        .logo span { color: var(--acento); }
+
+        .reset-subtitle {
+            color: #b8c8de;
+            font-size: 14px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-label {
+            color: var(--blanco);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border: 2px solid var(--fondo);
+            border-radius: 6px;
+            padding: 12px 15px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--acento);
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: var(--secundario);
+            opacity: 0.7;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, var(--acento) 0%, #ff7a1f 100%);
+            border: none;
+            color: var(--blanco);
+            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 6px;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 140, 66, 0.3);
+            color: var(--blanco);
+        }
+
+        .reset-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--acento);
+            color: #dbe5f2;
+            padding: 14px 16px;
+            border-radius: 6px;
+            margin-bottom: 22px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .reset-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--fondo);
+        }
+
+        .reset-footer a {
+            color: var(--acento);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .reset-footer a:hover {
+            color: #ffb27f;
+            text-decoration: underline;
+        }
+
+        .message {
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .message.show { display: block; }
+
+        .message-success {
+            background-color: #e5ffe5;
+            color: var(--disponible);
+            border-left: 4px solid var(--disponible);
+        }
+
+        .message-error {
+            background-color: #ffe5e5;
+            color: var(--no-disponible);
+            border-left: 4px solid var(--no-disponible);
+        }
+    </style>
+</head>
+<body>
+    <div class="reset-container">
+        <div class="reset-header">
+            <div class="logo">Prop<span>Tech</span></div>
+            <p class="reset-subtitle">Recupera el acceso a tu cuenta</p>
+        </div>
+
+        <div class="reset-info">
+            Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña.
+        </div>
+
+        <div class="message message-success" th:if="${message}">
+            <i class="bi bi-check-circle"></i> <span th:text="${message}"></span>
+        </div>
+        <div class="message message-error" th:if="${error}">
+            <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/olvido-contrasena}" method="post">
+            <div class="form-group">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <button type="submit" class="btn btn-reset">
+                <i class="bi bi-send"></i> Enviar enlace de recuperación
+            </button>
+        </form>
+
+        <div class="reset-footer">
+            <a th:href="@{/login}">Volver al inicio de sesión</a>
+        </div>
+    </div>
+</body>
+</html>

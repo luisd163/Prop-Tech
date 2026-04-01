@@ -50,6 +50,27 @@ public class LoginController {
     }
 
     /**
+     * Muestra la página de recuperación de contraseña (GET)
+     */
+    @GetMapping("/olvido-contrasena")
+    public String showForgotPasswordPage(Model model) {
+        model.addAttribute("titulo", "Olvidé mi contraseña");
+        return "olvido-contrasena";
+    }
+
+    /**
+     * Procesa la solicitud de recuperación de contraseña
+     */
+    @PostMapping("/olvido-contrasena")
+    public String processForgotPassword(
+            @RequestParam String email,
+            Model model) {
+        model.addAttribute("titulo", "Olvidé mi contraseña");
+        model.addAttribute("message", "Si el correo existe, enviaremos las instrucciones de recuperación.");
+        return "olvido-contrasena";
+    }
+
+    /**
      * Procesa el formulario de login (POST)
      * Recibe: email, password y opcional rememberMe
      */
