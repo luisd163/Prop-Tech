@@ -8,10 +8,11 @@ import lombok.*;
 @Builder
 public class Inmueble {
 
-	private String codigo, direccion, ciudad, barrio, codigoAsesorResponsable;
+	private String codigo, nombre, direccion, ciudad, barrio, codigoAsesorResponsable;
 	private TipoInmueble tipoInmueble;
 	private Finalidad finalidad;
-	private double precio, area;
+	private float precio;
+	private double area;
 	private int numeroHabitaciones, numeroBanos;
 	private EstadoInmueble estadoInmueble;
 	private Disponibilidad disponibilidad;
@@ -20,6 +21,7 @@ public class Inmueble {
 	public String toString() {
 		return "Inmueble {\n" +
 				"  Código: " + codigo + "\n" +
+				"  Nombre: " + nombre + "\n" +
 				"  Dirección: " + direccion + "\n" +
 				"  Ciudad: " + ciudad + "\n" +
 				"  Barrio: " + barrio + "\n" +

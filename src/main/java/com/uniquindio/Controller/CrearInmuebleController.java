@@ -1,5 +1,6 @@
 package com.uniquindio.Controller;
 
+import com.uniquindio.Model.Asesor;
 import com.uniquindio.Model.Inmueble.Disponibilidad;
 import com.uniquindio.Model.Inmueble.EstadoInmueble;
 import com.uniquindio.Model.Inmueble.Finalidad;
@@ -10,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 @Controller
 public class CrearInmuebleController {
@@ -21,7 +23,12 @@ public class CrearInmuebleController {
     }
 
     @GetMapping("/inmuebles/crear")
-    public String showCrearInmueble(Model model) {
+    public String showCrearInmueble(
+            @SessionAttribute(name = "asesorSesion", required = false) Asesor asesor,
+            Model model) {
+        if (asesor == null) {
+            return "redirect:/login";
+        }
         cargarCombos(model);
         model.addAttribute("titulo", "Crear Inmueble");
         return "crear-inmueble";
@@ -29,14 +36,15 @@ public class CrearInmuebleController {
 
     @PostMapping("/inmuebles/crear")
     public String processCrearInmueble(
+            @SessionAttribute(name = "asesorSesion", required = false) Asesor asesor,
             @RequestParam String codigo,
+            @RequestParam String nombre,
             @RequestParam String direccion,
             @RequestParam String ciudad,
             @RequestParam String barrio,
-            @RequestParam String asesorResponsableString,
             @RequestParam TipoInmueble tipoInmueble,
             @RequestParam Finalidad finalidad,
-            @RequestParam double precio,
+            @RequestParam String precio,
             @RequestParam double area,
             @RequestParam int numeroHabitaciones,
             @RequestParam int numeroBanos,
@@ -44,16 +52,23 @@ public class CrearInmuebleController {
             @RequestParam Disponibilidad disponibilidad,
             Model model
     ) {
+        if (asesor == null) {
+            return "redirect:/login";
+        }
+
         try {
+            float precioParseado = parsearPrecio(precio);
+
             inmuebleService.registrarInmueble(
                     codigo,
+                    nombre,
                     direccion,
                     ciudad,
                     barrio,
-                    asesorResponsableString,
+                    asesor.getIdentificacion(),
                     tipoInmueble,
                     finalidad,
-                    precio,
+                    precioParseado,
                     area,
                     numeroHabitaciones,
                     numeroBanos,
@@ -61,22 +76,52 @@ public class CrearInmuebleController {
                     disponibilidad
             );
             model.addAttribute("mensaje", "Inmueble registrado exitosamente.");
+            cargarCombos(model);
+            model.addAttribute("titulo", "Crear Inmueble");
+            return "crear-inmueble";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("codigo", codigo);
+            model.addAttribute("nombre", nombre);
             model.addAttribute("direccion", direccion);
             model.addAttribute("ciudad", ciudad);
             model.addAttribute("barrio", barrio);
-            model.addAttribute("asesorResponsableString", asesorResponsableString);
             model.addAttribute("precio", precio);
             model.addAttribute("area", area);
             model.addAttribute("numeroHabitaciones", numeroHabitaciones);
             model.addAttribute("numeroBanos", numeroBanos);
+            cargarCombos(model);
+            model.addAttribute("titulo", "Crear Inmueble");
+            return "crear-inmueble";
+        }
+    }
+
+    private float parsearPrecio(String precioTexto) {
+        if (precioTexto == null || precioTexto.trim().isEmpty()) {
+            throw new IllegalArgumentException("El precio es requerido");
         }
 
-        cargarCombos(model);
-        model.addAttribute("titulo", "Crear Inmueble");
-        return "crear-inmueble";
+        String valor = precioTexto.trim().replace(" ", "");
+
+        if (valor.contains(",")) {
+            valor = valor.replace(".", "");
+            valor = valor.replace(",", ".");
+        } else {
+            int ultimoPunto = valor.lastIndexOf('.');
+            if (ultimoPunto > 0) {
+                String parteEntera = valor.substring(0, ultimoPunto).replace(".", "");
+                String parteDecimal = valor.substring(ultimoPunto + 1);
+                valor = parteEntera + "." + parteDecimal;
+            } else {
+                valor = valor.replace(".", "");
+            }
+        }
+
+        try {
+            return Float.parseFloat(valor);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Formato de precio inválido");
+        }
     }
 
     private void cargarCombos(Model model) {
@@ -84,5 +129,14 @@ public class CrearInmuebleController {
         model.addAttribute("finalidades", Finalidad.values());
         model.addAttribute("estadosInmueble", EstadoInmueble.values());
         model.addAttribute("disponibilidades", Disponibilidad.values());
+    }
+
+    @GetMapping("/inmuebles/cancelar")
+    public String cancelarCrearInmueble(
+            @SessionAttribute(name = "asesorSesion", required = false) Asesor asesor) {
+        if (asesor == null) {
+            return "redirect:/login";
+        }
+        return "redirect:/home";
     }
 }

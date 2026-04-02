@@ -376,7 +376,7 @@
                 <div th:if="${inmueblesLimitados != null && inmueblesLimitados.size() > 0}" th:each="inmueble : ${inmueblesLimitados}" class="list-item">
                     <div class="icon-box"><i class="bi bi-house-door"></i></div>
                     <div>
-                        <div class="fw-semibold" th:text="${inmueble.codigo}">Inmueble</div>
+                        <div class="fw-semibold" th:text="${inmueble.nombre}">Inmueble</div>
                         <div class="muted"><span th:text="${'$' + inmueble.precio}">Precio</span> · <span th:text="${inmueble.numeroHabitaciones + ' hab'}">Habitaciones</span> · <span th:text="${inmueble.area + ' m²'}">Área</span></div>
                     </div>
                     <span class="status-badge s-disponible" th:text="${inmueble.disponibilidad}">Estado</span>

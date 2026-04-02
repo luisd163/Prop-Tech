@@ -16,10 +16,15 @@ public class InmuebleService {
     }
 
     // método que permite registrar un inmueble
-    public void registrarInmueble(String codigo, String direccion, String ciudad, String barrio, String asesorResponsableString, TipoInmueble tipoInmueble, Finalidad finalidad, double precio, double area, int numeroHabitaciones, int numeroBanos, EstadoInmueble estadoInmueble, Disponibilidad disponibilidad){
+    public void registrarInmueble(String codigo, String nombre, String direccion, String ciudad, String barrio, String asesorResponsableString, TipoInmueble tipoInmueble, Finalidad finalidad, float precio, double area, int numeroHabitaciones, int numeroBanos, EstadoInmueble estadoInmueble, Disponibilidad disponibilidad){
         // Validación de código
         if (codigo == null || codigo.trim().isEmpty()) {
             throw new IllegalArgumentException("El código del inmueble es requerido");
+        }
+
+        // Validación de nombre
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del inmueble es requerido");
         }
 
         // Validación de dirección
@@ -85,6 +90,7 @@ public class InmuebleService {
         // Crear el inmueble usando builder
         Inmueble inmueble = Inmueble.builder()
                 .codigo(codigo)
+                .nombre(nombre)
                 .direccion(direccion)
                 .ciudad(ciudad)
                 .barrio(barrio)

@@ -39,9 +39,10 @@ public class AsesorHomeService {
             return new ArrayList<>();
         }
 
+        InmuebleRepositorio repositorioActualizado = new InmuebleRepositorio();
         List<Inmueble> inmuebles = new ArrayList<>();
-        for (Inmueble inmueble : inmuebleRepositorio.obtenerInmuebles().values()) {
-            if (inmueble != null && inmueble.getCodigoAsesorResponsable().equals(asesor.getIdentificacion())) {
+        for (Inmueble inmueble : repositorioActualizado.obtenerInmuebles().values()) {
+            if (inmueble != null && Objects.equals(inmueble.getCodigoAsesorResponsable(), asesor.getIdentificacion())) {
                 inmuebles.add(inmueble);
             }
         }
