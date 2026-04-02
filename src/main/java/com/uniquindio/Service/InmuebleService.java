@@ -7,6 +7,8 @@ import com.uniquindio.Model.Inmueble.Finalidad;
 import com.uniquindio.Model.Inmueble.TipoInmueble;
 import com.uniquindio.Repositorio.InmuebleRepositorio;
 
+import java.util.List;
+
 public class InmuebleService {
     
     private InmuebleRepositorio inmuebleRepositorio;
@@ -16,7 +18,7 @@ public class InmuebleService {
     }
 
     // método que permite registrar un inmueble
-    public void registrarInmueble(String codigo, String nombre, String direccion, String ciudad, String barrio, String asesorResponsableString, TipoInmueble tipoInmueble, Finalidad finalidad, float precio, double area, int numeroHabitaciones, int numeroBanos, EstadoInmueble estadoInmueble, Disponibilidad disponibilidad){
+    public void registrarInmueble(String codigo, String nombre, String direccion, String ciudad, String barrio, String asesorResponsableString, TipoInmueble tipoInmueble, Finalidad finalidad, float precio, double area, int numeroHabitaciones, int numeroBanos, EstadoInmueble estadoInmueble, Disponibilidad disponibilidad, String fotoPortada, List<String> fotosGaleria){
         // Validación de código
         if (codigo == null || codigo.trim().isEmpty()) {
             throw new IllegalArgumentException("El código del inmueble es requerido");
@@ -87,6 +89,11 @@ public class InmuebleService {
             throw new IllegalArgumentException("La disponibilidad es requerida");
         }
 
+        // Validación de portada y galería (opcionales, pero si vienen deben ser consistentes)
+        if (fotosGaleria == null) {
+            fotosGaleria = List.of();
+        }
+
         // Crear el inmueble usando builder
         Inmueble inmueble = Inmueble.builder()
                 .codigo(codigo)
@@ -103,6 +110,8 @@ public class InmuebleService {
                 .numeroBanos(numeroBanos)
                 .estadoInmueble(estadoInmueble)
                 .disponibilidad(disponibilidad)
+                .fotoPortada(fotoPortada)
+                .fotosGaleria(fotosGaleria)
                 .build();
 
         // No agrega el inmueble si ya hay uno con ese código

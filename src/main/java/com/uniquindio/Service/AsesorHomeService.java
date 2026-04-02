@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.time.YearMonth;
 
 import com.uniquindio.Model.Asesor;
 import com.uniquindio.Model.Inmueble;
+import com.uniquindio.Model.Operacion;
 import com.uniquindio.Model.Alerta;
 import com.uniquindio.Repositorio.AlertaRepositorio;
 import com.uniquindio.Repositorio.InmuebleRepositorio;
@@ -52,5 +54,30 @@ public class AsesorHomeService {
     // Devuelve la cantidad de inmuebles asociados a un asesor
     public int cantidadInmueblesAsociados(Asesor asesor){
         return obtenerInmueblesAsesor(asesor).size();
+    }
+
+    // Devuelve la cantidad de operaciones finalizadas del mes actual asociadas al asesor
+    public int cantidadCierresMes(Asesor asesor) {
+        if (asesor == null || asesor.getOperaciones() == null) {
+            return 0;
+        }
+
+        YearMonth mesActual = YearMonth.now();
+        int cierres = 0;
+
+        for (Operacion operacion : asesor.getOperaciones()) {
+            if (operacion == null || operacion.getFecha() == null) {
+                continue;
+            }
+
+            boolean esDelMesActual = YearMonth.from(operacion.getFecha()).equals(mesActual);
+            boolean estaFinalizada = operacion.getEstado() == Operacion.EstadoOperacion.FINALIZADA;
+
+            if (esDelMesActual && estaFinalizada) {
+                cierres++;
+            }
+        }
+
+        return cierres;
     }
 }

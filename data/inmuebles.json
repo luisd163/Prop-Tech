@@ -1,34 +1,38 @@
 {
   "321": {
     "codigo": "321",
-    "nombre": "Casa Sevilla",
-    "direccion": "calle 60 #48-20",
-    "ciudad": "Sevilla",
+    "nombre": "Casa de Netanyahu",
+    "direccion": "123",
+    "ciudad": "Tel aviv",
     "barrio": "Obrero",
     "codigoAsesorResponsable": "321",
     "tipoInmueble": "CASA",
     "finalidad": "ARRIENDO",
-    "precio": 500.0,
-    "area": 90.0,
-    "numeroHabitaciones": 5,
+    "precio": 500000.0,
+    "area": 130.0,
+    "numeroHabitaciones": 6,
     "numeroBanos": 2,
-    "estadoInmueble": "USADO",
-    "disponibilidad": "DISPONIBLE"
+    "estadoInmueble": "NUEVO",
+    "disponibilidad": "DISPONIBLE",
+    "fotoPortada": "/uploads/inmuebles/portada_466fe91a-424d-4b4c-9ede-d6aa78c25988.png",
+    "fotosGaleria": []
   },
   "567": {
     "codigo": "567",
-    "nombre": "Casa Armenia",
+    "nombre": "casa de meci",
     "direccion": "calle 15 Norte #14-99",
     "ciudad": "Armenia",
     "barrio": "La fogata",
     "codigoAsesorResponsable": "321",
     "tipoInmueble": "CASA",
-    "finalidad": "VENTA",
-    "precio": 500000.0,
-    "area": 250.0,
+    "finalidad": "ARRIENDO",
+    "precio": 1000000.0,
+    "area": 200.0,
     "numeroHabitaciones": 10,
     "numeroBanos": 3,
-    "estadoInmueble": "USADO",
-    "disponibilidad": "DISPONIBLE"
+    "estadoInmueble": "NUEVO",
+    "disponibilidad": "DISPONIBLE",
+    "fotoPortada": "/uploads/inmuebles/portada_7b69ad49-1120-4b0d-b305-9d9789f29dff.jpg",
+    "fotosGaleria": []
   }
 }

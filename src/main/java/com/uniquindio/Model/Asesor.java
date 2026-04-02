@@ -2,6 +2,9 @@ package com.uniquindio.Model;
 
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,6 +18,18 @@ public class Asesor implements Usuario {
 	private String contrasena;
 	private String especialidad;
 	private double comisionPorcentaje;
+	private List<Operacion> operaciones;
+
+	public Asesor(String identificacion, String nombre, String correo, String telefono, String contrasena, String especialidad, double comisionPorcentaje) {
+		this.identificacion = identificacion;
+		this.nombre = nombre;
+		this.correo = correo;
+		this.telefono = telefono;
+		this.contrasena = contrasena;
+		this.especialidad = especialidad;
+		this.comisionPorcentaje = comisionPorcentaje;
+		this.operaciones = new ArrayList<>();
+	}
 
 	@Override
 	public String getCorreo() {

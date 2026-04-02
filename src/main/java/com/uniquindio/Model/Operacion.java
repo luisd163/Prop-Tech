@@ -14,7 +14,7 @@ public class Operacion {
 	private String id;
 	private Inmueble inmueble;
 	private Cliente cliente;
-	private String asesor;
+	private Asesor asesor;
 	private LocalDate fecha;
 	private TipoOperacion tipoOperacion;
 	private double valorAcordado;

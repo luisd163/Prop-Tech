@@ -117,7 +117,7 @@
     <div th:if="${mensaje}" class="mini-alert mini-alert-success" th:text="${mensaje}"></div>
     <div th:if="${error}" class="mini-alert mini-alert-error" th:text="${error}"></div>
 
-    <form th:action="@{/inmuebles/crear}" method="post">
+    <form th:action="@{/inmuebles/crear}" method="post" enctype="multipart/form-data">
         <div class="row g-3">
             <div class="col-md-4">
                 <label class="form-label" for="codigo">Código</label>
@@ -194,6 +194,16 @@
             <div class="col-md-4">
                 <label class="form-label" for="numeroBanos">Número de baños</label>
                 <input class="form-control" type="number" min="0" id="numeroBanos" name="numeroBanos" th:value="${numeroBanos}" required />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="fotoPortada">Foto de portada</label>
+                <input class="form-control" type="file" id="fotoPortada" name="fotoPortada" accept="image/*" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="fotosGaleria">Fotos de galería</label>
+                <input class="form-control" type="file" id="fotosGaleria" name="fotosGaleria" accept="image/*" multiple />
             </div>
         </div>
 

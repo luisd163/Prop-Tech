@@ -239,11 +239,15 @@
 
         .list-item {
             display: grid;
-            grid-template-columns: 38px 1fr auto;
+            grid-template-columns: 76px minmax(0, 1fr) auto;
             align-items: center;
             gap: 10px;
             padding: 12px 14px;
             border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .list-item > div:nth-child(2) {
+            min-width: 0;
         }
 
         .list-item:last-child { border-bottom: none; }
@@ -256,6 +260,14 @@
             place-items: center;
             background: rgba(255,255,255,0.06);
             color: #f6c23e;
+        }
+
+        .foto-inmueble {
+            width: 68px;
+            height: 68px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .muted { color: var(--text-soft); }
@@ -374,7 +386,11 @@
                     <a href="#" th:href="@{/inmuebles/todos}">Ver todos →</a>
                 </div>
                 <div th:if="${inmueblesLimitados != null && inmueblesLimitados.size() > 0}" th:each="inmueble : ${inmueblesLimitados}" class="list-item">
-                    <div class="icon-box"><i class="bi bi-house-door"></i></div>
+                    <div>
+                        <img class="foto-inmueble"
+                             th:src="${inmueble.fotoPortada != null ? inmueble.fotoPortada : (inmueble.fotosGaleria != null and !inmueble.fotosGaleria.isEmpty() ? inmueble.fotosGaleria[0] : '/img/casa-default.svg')}"
+                             alt="Foto inmueble">
+                    </div>
                     <div>
                         <div class="fw-semibold" th:text="${inmueble.nombre}">Inmueble</div>
                         <div class="muted"><span th:text="${'$' + inmueble.precio}">Precio</span> · <span th:text="${inmueble.numeroHabitaciones + ' hab'}">Habitaciones</span> · <span th:text="${inmueble.area + ' m²'}">Área</span></div>

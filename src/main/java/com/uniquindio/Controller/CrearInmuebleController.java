@@ -6,12 +6,22 @@ import com.uniquindio.Model.Inmueble.EstadoInmueble;
 import com.uniquindio.Model.Inmueble.Finalidad;
 import com.uniquindio.Model.Inmueble.TipoInmueble;
 import com.uniquindio.Service.InmuebleService;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class CrearInmuebleController {
@@ -49,6 +59,8 @@ public class CrearInmuebleController {
             @RequestParam int numeroHabitaciones,
             @RequestParam int numeroBanos,
             @RequestParam EstadoInmueble estadoInmueble,
+                @RequestParam(required = false) MultipartFile fotoPortada,
+                @RequestParam(required = false) MultipartFile[] fotosGaleria,
             @RequestParam Disponibilidad disponibilidad,
             Model model
     ) {
@@ -58,6 +70,8 @@ public class CrearInmuebleController {
 
         try {
             float precioParseado = parsearPrecio(precio);
+            String rutaFotoPortada = guardarArchivoImagen(fotoPortada, "portada");
+            List<String> rutasGaleria = guardarArchivosImagenes(fotosGaleria, "galeria");
 
             inmuebleService.registrarInmueble(
                     codigo,
@@ -73,7 +87,9 @@ public class CrearInmuebleController {
                     numeroHabitaciones,
                     numeroBanos,
                     estadoInmueble,
-                    disponibilidad
+                        disponibilidad,
+                        rutaFotoPortada,
+                        rutasGaleria
             );
             model.addAttribute("mensaje", "Inmueble registrado exitosamente.");
             cargarCombos(model);
@@ -93,6 +109,55 @@ public class CrearInmuebleController {
             cargarCombos(model);
             model.addAttribute("titulo", "Crear Inmueble");
             return "crear-inmueble";
+        }
+    }
+
+    private String guardarArchivoImagen(MultipartFile archivo, String prefijo) {
+        if (archivo == null || archivo.isEmpty()) {
+            return null;
+        }
+
+        validarImagen(archivo);
+
+        try {
+            String nombreOriginal = Paths.get(archivo.getOriginalFilename()).getFileName().toString();
+            String extension = "";
+            int ultimoPunto = nombreOriginal.lastIndexOf('.');
+            if (ultimoPunto >= 0) {
+                extension = nombreOriginal.substring(ultimoPunto);
+            }
+
+            String nombreUnico = prefijo + "_" + UUID.randomUUID() + extension;
+            Path carpeta = Paths.get(System.getProperty("user.dir"), "uploads", "inmuebles");
+            Files.createDirectories(carpeta);
+
+            Path destino = carpeta.resolve(nombreUnico);
+            Files.copy(archivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/inmuebles/" + nombreUnico;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("No fue posible guardar una de las imágenes");
+        }
+    }
+
+    private List<String> guardarArchivosImagenes(MultipartFile[] archivos, String prefijo) {
+        List<String> rutas = new ArrayList<>();
+        if (archivos == null || archivos.length == 0) {
+            return rutas;
+        }
+
+        for (MultipartFile archivo : archivos) {
+            String ruta = guardarArchivoImagen(archivo, prefijo);
+            if (ruta != null) {
+                rutas.add(ruta);
+            }
+        }
+        return rutas;
+    }
+
+    private void validarImagen(MultipartFile archivo) {
+        String contentType = archivo.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("Solo se permiten archivos de imagen");
         }
     }
 

@@ -1,6 +1,8 @@
 package com.uniquindio.Model;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,6 +18,8 @@ public class Inmueble {
 	private int numeroHabitaciones, numeroBanos;
 	private EstadoInmueble estadoInmueble;
 	private Disponibilidad disponibilidad;
+	private String fotoPortada;
+	private List<String> fotosGaleria;
 
 	@Override
 	public String toString() {
@@ -34,6 +38,8 @@ public class Inmueble {
 				"  Número de baños: " + numeroBanos + "\n" +
 				"  Estado inmueble: " + estadoInmueble + "\n" +
 				"  Disponibilidad: " + disponibilidad + "\n" +
+				"  Foto portada: " + fotoPortada + "\n" +
+				"  Fotos galería: " + fotosGaleria + "\n" +
 				"}";
 	}
 
