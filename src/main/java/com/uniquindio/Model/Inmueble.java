@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 public class Inmueble {
 
-	private String codigo, direccion, ciudad, barrio, asesorResponsable;
+	private String codigo, direccion, ciudad, barrio, codigoAsesorResponsable;
 	private TipoInmueble tipoInmueble;
 	private Finalidad finalidad;
 	private double precio, area;
@@ -23,7 +23,7 @@ public class Inmueble {
 				"  Dirección: " + direccion + "\n" +
 				"  Ciudad: " + ciudad + "\n" +
 				"  Barrio: " + barrio + "\n" +
-				"  Asesor responsable: " + asesorResponsable + "\n" +
+				"  Asesor responsable: " + codigoAsesorResponsable + "\n" +
 				"  Tipo inmueble: " + tipoInmueble + "\n" +
 				"  Finalidad: " + finalidad + "\n" +
 				"  Precio: " + precio + "\n" +

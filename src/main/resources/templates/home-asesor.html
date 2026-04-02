@@ -340,7 +340,7 @@
             </div>
             <div class="actions">
                 <span class="pill-alert" th:text="${alertasTotalesTexto ?: '0 alertas'}">0 alertas</span>
-                <button class="btn btn-acento">+ Nuevo inmueble</button>
+                <a class="btn btn-acento" th:href="@{/inmuebles/crear}">+ Nuevo inmueble</a>
             </div>
         </div>
 

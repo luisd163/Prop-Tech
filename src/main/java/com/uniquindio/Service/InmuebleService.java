@@ -88,7 +88,7 @@ public class InmuebleService {
                 .direccion(direccion)
                 .ciudad(ciudad)
                 .barrio(barrio)
-                .asesorResponsable(asesorResponsableString)
+                .codigoAsesorResponsable(asesorResponsableString)
                 .tipoInmueble(tipoInmueble)
                 .finalidad(finalidad)
                 .precio(precio)

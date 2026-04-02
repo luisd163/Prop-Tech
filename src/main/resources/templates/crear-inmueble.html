@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear Inmueble</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+        :root {
+            --primario: #1a2332;
+            --secundario: #5a6b7d;
+            --acento: #ff8c42;
+            --blanco: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #101823 0%, #1a2332 50%, #243447 100%);
+            color: var(--blanco);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .form-card {
+            width: 100%;
+            max-width: 980px;
+            background: rgba(26, 35, 50, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            padding: 28px;
+        }
+
+        .form-label {
+            color: var(--blanco);
+            font-weight: 500;
+        }
+
+        .form-control,
+        .form-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--blanco);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--acento);
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.25);
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--blanco);
+        }
+
+        .form-select option {
+            color: #111;
+        }
+
+        .btn-acento {
+            background: var(--acento);
+            border-color: var(--acento);
+            color: #1b1b1b;
+            font-weight: 600;
+        }
+
+        .btn-acento:hover {
+            background: #ff9f63;
+            border-color: #ff9f63;
+        }
+
+        .titulo {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .subtitulo {
+            color: #d8dee8;
+            margin-bottom: 22px;
+        }
+
+        .separador {
+            width: 100%;
+            height: 1px;
+            background: #ff8c42;
+            opacity: 0.8;
+            margin-bottom: 22px;
+        }
+
+        .mini-alert {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            border: 1px solid transparent;
+        }
+
+        .mini-alert-success {
+            color: #d8ffe9;
+            background: rgba(46, 204, 113, 0.18);
+            border-color: rgba(46, 204, 113, 0.45);
+        }
+
+        .mini-alert-error {
+            color: #ffd8d8;
+            background: rgba(231, 76, 60, 0.2);
+            border-color: rgba(231, 76, 60, 0.5);
+        }
+    </style>
+</head>
+<body>
+<div class="form-card">
+    <h2 class="titulo">Creación de inmueble</h2>
+    <p class="subtitulo">Completa la información para registrar un nuevo inmueble.</p>
+    <div class="separador"></div>
+
+    <div th:if="${mensaje}" class="mini-alert mini-alert-success" th:text="${mensaje}"></div>
+    <div th:if="${error}" class="mini-alert mini-alert-error" th:text="${error}"></div>
+
+    <form th:action="@{/inmuebles/crear}" method="post">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label" for="codigo">Código</label>
+                <input class="form-control" type="text" id="codigo" name="codigo" th:value="${codigo}" required />
+            </div>
+
+            <div class="col-md-8">
+                <label class="form-label" for="direccion">Dirección</label>
+                <input class="form-control" type="text" id="direccion" name="direccion" th:value="${direccion}" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="ciudad">Ciudad</label>
+                <input class="form-control" type="text" id="ciudad" name="ciudad" th:value="${ciudad}" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="barrio">Barrio</label>
+                <input class="form-control" type="text" id="barrio" name="barrio" th:value="${barrio}" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="asesorResponsableString">Asesor responsable</label>
+                <input class="form-control" type="text" id="asesorResponsableString" name="asesorResponsableString" th:value="${asesorResponsableString}" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="tipoInmueble">Tipo de inmueble</label>
+                <select class="form-select" id="tipoInmueble" name="tipoInmueble" required>
+                    <option value="">Selecciona...</option>
+                    <option th:each="tipo : ${tiposInmueble}" th:value="${tipo}" th:text="${tipo}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="finalidad">Finalidad</label>
+                <select class="form-select" id="finalidad" name="finalidad" required>
+                    <option value="">Selecciona...</option>
+                    <option th:each="fin : ${finalidades}" th:value="${fin}" th:text="${fin}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="estadoInmueble">Estado del inmueble</label>
+                <select class="form-select" id="estadoInmueble" name="estadoInmueble" required>
+                    <option value="">Selecciona...</option>
+                    <option th:each="estado : ${estadosInmueble}" th:value="${estado}" th:text="${estado}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="disponibilidad">Disponibilidad</label>
+                <select class="form-select" id="disponibilidad" name="disponibilidad" required>
+                    <option value="">Selecciona...</option>
+                    <option th:each="disp : ${disponibilidades}" th:value="${disp}" th:text="${disp}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="precio">Precio</label>
+                <input class="form-control" type="number" step="0.01" min="0" id="precio" name="precio" th:value="${precio}" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="area">Área (m²)</label>
+                <input class="form-control" type="number" step="0.01" min="0" id="area" name="area" th:value="${area}" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="numeroHabitaciones">Número de habitaciones</label>
+                <input class="form-control" type="number" min="0" id="numeroHabitaciones" name="numeroHabitaciones" th:value="${numeroHabitaciones}" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="numeroBanos">Número de baños</label>
+                <input class="form-control" type="number" min="0" id="numeroBanos" name="numeroBanos" th:value="${numeroBanos}" required />
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-acento">Registrar inmueble</button>
+            <a class="btn btn-outline-light" th:href="@{/home}">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

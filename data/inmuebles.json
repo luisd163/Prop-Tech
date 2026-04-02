@@ -1,0 +1,17 @@
+{
+  "321": {
+    "codigo": "321",
+    "direccion": "calle 60 #48-20",
+    "ciudad": "Sevilla",
+    "barrio": "Obrero",
+    "codigoAsesorResponsable": "321",
+    "tipoInmueble": "CASA",
+    "finalidad": "ARRIENDO",
+    "precio": 500.0,
+    "area": 90.0,
+    "numeroHabitaciones": 5,
+    "numeroBanos": 2,
+    "estadoInmueble": "USADO",
+    "disponibilidad": "DISPONIBLE"
+  }
+}
