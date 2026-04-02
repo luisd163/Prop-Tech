@@ -371,15 +371,18 @@
             <article class="section-card">
                 <div class="section-head">
                     <h5>Mis inmuebles</h5>
-                    <a href="#">Ver todos →</a>
+                    <a href="#" th:href="@{/inmuebles/todos}">Ver todos →</a>
                 </div>
-                <div class="list-item">
+                <div th:if="${inmueblesLimitados != null && inmueblesLimitados.size() > 0}" th:each="inmueble : ${inmueblesLimitados}" class="list-item">
                     <div class="icon-box"><i class="bi bi-house-door"></i></div>
                     <div>
-                        <div class="fw-semibold">[Nombre del inmueble]</div>
-                        <div class="muted">[Precio] · [Habitaciones] · [Área]</div>
+                        <div class="fw-semibold" th:text="${inmueble.codigo}">Inmueble</div>
+                        <div class="muted"><span th:text="${'$' + inmueble.precio}">Precio</span> · <span th:text="${inmueble.numeroHabitaciones + ' hab'}">Habitaciones</span> · <span th:text="${inmueble.area + ' m²'}">Área</span></div>
                     </div>
-                    <span class="status-badge s-disponible">[Estado]</span>
+                    <span class="status-badge s-disponible" th:text="${inmueble.disponibilidad}">Estado</span>
+                </div>
+                <div th:if="${inmueblesLimitados == null || inmueblesLimitados.size() == 0}" class="list-item">
+                    <div class="muted">No tienes inmuebles asignados</div>
                 </div>
             </article>
 
