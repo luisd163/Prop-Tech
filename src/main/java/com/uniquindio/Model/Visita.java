@@ -12,11 +12,12 @@ import java.time.LocalTime;
 @Builder
 public class Visita {
 
+	private String id;
 	private Cliente cliente;
 	private Inmueble inmueble;
 	private LocalDate fecha;
 	private LocalTime hora;
-	private String asesor;
+	private String asesorId;
 	private EstadoVisita estado;
 	private String observaciones;
 

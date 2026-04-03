@@ -59,6 +59,7 @@
             color: #f6c23e;
             margin: 0;
             font-weight: 600;
+            font-size: 1.5rem;
         }
 
         .brand p {
@@ -84,6 +85,7 @@
             padding: 10px 22px;
             border-left: 3px solid transparent;
             transition: .2s;
+            font-size: .95rem;
         }
 
         .menu-item:hover {
@@ -118,6 +120,15 @@
             place-items: center;
             color: #f6c23e;
             font-size: .8rem;
+        }
+
+        .profile-box .fw-semibold {
+            font-size: .95rem;
+            line-height: 1.2;
+        }
+
+        .profile-box .small {
+            font-size: .78rem !important;
         }
 
         .main {
@@ -326,7 +337,7 @@
 
         <div class="menu-section-title">PRINCIPAL</div>
         <a class="menu-item active" href="#"><i class="bi bi-grid"></i> Dashboard</a>
-        <a class="menu-item" href="#"><i class="bi bi-calendar-check"></i> Mis visitas</a>
+        <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
         <a class="menu-item" th:href="@{/inmuebles/todos}"><i class="bi bi-house"></i> Inmuebles</a>
         <a class="menu-item" href="#"><i class="bi bi-people"></i> Clientes</a>
 
@@ -407,7 +418,7 @@
             <article class="section-card">
                 <div class="section-head">
                     <h5>Próximas visitas</h5>
-                    <a href="#">Ver agenda →</a>
+                    <a th:href="@{/visitas}">Ver agenda →</a>
                 </div>
                 <div class="list-item">
                     <div class="alert-dot dot-warn"></div>
