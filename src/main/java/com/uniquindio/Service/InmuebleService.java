@@ -7,7 +7,9 @@ import com.uniquindio.Model.Inmueble.Finalidad;
 import com.uniquindio.Model.Inmueble.TipoInmueble;
 import com.uniquindio.Repositorio.InmuebleRepositorio;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class InmuebleService {
     
@@ -15,6 +17,31 @@ public class InmuebleService {
 
     public InmuebleService(){
         this.inmuebleRepositorio = new InmuebleRepositorio();
+    }
+
+    // genera un código aleatorio de 4 dígitos que no se repita
+    public String generarCodigoUnico4Digitos() {
+        final int minimo = 1000;
+        final int maximo = 9999;
+
+        // Intentos aleatorios
+        for (int i = 0; i < 200; i++) {
+            int numero = ThreadLocalRandom.current().nextInt(minimo, maximo + 1);
+            String codigo = String.valueOf(numero);
+            if (inmuebleRepositorio.obtenerInmueble(codigo) == null) {
+                return codigo;
+            }
+        }
+
+        // Fallback secuencial
+        for (int numero = minimo; numero <= maximo; numero++) {
+            String codigo = String.valueOf(numero);
+            if (inmuebleRepositorio.obtenerInmueble(codigo) == null) {
+                return codigo;
+            }
+        }
+
+        throw new IllegalStateException("No hay códigos disponibles de 4 dígitos.");
     }
 
     // método que permite registrar un inmueble
@@ -154,5 +181,75 @@ public class InmuebleService {
     // método para modificar inmuebles
     // Falta implementar
     public void modificarInmueble(){}
+
+    // obtiene todos los inmuebles registrados
+    public List<Inmueble> obtenerTodosInmuebles() {
+        return new ArrayList<>(inmuebleRepositorio.obtenerInmuebles().values());
+    }
+
+    // obtiene los inmuebles asociados a un asesor
+    public List<Inmueble> obtenerInmueblesPorAsesor(String identificacionAsesor) {
+        List<Inmueble> inmueblesAsesor = new ArrayList<>();
+
+        if (identificacionAsesor == null || identificacionAsesor.trim().isEmpty()) {
+            return inmueblesAsesor;
+        }
+
+        for (Inmueble inmueble : inmuebleRepositorio.obtenerInmuebles().values()) {
+            if (inmueble != null && identificacionAsesor.equals(inmueble.getCodigoAsesorResponsable())) {
+                inmueblesAsesor.add(inmueble);
+            }
+        }
+
+        return inmueblesAsesor;
+    }
+
+    // cantidad de inmuebles disponibles
+    public int cantInmueblesDisponibles(){
+        return cantInmueblesDisponibles(new ArrayList<>(inmuebleRepositorio.obtenerInmuebles().values()));
+    }
+
+    // cantidad de inmuebles disponibles para una lista dada
+    public int cantInmueblesDisponibles(List<Inmueble> inmuebles){
+        int cant = 0;
+        for (Inmueble inmueble : inmuebles) {
+            if (inmueble != null && inmueble.getDisponibilidad() == Disponibilidad.DISPONIBLE) {
+                cant++;
+            }
+        }
+        return cant;
+    }
+
+    // cantidad de inmuebles no disponibles
+    public int cantInmueblesNoDisponibles(){
+        return cantInmueblesNoDisponibles(new ArrayList<>(inmuebleRepositorio.obtenerInmuebles().values()));
+    }
+
+    // cantidad de inmuebles no disponibles para una lista dada
+    public int cantInmueblesNoDisponibles(List<Inmueble> inmuebles){
+        int cant = 0;
+        for (Inmueble inmueble : inmuebles) {
+            if (inmueble != null && inmueble.getDisponibilidad() == Disponibilidad.NO_DISPONIBLE) {
+                cant++;
+            }
+        }
+        return cant;
+    }
+
+    // cantidad de inmuebles reservados
+    public int cantInmueblesReservados(){
+        return cantInmueblesReservados(new ArrayList<>(inmuebleRepositorio.obtenerInmuebles().values()));
+    }
+
+    // cantidad de inmuebles reservados para una lista dada
+    public int cantInmueblesReservados(List<Inmueble> inmuebles){
+        int cant = 0;
+        for (Inmueble inmueble : inmuebles) {
+            if (inmueble != null && inmueble.getDisponibilidad() == Disponibilidad.RESERVADO) {
+                cant++;
+            }
+        }
+        return cant;
+    }
 
 }

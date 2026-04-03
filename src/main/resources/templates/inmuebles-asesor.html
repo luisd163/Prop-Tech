@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Mis inmuebles</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+	<style>
+		:root {
+			--bg: #0e1f3a;
+			--panel: #152b4d;
+			--border: rgba(255,255,255,.08);
+			--text: #f3f6fb;
+			--muted: #93a6c5;
+			--gold: #f2b233;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background: linear-gradient(180deg, #132745 0%, var(--bg) 100%);
+			color: var(--text);
+			font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		}
+
+		.page {
+			width: 100%;
+			max-width: 900px;
+			margin: 0 auto;
+			padding: 10px 10px 10px;
+		}
+
+		.topbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 12px;
+		}
+
+		.left-top {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.back-btn {
+			border: 1px solid rgba(255,255,255,.12);
+			background: rgba(255,255,255,.02);
+			color: #b8c7df;
+			border-radius: 8px;
+			padding: 6px 12px;
+			font-size: 12px;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			text-decoration: none;
+		}
+
+		.title {
+			font-weight: 700;
+			font-size: 20px;
+			margin: 0;
+			color: #f7f9ff;
+		}
+
+		.new-btn {
+			border: 1px solid rgba(242,178,51,.65);
+			background: transparent;
+			color: #f2b233;
+			border-radius: 8px;
+			padding: 6px 14px;
+			font-size: 12px;
+			font-weight: 600;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			text-decoration: none;
+		}
+
+		.stats-row {
+			display: grid;
+			grid-template-columns: repeat(5, 1fr);
+			gap: 10px;
+			margin-bottom: 10px;
+		}
+
+		.stat-card {
+			background: rgba(255,255,255,.03);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 10px 12px;
+			min-height: 54px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.stat-dot {
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			flex: 0 0 auto;
+		}
+
+		.stat-value {
+			font-size: 18px;
+			line-height: 1;
+			font-weight: 700;
+			color: #ffffff;
+			margin-bottom: 3px;
+		}
+
+		.stat-label {
+			font-size: 11px;
+			color: var(--muted);
+		}
+
+		.search-box {
+			margin-bottom: 8px;
+		}
+
+		.search-input-wrap {
+			position: relative;
+			margin-bottom: 8px;
+		}
+
+		.search-input-wrap i {
+			position: absolute;
+			left: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: #5f7393;
+			font-size: 14px;
+		}
+
+		.search-input-wrap input {
+			width: 100%;
+			height: 34px;
+			border-radius: 6px;
+			border: 1px solid rgba(242,178,51,.35);
+			background: #4b451f;
+			color: #d7d0b0;
+			padding: 0 12px 0 32px;
+			font-size: 13px;
+			outline: none;
+		}
+
+		.search-input-wrap input::placeholder {
+			color: #8f8658;
+		}
+
+		.filter-select {
+			width: 100%;
+			height: 32px;
+			border-radius: 4px;
+			border: 1px solid rgba(255,255,255,.10);
+			background: #5a4628;
+			color: #fff4d2;
+			margin-bottom: 8px;
+			padding: 0 10px;
+			font-size: 12px;
+			font-weight: 600;
+			outline: none;
+		}
+
+		.chips {
+			display: flex;
+			gap: 8px;
+			margin-bottom: 10px;
+		}
+
+		.chip {
+			border: 1px solid rgba(255,255,255,.10);
+			background: #21395f;
+			color: #c6d3ea;
+			border-radius: 6px;
+			padding: 6px 12px;
+			font-size: 11px;
+			line-height: 1;
+		}
+
+		.chip.active {
+			background: #304a74;
+			color: #fff;
+			border-color: rgba(255,255,255,.18);
+		}
+
+		.table-card {
+			background: rgba(21,43,77,.9);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			overflow: hidden;
+		}
+
+		.table-scroll {
+			max-height: 316px;
+			overflow-y: auto;
+		}
+
+		.table-scroll::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.table-scroll::-webkit-scrollbar-thumb {
+			background: rgba(147,166,197,.35);
+			border-radius: 999px;
+		}
+
+		.table-scroll::-webkit-scrollbar-track {
+			background: rgba(255,255,255,.04);
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		thead th {
+			text-align: left;
+			font-size: 10px;
+			letter-spacing: .04em;
+			color: #58709c;
+			font-weight: 700;
+			padding: 10px 12px;
+			border-bottom: 1px solid rgba(255,255,255,.06);
+		}
+
+		tbody td {
+			padding: 11px 12px;
+			border-bottom: 1px solid rgba(255,255,255,.06);
+			vertical-align: middle;
+			font-size: 12px;
+		}
+
+		.property {
+			display: flex;
+			align-items: flex-start;
+			gap: 10px;
+		}
+
+		.property-thumb {
+			width: 54px;
+			height: 54px;
+			border-radius: 10px;
+			object-fit: cover;
+			border: 1px solid rgba(255,255,255,.12);
+			background: rgba(255,255,255,.04);
+			flex: 0 0 auto;
+		}
+
+		.icon-box {
+			width: 24px;
+			height: 24px;
+			border-radius: 4px;
+			background: rgba(255,198,66,.12);
+			border: 1px solid rgba(255,198,66,.22);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #ffcf67;
+			font-size: 12px;
+			flex: 0 0 auto;
+			margin-top: 2px;
+		}
+
+		.property-name {
+			font-weight: 700;
+			color: #ffffff;
+			line-height: 1.1;
+			margin-bottom: 2px;
+			font-size: 12px;
+		}
+
+		.property-meta {
+			color: #8fa2c2;
+			font-size: 10px;
+			line-height: 1.2;
+		}
+
+		.tag {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 58px;
+			padding: 3px 7px;
+			border-radius: 6px;
+			font-size: 10px;
+			font-weight: 700;
+			color: #dfe8f7;
+			background: rgba(91,140,255,.14);
+			border: 1px solid rgba(91,140,255,.18);
+		}
+
+		.price { color: var(--gold); font-weight: 700; white-space: nowrap; }
+		.area, .hab { font-weight: 600; color: #d6e0f0; white-space: nowrap; }
+
+		.status {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 3px 8px;
+			border-radius: 999px;
+			font-size: 10px;
+			font-weight: 700;
+			border: 1px solid transparent;
+			white-space: nowrap;
+		}
+
+		.s-disponible { background: rgba(25,195,125,.13); color: #3be08f; border-color: rgba(25,195,125,.25); }
+		.s-reservado { background: rgba(245,158,11,.14); color: #ffbe5a; border-color: rgba(245,158,11,.25); }
+		.s-negociando { background: rgba(91,140,255,.14); color: #7ca7ff; border-color: rgba(91,140,255,.25); }
+		.s-nodisponible { background: rgba(255,91,91,.12); color: #ff7b7b; border-color: rgba(255,91,91,.22); }
+
+		.footerbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-top: 10px;
+			color: #6f87ac;
+			font-size: 11px;
+		}
+
+		.pagination-custom { display: flex; gap: 6px; align-items: center; }
+
+		.page-btn {
+			min-width: 32px;
+			height: 28px;
+			padding: 0 10px;
+			border-radius: 6px;
+			border: 1px solid rgba(255,255,255,.12);
+			background: transparent;
+			color: #f2f5fb;
+			font-size: 12px;
+			font-weight: 600;
+		}
+
+		.page-btn.active {
+			background: #223b63;
+			border-color: rgba(255,255,255,.18);
+		}
+	</style>
+</head>
+<body>
+	<div class="page">
+		<div class="topbar">
+			<div class="left-top">
+				<a th:href="@{/home}" class="back-btn"><i class="bi bi-chevron-left"></i> Volver</a>
+				<h1 class="title">Mis inmuebles</h1>
+			</div>
+			<a th:href="@{/inmuebles/crear}" class="new-btn"><i class="bi bi-plus-lg"></i> Nuevo inmueble</a>
+		</div>
+
+		<div class="stats-row">
+			<div class="stat-card"><div class="stat-dot" style="background:#8aa0c7"></div><div><div class="stat-value" th:text="${kpiTotalAsignados ?: '--'}">--</div><div class="stat-label">Total asignados</div></div></div>
+			<div class="stat-card"><div class="stat-dot" style="background:#27e08a"></div><div><div class="stat-value" th:text="${kpiDisponibles ?: '--'}">--</div><div class="stat-label">Disponibles</div></div></div>
+			<div class="stat-card"><div class="stat-dot" style="background:#ff5b5b"></div><div><div class="stat-value" th:text="${kpiNoDisponibles ?: '--'}">--</div><div class="stat-label">No disponibles</div></div></div>
+			<div class="stat-card"><div class="stat-dot" style="background:#ffbf3f"></div><div><div class="stat-value" th:text="${kpiReservados ?: '--'}">--</div><div class="stat-label">Reservados</div></div></div>
+			<div class="stat-card"><div class="stat-dot" style="background:#5b8cff"></div><div><div class="stat-value" th:text="${kpiNegociacion ?: '--'}">--</div><div class="stat-label">En negociación</div></div></div>
+		</div>
+
+		<form class="search-box" th:action="@{/inmuebles/todos}" method="get">
+			<div class="search-input-wrap">
+				<i class="bi bi-search"></i>
+				<input type="text" name="codigo" th:value="${codigoBusqueda}" placeholder="Buscar por código..." />
+			</div>
+
+			<select class="filter-select" name="tipoInmueble" onchange="this.form.submit()">
+				<option value="" th:selected="${tipoFiltro == null || tipoFiltro.isEmpty()}">Todos los tipos</option>
+				<option value="APARTAMENTO" th:selected="${tipoFiltro == 'APARTAMENTO'}">Apartamento</option>
+				<option value="CASA" th:selected="${tipoFiltro == 'CASA'}">Casa</option>
+				<option value="LOCAL_COMERCIAL" th:selected="${tipoFiltro == 'LOCAL_COMERCIAL'}">Local comercial</option>
+				<option value="OFICINA" th:selected="${tipoFiltro == 'OFICINA'}">Oficina</option>
+			</select>
+
+			<select class="filter-select" name="finalidad" onchange="this.form.submit()">
+				<option value="" th:selected="${finalidadFiltro == null || finalidadFiltro.isEmpty()}">Venta y arriendo</option>
+				<option value="VENTA" th:selected="${finalidadFiltro == 'VENTA'}">Venta</option>
+				<option value="ARRIENDO" th:selected="${finalidadFiltro == 'ARRIENDO'}">Arriendo</option>
+			</select>
+
+			<select class="filter-select" name="disponibilidad" onchange="this.form.submit()">
+				<option value="" th:selected="${disponibilidadFiltro == null || disponibilidadFiltro.isEmpty()}">Todos los estados</option>
+				<option value="DISPONIBLE" th:selected="${disponibilidadFiltro == 'DISPONIBLE'}">Disponible</option>
+				<option value="RESERVADO" th:selected="${disponibilidadFiltro == 'RESERVADO'}">Reservado</option>
+				<option value="NO_DISPONIBLE" th:selected="${disponibilidadFiltro == 'NO_DISPONIBLE'}">No disponible</option>
+			</select>
+		</form>
+
+		<div class="chips">
+			<div class="chip active">Todos</div>
+			<div class="chip">Con visita hoy</div>
+			<div class="chip">Sin visitas recientes</div>
+		</div>
+
+		<div class="table-card">
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>INMUEBLE</th><th>TIPO</th><th>FINALIDAD</th><th>PRECIO</th><th>ÁREA</th><th>HAB.</th><th>ESTADO</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="inmueble : ${inmueblesAsesor}">
+							<td>
+								<div class="property">
+									<img class="property-thumb"
+										 th:src="${inmueble.fotoPortada != null ? inmueble.fotoPortada : (inmueble.fotosGaleria != null and !inmueble.fotosGaleria.isEmpty() ? inmueble.fotosGaleria[0] : '/img/casa-default.svg')}"
+										 alt="Portada inmueble">
+									<div>
+										<div class="property-name" th:text="${inmueble.nombre}">Nombre inmueble</div>
+										<div class="property-meta"><span th:text="${inmueble.codigo}">COD-000</span> · <span th:text="${inmueble.ciudad}">Ciudad</span></div>
+									</div>
+								</div>
+							</td>
+							<td><span class="tag" th:text="${inmueble.tipoInmueble}">Tipo</span></td>
+							<td th:text="${inmueble.finalidad}">Finalidad</td>
+							<td class="price" th:text="${'$' + inmueble.precio}">$0</td>
+							<td class="area" th:text="${inmueble.area + ' m²'}">0 m²</td>
+							<td class="hab" th:text="${inmueble.numeroHabitaciones}">0</td>
+							<td><span class="status"
+									th:classappend="${inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).DISPONIBLE ? ' s-disponible' : (inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).RESERVADO ? ' s-reservado' : ' s-nodisponible')}"
+									th:text="${inmueble.disponibilidad}">Estado</span></td>
+						</tr>
+						<tr th:if="${inmueblesAsesor == null || inmueblesAsesor.isEmpty()}">
+							<td colspan="7" style="text-align:center; color:#93a6c5; padding:18px;">No hay inmuebles asignados para mostrar.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="footerbar">
+			<div>Mostrando <span th:text="${inmueblesAsesor != null ? inmueblesAsesor.size() : 0}">0</span> inmuebles</div>
+		</div>
+	</div>
+</body>
+</html>

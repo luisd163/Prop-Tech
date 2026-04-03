@@ -47,7 +47,6 @@ public class CrearInmuebleController {
     @PostMapping("/inmuebles/crear")
     public String processCrearInmueble(
             @SessionAttribute(name = "asesorSesion", required = false) Asesor asesor,
-            @RequestParam String codigo,
             @RequestParam String nombre,
             @RequestParam String direccion,
             @RequestParam String ciudad,
@@ -69,6 +68,7 @@ public class CrearInmuebleController {
         }
 
         try {
+            String codigo = inmuebleService.generarCodigoUnico4Digitos();
             float precioParseado = parsearPrecio(precio);
             String rutaFotoPortada = guardarArchivoImagen(fotoPortada, "portada");
             List<String> rutasGaleria = guardarArchivosImagenes(fotosGaleria, "galeria");
@@ -97,7 +97,6 @@ public class CrearInmuebleController {
             return "crear-inmueble";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("codigo", codigo);
             model.addAttribute("nombre", nombre);
             model.addAttribute("direccion", direccion);
             model.addAttribute("ciudad", ciudad);

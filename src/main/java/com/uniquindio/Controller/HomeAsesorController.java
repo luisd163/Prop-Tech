@@ -34,6 +34,7 @@ public class HomeAsesorController {
         int totalAlertas = asesorHomeService.cantidadAlertas(asesor);
         int cantidadInmuebles = asesorHomeService.cantidadInmueblesAsociados(asesor);
         int cierresMes = asesorHomeService.cantidadCierresMes(asesor);
+        int visitasSemana = asesorHomeService.cantidadVisitasEstaSemana(asesor);
         List<Inmueble> inmueblesAsesor = asesorHomeService.obtenerInmueblesAsesor(asesor);
         List<Inmueble> inmueblesLimitados = inmueblesAsesor.stream().limit(2).collect(Collectors.toList());
         String fechaActual = LocalDate.now().format(DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy"));
@@ -45,6 +46,7 @@ public class HomeAsesorController {
         model.addAttribute("fechaActual", fechaActual);
         model.addAttribute("alertasTotalesTexto", totalAlertas + " alertas");
         model.addAttribute("kpiInmueblesAsignados", cantidadInmuebles);
+        model.addAttribute("kpiVisitasSemana", visitasSemana);
         model.addAttribute("kpiCierresMes", cierresMes);
         model.addAttribute("inmueblesLimitados", inmueblesLimitados);
         return "home-asesor";

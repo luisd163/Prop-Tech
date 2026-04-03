@@ -80,4 +80,13 @@ public class AsesorHomeService {
 
         return cierres;
     }
+
+    // Calcula la cantidad de visitas de esta semana
+    public int cantidadVisitasEstaSemana(Asesor asesor) {
+        if (asesor == null) {
+            return 0;
+        }
+        // Por ahora retorna 0 ya que no tenemos persistencia de visitas
+        return 0;
+    }
 }

@@ -327,7 +327,7 @@
         <div class="menu-section-title">PRINCIPAL</div>
         <a class="menu-item active" href="#"><i class="bi bi-grid"></i> Dashboard</a>
         <a class="menu-item" href="#"><i class="bi bi-calendar-check"></i> Mis visitas</a>
-        <a class="menu-item" href="#"><i class="bi bi-house"></i> Inmuebles</a>
+        <a class="menu-item" th:href="@{/inmuebles/todos}"><i class="bi bi-house"></i> Inmuebles</a>
         <a class="menu-item" href="#"><i class="bi bi-people"></i> Clientes</a>
 
         <div class="menu-section-title">GESTIÓN</div>
@@ -395,7 +395,9 @@
                         <div class="fw-semibold" th:text="${inmueble.nombre}">Inmueble</div>
                         <div class="muted"><span th:text="${'$' + inmueble.precio}">Precio</span> · <span th:text="${inmueble.numeroHabitaciones + ' hab'}">Habitaciones</span> · <span th:text="${inmueble.area + ' m²'}">Área</span></div>
                     </div>
-                    <span class="status-badge s-disponible" th:text="${inmueble.disponibilidad}">Estado</span>
+                      <span class="status-badge"
+                          th:classappend="${inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).DISPONIBLE ? ' s-disponible' : (inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).RESERVADO ? ' s-reservado' : ' s-no')}"
+                          th:text="${inmueble.disponibilidad}">Estado</span>
                 </div>
                 <div th:if="${inmueblesLimitados == null || inmueblesLimitados.size() == 0}" class="list-item">
                     <div class="muted">No tienes inmuebles asignados</div>
