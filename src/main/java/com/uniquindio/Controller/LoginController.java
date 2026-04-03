@@ -1,6 +1,7 @@
 package com.uniquindio.Controller;
 
 import com.uniquindio.Model.Asesor;
+import com.uniquindio.Model.Cliente;
 import com.uniquindio.Model.Usuario;
 import com.uniquindio.Service.LoginService;
 import jakarta.servlet.http.HttpSession;
@@ -96,6 +97,11 @@ public class LoginController {
                 if (usuario.getTipo() == Usuario.TipoUsuario.ASESOR) {
                     session.setAttribute("asesorSesion", (Asesor) usuario);
                     return "redirect:/home";
+                }
+
+                if (usuario.getTipo() == Usuario.TipoUsuario.CLIENTE) {
+                    session.setAttribute("clienteSesion", (Cliente) usuario);
+                    return "redirect:/home-cliente";
                 }
 
                 model.addAttribute("error", "El usuario autenticado no es asesor");

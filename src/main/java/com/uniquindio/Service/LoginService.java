@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 public class LoginService {
 
-    private ClienteRepositorio clienteRepositorio;
-
     /**
      * Autentica un usuario (Cliente o Asesor) por correo y contraseña
      * 
@@ -22,17 +20,17 @@ public class LoginService {
      * @return Usuario autenticado (Cliente o Asesor) o null si no se encuentra
      */
     public Usuario iniciarSesion(String correo, String contrasena) {
+        ClienteRepositorio clienteRepositorio = new ClienteRepositorio();
+        AsesorRepositorio asesorRepositorio = new AsesorRepositorio();
+
         // Intentar buscar como Cliente
-        if (clienteRepositorio != null) {
-            Cliente cliente = clienteRepositorio.obtenerCliente(correo);
-            if (cliente != null && validarContrasena(cliente.getContrasena(), contrasena)) {
-                return cliente; // Cliente implementa Usuario
-            }
+        Cliente cliente = clienteRepositorio.obtenerCliente(correo);
+        if (cliente != null && validarContrasena(cliente.getContrasena(), contrasena)) {
+            return cliente; // Cliente implementa Usuario
         }
 
         // Intentar buscar como Asesor
-        // asesor de prueba
-        Asesor asesor = new Asesor("321", "Luis", "luisdanielgomez23@gmail.com", "123", "123", "Casas", 15.0);
+        Asesor asesor = asesorRepositorio.obtenerAsesor(correo);
         if (asesor != null
                 && asesor.getCorreo().equalsIgnoreCase(correo)
                 && validarContrasena(asesor.getContrasena(), contrasena)) {

@@ -287,6 +287,18 @@
 
         <!-- Form -->
         <form th:action="@{/register}" method="post" class="register-form" id="registerForm">
+            <!-- Identificación -->
+            <div class="form-group">
+                <label for="identificacion" class="form-label">Identificación</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="identificacion"
+                    name="identificacion"
+                    placeholder="Número de documento o ID"
+                    required>
+            </div>
+
             <!-- Nombres -->
             <div class="form-row">
                 <div class="form-group">
@@ -340,11 +352,98 @@
                 <label for="tipoUsuario" class="form-label">Tipo de Usuario</label>
                 <select class="form-select" id="tipoUsuario" name="tipoUsuario" required>
                     <option value="">Selecciona tu rol...</option>
-                    <option value="asesor">Asesor Inmobiliario</option>
-                    <option value="cliente_venta">Cliente (Venta)</option>
-                    <option value="cliente_arriendo">Cliente (Arriendo)</option>
-                    <option value="propietario">Propietario</option>
+                    <option value="cliente">Cliente</option>
+                    <option value="asesor">Asesor</option>
                 </select>
+            </div>
+
+            <!-- Campos de Cliente -->
+            <div id="clienteFields" style="display: none;">
+                <div class="form-group">
+                    <label for="tipoCliente" class="form-label">Tipo de Cliente</label>
+                    <select class="form-select" id="tipoCliente" name="tipoCliente">
+                        <option value="PERSONA_NATURAL">Persona natural</option>
+                        <option value="EMPRESA">Empresa</option>
+                        <option value="INVERSIONISTA">Inversionista</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="presupuesto" class="form-label">Presupuesto</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="presupuesto"
+                        name="presupuesto"
+                        step="0.01"
+                        min="0"
+                        placeholder="Ej: 150000000">
+                </div>
+
+                <div class="form-group">
+                    <label for="zonasDeInteres" class="form-label">Zonas de interés</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="zonasDeInteres"
+                        name="zonasDeInteres"
+                        placeholder="Armenia, Sevilla, Pereira">
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoInmuebleDeseado" class="form-label">Tipo de inmueble deseado</label>
+                    <select class="form-select" id="tipoInmuebleDeseado" name="tipoInmuebleDeseado">
+                        <option value="CASA">Casa</option>
+                        <option value="APARTAMENTO">Apartamento</option>
+                        <option value="LOCAL_COMERCIAL">Local comercial</option>
+                        <option value="OFICINA">Oficina</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cantidadMinimaHabitaciones" class="form-label">Cantidad mínima de habitaciones</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="cantidadMinimaHabitaciones"
+                        name="cantidadMinimaHabitaciones"
+                        min="0"
+                        value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="estadoBusqueda" class="form-label">Estado de búsqueda</label>
+                    <select class="form-select" id="estadoBusqueda" name="estadoBusqueda">
+                        <option value="ACTIVA">Activa</option>
+                        <option value="PAUSADA">Pausada</option>
+                        <option value="FINALIZADA">Finalizada</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Campos de Asesor -->
+            <div id="asesorFields" style="display: none;">
+                <div class="form-group">
+                    <label for="especialidad" class="form-label">Especialidad</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="especialidad"
+                        name="especialidad"
+                        placeholder="Casas, apartamentos, comercial...">
+                </div>
+
+                <div class="form-group">
+                    <label for="comisionPorcentaje" class="form-label">Comisión (%)</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="comisionPorcentaje"
+                        name="comisionPorcentaje"
+                        step="0.01"
+                        min="0"
+                        placeholder="Ej: 10">
+                </div>
             </div>
 
             <!-- Contraseña -->
@@ -445,6 +544,34 @@
         // Validar que las contraseñas coincidan
         const confirmPasswordInput = document.getElementById('confirmPassword');
         const registerForm = document.getElementById('registerForm');
+        const tipoUsuarioSelect = document.getElementById('tipoUsuario');
+        const clienteFields = document.getElementById('clienteFields');
+        const asesorFields = document.getElementById('asesorFields');
+
+        function toggleRequired(container, enabled) {
+            container.querySelectorAll('input, select, textarea').forEach((field) => {
+                if (enabled) {
+                    field.setAttribute('required', 'required');
+                } else {
+                    field.removeAttribute('required');
+                }
+            });
+        }
+
+        function updateRoleFields() {
+            const role = tipoUsuarioSelect.value;
+            const isCliente = role === 'cliente';
+            const isAsesor = role === 'asesor';
+
+            clienteFields.style.display = isCliente ? 'block' : 'none';
+            asesorFields.style.display = isAsesor ? 'block' : 'none';
+
+            toggleRequired(clienteFields, isCliente);
+            toggleRequired(asesorFields, isAsesor);
+        }
+
+        tipoUsuarioSelect.addEventListener('change', updateRoleFields);
+        updateRoleFields();
 
         registerForm.addEventListener('submit', function(e) {
             if (passwordInput.value !== confirmPasswordInput.value) {

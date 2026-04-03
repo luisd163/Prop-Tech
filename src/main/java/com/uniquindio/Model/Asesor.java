@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Asesor implements Usuario {
@@ -18,7 +19,7 @@ public class Asesor implements Usuario {
 	private String contrasena;
 	private String especialidad;
 	private double comisionPorcentaje;
-	private List<Operacion> operaciones;
+	private transient List<Operacion> operaciones;
 
 	public Asesor(String identificacion, String nombre, String correo, String telefono, String contrasena, String especialidad, double comisionPorcentaje) {
 		this.identificacion = identificacion;
