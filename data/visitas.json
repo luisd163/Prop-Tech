@@ -1,0 +1,86 @@
+{
+  "514a9bba-5d5c-4331-b1f0-8473c3c46f50": {
+    "id": "514a9bba-5d5c-4331-b1f0-8473c3c46f50",
+    "cliente": {
+      "identificacion": "1220302622",
+      "nombre": "Manolo Vargas",
+      "correo": "luisdapro16@gmail.com",
+      "telefono": "3205729072",
+      "contrasena": "123",
+      "tipoCliente": "PERSONA_NATURAL",
+      "presupuesto": 1.0E9,
+      "zonasDeInteres": [
+        "Armenia",
+        "Medellin"
+      ],
+      "tipoInmuebleDeseado": "CASA",
+      "cantidadMinimaHabitaciones": 2,
+      "estadoBusqueda": "ACTIVA"
+    },
+    "inmueble": {
+      "codigo": "001",
+      "nombre": "Casa de Maduro",
+      "direccion": "123",
+      "ciudad": "Miami",
+      "barrio": "000",
+      "codigoAsesorResponsable": "1020302622",
+      "tipoInmueble": "APARTAMENTO",
+      "finalidad": "ARRIENDO",
+      "precio": 3000.0,
+      "area": 10.0,
+      "numeroHabitaciones": 1,
+      "numeroBanos": 1,
+      "estadoInmueble": "USADO",
+      "disponibilidad": "RESERVADO",
+      "fotoPortada": "/uploads/inmuebles/portada_d6b1f382-c070-4e36-9ca4-5ab376507764.webp",
+      "fotosGaleria": []
+    },
+    "fecha": "2026-04-15",
+    "hora": "04:00",
+    "asesorId": "1020302622",
+    "estado": "REPROGRAMADA",
+    "observaciones": "Visita Manolo"
+  },
+  "c8eba6a7-882f-46ef-b172-e4abd01c6003": {
+    "id": "c8eba6a7-882f-46ef-b172-e4abd01c6003",
+    "cliente": {
+      "identificacion": "1220302622",
+      "nombre": "Manolo Vargas",
+      "correo": "luisdapro16@gmail.com",
+      "telefono": "3205729072",
+      "contrasena": "123",
+      "tipoCliente": "PERSONA_NATURAL",
+      "presupuesto": 1.0E9,
+      "zonasDeInteres": [
+        "Armenia",
+        "Medellin"
+      ],
+      "tipoInmuebleDeseado": "CASA",
+      "cantidadMinimaHabitaciones": 2,
+      "estadoBusqueda": "ACTIVA"
+    },
+    "inmueble": {
+      "codigo": "001",
+      "nombre": "Casa de Maduro",
+      "direccion": "123",
+      "ciudad": "Miami",
+      "barrio": "000",
+      "codigoAsesorResponsable": "1020302622",
+      "tipoInmueble": "APARTAMENTO",
+      "finalidad": "ARRIENDO",
+      "precio": 3000.0,
+      "area": 10.0,
+      "numeroHabitaciones": 1,
+      "numeroBanos": 1,
+      "estadoInmueble": "USADO",
+      "disponibilidad": "RESERVADO",
+      "fotoPortada": "/uploads/inmuebles/portada_d6b1f382-c070-4e36-9ca4-5ab376507764.webp",
+      "fotosGaleria": []
+    },
+    "fecha": "2026-04-18",
+    "hora": "04:00",
+    "asesorId": "1020302622",
+    "estado": "CONFIRMADA",
+    "observaciones": "Visita manolo"
+  }
+}

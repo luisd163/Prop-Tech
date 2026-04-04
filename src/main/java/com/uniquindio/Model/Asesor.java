@@ -19,6 +19,7 @@ public class Asesor implements Usuario {
 	private String contrasena;
 	private String especialidad;
 	private double comisionPorcentaje;
+	private List<Cliente> clientes;
 	private transient List<Operacion> operaciones;
 
 	public Asesor(String identificacion, String nombre, String correo, String telefono, String contrasena, String especialidad, double comisionPorcentaje) {
@@ -29,6 +30,7 @@ public class Asesor implements Usuario {
 		this.contrasena = contrasena;
 		this.especialidad = especialidad;
 		this.comisionPorcentaje = comisionPorcentaje;
+		this.clientes = new ArrayList<>();
 		this.operaciones = new ArrayList<>();
 	}
 

@@ -2,13 +2,16 @@ package com.uniquindio.Controller;
 
 import com.uniquindio.Model.Asesor;
 import com.uniquindio.Model.Inmueble;
+import com.uniquindio.Model.Visita;
 import com.uniquindio.Service.AsesorHomeService;
+import com.uniquindio.Service.VisitaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,9 +37,21 @@ public class HomeAsesorController {
         int totalAlertas = asesorHomeService.cantidadAlertas(asesor);
         int cantidadInmuebles = asesorHomeService.cantidadInmueblesAsociados(asesor);
         int cierresMes = asesorHomeService.cantidadCierresMes(asesor);
-        int visitasSemana = asesorHomeService.cantidadVisitasEstaSemana(asesor);
         List<Inmueble> inmueblesAsesor = asesorHomeService.obtenerInmueblesAsesor(asesor);
         List<Inmueble> inmueblesLimitados = inmueblesAsesor.stream().limit(2).collect(Collectors.toList());
+
+        VisitaService visitaService = new VisitaService();
+        List<Visita> visitasAsesor = visitaService.obtenerVisitasPorAsesor(asesor.getIdentificacion());
+        int visitasSemana = visitaService.filtrarEstaSemana(visitasAsesor).size();
+        List<Visita> visitasProximas = visitasAsesor.stream()
+            .filter(v -> v != null && v.getFecha() != null && v.getHora() != null)
+            .filter(v -> !v.getFecha().isBefore(LocalDate.now()))
+            .sorted(Comparator
+                .comparing(Visita::getFecha)
+                .thenComparing(Visita::getHora))
+            .limit(2)
+            .collect(Collectors.toList());
+
         String fechaActual = LocalDate.now().format(DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy"));
 
         model.addAttribute("titulo", "Panel Asesor");
@@ -49,6 +64,7 @@ public class HomeAsesorController {
         model.addAttribute("kpiVisitasSemana", visitasSemana);
         model.addAttribute("kpiCierresMes", cierresMes);
         model.addAttribute("inmueblesLimitados", inmueblesLimitados);
+        model.addAttribute("visitasProximas", visitasProximas);
         return "home-asesor";
     }
 
