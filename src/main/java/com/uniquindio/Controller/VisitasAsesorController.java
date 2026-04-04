@@ -136,6 +136,8 @@ public class VisitasAsesorController {
     public String showClientes(
             @SessionAttribute(name = "asesorSesion", required = false) Asesor asesor,
             @RequestParam(name = "codigo", required = false) String codigo,
+            @RequestParam(name = "estado", required = false) String estado,
+            @RequestParam(name = "tipoOperacion", required = false) String tipoOperacion,
             Model model
     ) {
         if (asesor == null) {
@@ -147,16 +149,41 @@ public class VisitasAsesorController {
             clientesAsesor = new java.util.ArrayList<>();
         }
 
+        VisitaService visitaService = new VisitaService();
+        List<Visita> visitasAsesor = visitaService.obtenerVisitasPorAsesor(asesor.getIdentificacion());
+
+        String estadoFiltro = (estado == null || estado.isBlank()) ? "TODAS" : estado.toUpperCase();
+        String tipoOperacionFiltro = (tipoOperacion == null || tipoOperacion.isBlank()) ? "TODAS" : tipoOperacion.toUpperCase();
+
+        if (!"TODAS".equals(estadoFiltro)) {
+            try {
+                Cliente.EstadoBusqueda estadoBusqueda = Cliente.EstadoBusqueda.valueOf(estadoFiltro);
+                clientesAsesor = clientesAsesor.stream()
+                        .filter(c -> c != null && c.getEstadoBusqueda() == estadoBusqueda)
+                        .collect(Collectors.toList());
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        if (!"TODAS".equals(tipoOperacionFiltro)) {
+            String tipoFinal = tipoOperacionFiltro;
+            clientesAsesor = clientesAsesor.stream()
+                    .filter(c -> coincideTipoOperacion(c, tipoFinal, visitasAsesor))
+                    .collect(Collectors.toList());
+        }
+
         if (codigo != null && !codigo.isBlank()) {
-            String codigoFiltro = codigo.trim().toLowerCase();
+            String codigoFiltro = normalizarCodigo(codigo);
             clientesAsesor = clientesAsesor.stream()
                     .filter(c -> c != null && c.getIdentificacion() != null
-                            && c.getIdentificacion().toLowerCase().contains(codigoFiltro))
+                    && normalizarCodigo(c.getIdentificacion()).contains(codigoFiltro))
                     .collect(Collectors.toList());
         }
 
         model.addAttribute("clientesAsesor", clientesAsesor);
         model.addAttribute("codigo", codigo == null ? "" : codigo);
+        model.addAttribute("estadoFiltro", estadoFiltro);
+        model.addAttribute("tipoOperacionFiltro", tipoOperacionFiltro);
         model.addAttribute("asesor", asesor);
         model.addAttribute("nombreAsesor", asesor.getNombre());
         model.addAttribute("rolAsesor", "Asesor inmobiliario");
@@ -284,6 +311,39 @@ public class VisitasAsesorController {
         }
 
         return (partes[0].substring(0, 1) + partes[1].substring(0, 1)).toUpperCase();
+    }
+
+    private String normalizarCodigo(String codigo) {
+        if (codigo == null) {
+            return "";
+        }
+        return codigo.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+    }
+
+    private boolean coincideTipoOperacion(Cliente cliente, String tipoOperacionFiltro, List<Visita> visitasAsesor) {
+        if (cliente == null || cliente.getIdentificacion() == null) {
+            return false;
+        }
+
+        for (Visita visita : visitasAsesor) {
+            if (visita == null || visita.getCliente() == null || visita.getInmueble() == null || visita.getInmueble().getFinalidad() == null) {
+                continue;
+            }
+
+            if (!cliente.getIdentificacion().equals(visita.getCliente().getIdentificacion())) {
+                continue;
+            }
+
+            if ("COMPRA".equals(tipoOperacionFiltro) && visita.getInmueble().getFinalidad() == Inmueble.Finalidad.VENTA) {
+                return true;
+            }
+
+            if ("ARRIENDO".equals(tipoOperacionFiltro) && visita.getInmueble().getFinalidad() == Inmueble.Finalidad.ARRIENDO) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Set<String> obtenerIdsClientesAsesor(Asesor asesor) {

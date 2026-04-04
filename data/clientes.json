@@ -14,5 +14,20 @@
     "tipoInmuebleDeseado": "CASA",
     "cantidadMinimaHabitaciones": 2,
     "estadoBusqueda": "ACTIVA"
+  },
+  "456": {
+    "identificacion": "456",
+    "nombre": "Laura Osorio",
+    "correo": "lauras.osoriom@uqvirtual.edu.co",
+    "telefono": "3156885637",
+    "contrasena": "321",
+    "tipoCliente": "PERSONA_NATURAL",
+    "presupuesto": 1.0E24,
+    "zonasDeInteres": [
+      "Armenia"
+    ],
+    "tipoInmuebleDeseado": "APARTAMENTO",
+    "cantidadMinimaHabitaciones": 3,
+    "estadoBusqueda": "ACTIVA"
   }
 }

@@ -468,10 +468,22 @@
 
             <article class="section-card">
                 <div class="section-head"><h5>Clientes activos</h5><a th:href="@{/clientes}">Ver todos →</a></div>
-                <div class="list-item">
-                    <div class="avatar">--</div>
-                    <div><div class="fw-semibold">[Nombre cliente]</div><div class="muted">[Interés / presupuesto]</div></div>
-                    <span class="status-badge s-negociando">[Estado]</span>
+                <div class="list-item" th:each="cliente : ${clientesActivos}">
+                    <div class="avatar" th:text="${cliente.nombre != null && cliente.nombre.length() >= 2 ? #strings.substring(cliente.nombre,0,2).toUpperCase() : '--'}">--</div>
+                    <div>
+                        <div class="fw-semibold" th:text="${cliente.nombre}">Nombre cliente</div>
+                        <div class="muted">
+                            <span th:text="${cliente.tipoInmuebleDeseado != null ? cliente.tipoInmuebleDeseado : 'Interés'}">Interés</span>
+                            /
+                            <span th:text="${'$' + #numbers.formatDecimal(cliente.presupuesto, 1, 'POINT', 0, 'COMMA')}">$0</span>
+                        </div>
+                    </div>
+                    <span class="status-badge"
+                          th:classappend="${cliente.estadoBusqueda != null && cliente.estadoBusqueda.name() == 'ACTIVA' ? ' s-disponible' : (cliente.estadoBusqueda != null && cliente.estadoBusqueda.name() == 'PAUSADA' ? ' s-negociando' : ' s-no')}"
+                          th:text="${cliente.estadoBusqueda != null ? cliente.estadoBusqueda : 'ACTIVA'}">Estado</span>
+                </div>
+                <div class="list-item" th:if="${clientesActivos == null || clientesActivos.isEmpty()}">
+                    <div class="muted">No tienes clientes en tu cartera.</div>
                 </div>
             </article>
         </section>

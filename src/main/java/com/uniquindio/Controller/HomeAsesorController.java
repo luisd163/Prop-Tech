@@ -1,6 +1,7 @@
 package com.uniquindio.Controller;
 
 import com.uniquindio.Model.Asesor;
+import com.uniquindio.Model.Cliente;
 import com.uniquindio.Model.Inmueble;
 import com.uniquindio.Model.Visita;
 import com.uniquindio.Service.AsesorHomeService;
@@ -39,6 +40,11 @@ public class HomeAsesorController {
         int cierresMes = asesorHomeService.cantidadCierresMes(asesor);
         List<Inmueble> inmueblesAsesor = asesorHomeService.obtenerInmueblesAsesor(asesor);
         List<Inmueble> inmueblesLimitados = inmueblesAsesor.stream().limit(2).collect(Collectors.toList());
+        List<Cliente> clientesActivos = (asesor.getClientes() == null ? List.<Cliente>of() : asesor.getClientes())
+            .stream()
+            .filter(c -> c != null)
+            .limit(2)
+            .collect(Collectors.toList());
 
         VisitaService visitaService = new VisitaService();
         List<Visita> visitasAsesor = visitaService.obtenerVisitasPorAsesor(asesor.getIdentificacion());
@@ -65,6 +71,7 @@ public class HomeAsesorController {
         model.addAttribute("kpiCierresMes", cierresMes);
         model.addAttribute("inmueblesLimitados", inmueblesLimitados);
         model.addAttribute("visitasProximas", visitasProximas);
+        model.addAttribute("clientesActivos", clientesActivos);
         return "home-asesor";
     }
 

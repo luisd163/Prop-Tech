@@ -150,7 +150,7 @@
 
         .filters {
             display: grid;
-            grid-template-columns: 220px 1fr 1fr;
+            grid-template-columns: 220px 1fr 1fr 110px;
             gap: 8px;
             margin-bottom: 12px;
         }
@@ -176,6 +176,14 @@
             color: #f2f4f8;
             border-radius: 8px;
             font-weight: 600;
+        }
+
+        .btn-filter {
+            border: 1px solid rgba(246, 194, 62, .45);
+            color: #f6c23e;
+            background: rgba(246, 194, 62, 0.08);
+            border-radius: 8px;
+            font-weight: 700;
         }
 
         .clients-panel {
@@ -319,20 +327,19 @@
         </div>
 
         <form class="filters" th:action="@{/clientes}" method="get">
-            <input id="filtroCodigo" class="filter-input" type="text" name="codigo" th:value="${codigo}" placeholder="Búsqueda por código">
-            <select class="form-select" name="estado">
-                <option>Todos los estados</option>
-                <option>Activo</option>
-                <option>Negociando</option>
-                <option>Alta atención</option>
-                <option>Cerrado</option>
-                <option>Pausado</option>
+            <input id="filtroCodigo" class="filter-input" type="text" name="codigo" th:value="${codigo}" placeholder="Búsqueda por código" autocomplete="off">
+            <select class="form-select" name="estado" onchange="this.form.submit()">
+                <option value="TODAS" th:selected="${estadoFiltro == 'TODAS'}">Todos los estados</option>
+                <option value="ACTIVA" th:selected="${estadoFiltro == 'ACTIVA'}">Activo</option>
+                <option value="PAUSADA" th:selected="${estadoFiltro == 'PAUSADA'}">Pausado</option>
+                <option value="FINALIZADA" th:selected="${estadoFiltro == 'FINALIZADA'}">Cerrado</option>
             </select>
-            <select class="form-select" name="tipoOperacion">
-                <option>Compra y arriendo</option>
-                <option>Compra</option>
-                <option>Arriendo</option>
+            <select class="form-select" name="tipoOperacion" onchange="this.form.submit()">
+                <option value="TODAS" th:selected="${tipoOperacionFiltro == 'TODAS'}">Compra y arriendo</option>
+                <option value="COMPRA" th:selected="${tipoOperacionFiltro == 'COMPRA'}">Compra</option>
+                <option value="ARRIENDO" th:selected="${tipoOperacionFiltro == 'ARRIENDO'}">Arriendo</option>
             </select>
+            <button type="submit" class="btn btn-filter">Buscar</button>
         </form>
 
         <section class="clients-panel">
@@ -378,12 +385,14 @@
         const input = document.getElementById('filtroCodigo');
         if (!input) return;
 
+        const normalizar = (valor) => (valor || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
         input.addEventListener('input', function () {
-            const query = (input.value || '').trim().toLowerCase();
+            const query = normalizar(input.value);
             const rows = document.querySelectorAll('.clients-panel .client-row[data-codigo]');
 
             rows.forEach(function (row) {
-                const codigo = (row.getAttribute('data-codigo') || '').toLowerCase();
+                const codigo = normalizar(row.getAttribute('data-codigo'));
                 row.style.display = codigo.includes(query) ? '' : 'none';
             });
         });
