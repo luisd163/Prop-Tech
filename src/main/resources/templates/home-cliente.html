@@ -3,38 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${titulo}">Panel Cliente</title>
+    <title th:text="${titulo} ?: 'Inicio'">Inicio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        :root {
+            --bg: #071429;
+            --bg-soft: #0b1f3d;
+            --panel: #10284a;
+            --panel-2: #132f57;
+            --line: rgba(255,255,255,.10);
+            --text: #e8eef7;
+            --muted: #7f96b8;
+            --gold: #f6c23e;
+            --active: #1d3658;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            min-height: 100vh;
             margin: 0;
-            display: grid;
-            place-items: center;
-            background: linear-gradient(135deg, #101823 0%, #1a2332 50%, #243447 100%);
-            color: #fff;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #203d63 0%, #0a1f3d 55%, #071429 100%);
+            color: var(--text);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .card-home {
-            width: min(720px, 92vw);
-            background: rgba(26, 35, 50, 0.95);
-            border: 1px solid rgba(255,255,255,.12);
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(0,0,0,.35);
-            padding: 32px;
+
+        .layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
         }
-        .accent {
-            color: #ff8c42;
+
+        .sidebar {
+            background: linear-gradient(180deg, #061a33 0%, #031228 100%);
+            border-right: 1px solid #17365e;
+            padding: 22px 0 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 0 22px 18px;
+            border-bottom: 1px solid #17365e;
+            margin-bottom: 12px;
+        }
+
+        .brand h4 {
+            margin: 0;
+            color: var(--gold);
+            font-size: 1.45rem;
+            font-weight: 700;
+        }
+
+        .brand p {
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: .82rem;
+            letter-spacing: .8px;
+        }
+
+        .menu-section-title {
+            color: var(--muted);
+            font-size: .76rem;
+            letter-spacing: 1.4px;
+            margin: 16px 22px 8px;
+        }
+
+        .menu-item {
+            color: #b5c7df;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px;
+            border-left: 3px solid transparent;
+            font-size: .95rem;
+            transition: .2s;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--active);
+            color: #f6c23e;
+            border-left-color: #f6c23e;
+        }
+
+        .profile-box {
+            margin: auto 14px 0;
+            border: 1px solid #1f416e;
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #f6c23e;
+            display: grid;
+            place-items: center;
+            color: #f6c23e;
+            font-size: .8rem;
+            flex: 0 0 auto;
+        }
+
+        .main {
+            padding: 16px;
+            overflow: auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1d3d69;
+            margin-bottom: 14px;
+        }
+
+        .topbar h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .topbar .sub {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .pill {
+            border: 1px solid rgba(255,255,255,.12);
+            background: rgba(255,255,255,.04);
+            color: #b9c9e4;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: .85rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+            min-height: 86px;
+        }
+
+        .stat-value {
+            font-size: 1.65rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: .92rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(260px, .9fr);
+            gap: 12px;
+        }
+
+        .section-card {
+            background: var(--panel-2);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .section-head h5 {
+            margin: 0;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .section-head a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: .88rem;
+        }
+
+        .search-card {
+            padding: 12px 14px 14px;
+        }
+
+        .search-box {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255,255,255,.03);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .search-row {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .search-row i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+
+        .search-row input,
+        .search-row select {
+            width: 100%;
+            height: 46px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.12);
+            background: #3b392f;
+            color: #f4f4f4;
+            padding: 0 14px 0 40px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-row select {
+            padding-left: 14px;
+            appearance: none;
+        }
+
+        .list-item {
+            display: grid;
+            grid-template-columns: 64px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-top: 1px solid rgba(255,255,255,.05);
+        }
+
+        .list-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            display: grid;
+            place-items: center;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .list-title {
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .list-sub {
+            color: var(--muted);
+            font-size: .88rem;
+            line-height: 1.2;
+        }
+
+        .tag {
+            border-radius: 999px;
+            padding: 3px 10px;
+            border: 1px solid rgba(255,255,255,.12);
+            color: #c7d1df;
+            font-size: .75rem;
+            white-space: nowrap;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-soft {
+            border: 1px solid rgba(255,255,255,.28);
+            color: #eaf1ff;
+            background: transparent;
+            border-radius: 10px;
+            padding: 7px 14px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .placeholder-box {
+            height: 100%;
+            min-height: 370px;
+            padding: 14px;
+        }
+
+        .placeholder-area {
+            height: calc(100% - 46px);
+            border: 1px dashed rgba(255,255,255,.16);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            text-align: center;
+            padding: 16px;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .small-box {
+            min-height: 160px;
+            padding: 14px;
+        }
+
+        .small-empty {
+            height: calc(100% - 34px);
+            border: 1px dashed rgba(255,255,255,.14);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: .92rem;
+            text-align: center;
+            padding: 14px;
+        }
+
+        @media (max-width: 1100px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .content-grid { grid-template-columns: 1fr; }
+            .bottom-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="card-home">
-        <h1 class="mb-2" th:text="${saludo ?: 'Bienvenido(a), cliente'}">Bienvenido(a), cliente</h1>
-        <p class="mb-4 text-light-emphasis">Tu registro e ingreso ya están funcionando correctamente.</p>
-        <div class="d-flex gap-2">
-            <a class="btn btn-warning fw-semibold" th:href="@{/login}">Cerrar sesión</a>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <h4>PropTech</h4>
+            <p>PORTAL CLIENTE</p>
         </div>
-    </div>
+
+        <div class="menu-section-title">EXPLORAR</div>
+        <a class="menu-item active" href="#"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
+        <a class="menu-item" href="#"><i class="bi bi-house"></i> Inmuebles</a>
+        <a class="menu-item" href="#"><i class="bi bi-star"></i> Favoritos</a>
+        <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Recomendados</a>
+
+        <div class="menu-section-title">MI CUENTA</div>
+        <a class="menu-item" href="#"><i class="bi bi-calendar-event"></i> Mis visitas</a>
+        <a class="menu-item" href="#"><i class="bi bi-clock-history"></i> Mi historial</a>
+        <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
+
+        <div class="profile-box">
+            <div class="avatar" th:text="${inicialesCliente ?: 'CL'}">CL</div>
+            <div>
+                <div class="fw-semibold" th:text="${nombreCliente ?: 'Perfil'}">Perfil</div>
+                <div class="small" style="color:#8aa2c2" th:text="${rolCliente ?: 'Cliente'}">Cliente</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <h3 th:text="${saludo ?: 'Bienvenida, [Nombre]'}">Bienvenida, [Nombre]</h3>
+                <div class="sub" th:text="${subtitulo ?: 'Tienes [n] inmuebles recomendados nuevos hoy'}">Tienes [n] inmuebles recomendados nuevos hoy</div>
+            </div>
+            <div class="pill" th:text="${infoDerecha ?: 'Presupuesto: $[valor]/mes'}">Presupuesto: $[valor]/mes</div>
+        </div>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric1 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric1Label ?: 'Consultados'}">Consultados</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric2 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric2Label ?: 'Favoritos'}">Favoritos</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric3 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric3Label ?: 'Visitas agendadas'}">Visitas agendadas</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric4 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric4Label ?: 'En negociación'}">En negociación</div>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="section-card search-card">
+                <div class="section-head">
+                    <h5>Buscar inmuebles</h5>
+                    <a href="#">Ver todos →</a>
+                </div>
+                <div class="search-box">
+                    <div class="search-row">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Zona, barrio o ciudad...">
+                    </div>
+                    <div class="search-row">
+                        <select>
+                            <option>Todos los tipos</option>
+                        </select>
+                    </div>
+                    <div class="search-row">
+                        <select>
+                            <option>Precio máx.</option>
+                        </select>
+                    </div>
+                    <div class="search-row">
+                        <select>
+                            <option>Hab. mín.</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="list-item" th:each="item : ${itemsPrincipales}">
+                    <div class="list-icon"><i class="bi bi-folder2"></i></div>
+                    <div>
+                        <div class="list-title" th:text="${item.titulo}">Título</div>
+                        <div class="list-sub" th:text="${item.subtitulo}">Subtítulo</div>
+                    </div>
+                    <div class="actions">
+                        <span class="tag" th:text="${item.estado ?: 'Estado'}">Estado</span>
+                        <a class="btn-soft" href="#">Ver</a>
+                    </div>
+                </div>
+
+                <div class="list-item" th:if="${itemsPrincipales == null || itemsPrincipales.isEmpty()}">
+                    <div class="list-icon"><i class="bi bi-folder2-open"></i></div>
+                    <div>
+                        <div class="list-title">[Inmueble]</div>
+                        <div class="list-sub">[Tipo] · [Zona] · [Precio]</div>
+                    </div>
+                    <div class="actions">
+                            <span class="tag">[Estado]</span>
+                        <a class="btn-soft" href="#">Ver</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="section-card placeholder-box">
+                <div class="section-head">
+                    <h5>Recomendados</h5>
+                    <a href="#">Ver todos →</a>
+                </div>
+                <div class="placeholder-area">
+                    <div>
+                        <div class="fw-semibold mb-2">[Elemento]</div>
+                        <div>[Descripción breve]</div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="bottom-grid">
+            <article class="section-card small-box">
+                <div class="section-head"><h5>Mi historial</h5><a href="#">Ver →</a></div>
+                <div class="small-empty">[Contenido]</div>
+            </article>
+
+            <article class="section-card small-box">
+                <div class="section-head"><h5>[Bloque]</h5><a href="#">Ver →</a></div>
+                <div class="small-empty">[Contenido]</div>
+            </article>
+
+            <article class="section-card small-box">
+                <div class="section-head"><h5>[Bloque]</h5><a href="#">Ver →</a></div>
+                <div class="small-empty">[Contenido]</div>
+            </article>
+        </section>
+    </main>
+</div>
 </body>
 </html>
