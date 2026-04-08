@@ -46,6 +46,8 @@ public class Inmueble {
 	public enum TipoInmueble {
 		APARTAMENTO,
 		CASA,
+		LOTE,
+		BODEGA,
 		LOCAL_COMERCIAL,
 		OFICINA
 	}

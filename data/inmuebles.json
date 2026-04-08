@@ -35,6 +35,24 @@
     "fotoPortada": "/uploads/inmuebles/portada_3d3f45ad-837f-4ebc-a931-b5b8f2b03c4f.png",
     "fotosGaleria": []
   },
+  "4928": {
+    "codigo": "4928",
+    "nombre": "Prueba",
+    "direccion": "calle 60 #48-20",
+    "ciudad": "Tel Aviv",
+    "barrio": "Obrero",
+    "codigoAsesorResponsable": "1020302622",
+    "tipoInmueble": "BODEGA",
+    "finalidad": "VENTA",
+    "precio": 500.0,
+    "area": 67.0,
+    "numeroHabitaciones": 2,
+    "numeroBanos": 1,
+    "estadoInmueble": "NUEVO",
+    "disponibilidad": "DISPONIBLE",
+    "fotoPortada": "/uploads/inmuebles/portada_5ffe3ca8-a83e-4485-a839-e9e129a29de0.jpg",
+    "fotosGaleria": []
+  },
   "444": {
     "codigo": "444",
     "nombre": "Luis",
