@@ -262,14 +262,24 @@
         }
 
         .list-icon {
-            width: 56px;
-            height: 56px;
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            min-height: 64px;
             border-radius: 12px;
             background: rgba(255,255,255,.05);
             display: grid;
             place-items: center;
             color: var(--gold);
             font-size: 1.2rem;
+            overflow: hidden;
+        }
+        
+        .list-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
         }
 
         .list-title {
@@ -357,6 +367,40 @@
             .bottom-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <script>
+        function filtrarInmuebles() {
+            const busquedaZona = document.getElementById('busquedaZona').value.toLowerCase().trim();
+            const items = document.querySelectorAll('.list-item[data-inmueble]');
+            let conteoVisible = 0;
+
+            items.forEach(item => {
+                const nombre = item.getAttribute('data-nombre').toLowerCase();
+                const barrio = item.getAttribute('data-barrio').toLowerCase();
+                const ciudad = item.getAttribute('data-ciudad').toLowerCase();
+                
+                if (busquedaZona === '' || nombre.includes(busquedaZona) || barrio.includes(busquedaZona) || ciudad.includes(busquedaZona)) {
+                    item.style.display = '';
+                    conteoVisible++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Actualizar contador dinámico
+            const contadorElement = document.getElementById('contadorInmuebles');
+            if (contadorElement) {
+                contadorElement.textContent = conteoVisible;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const busquedaZonaInput = document.getElementById('busquedaZona');
+            if (busquedaZonaInput) {
+                busquedaZonaInput.addEventListener('keyup', filtrarInmuebles);
+                busquedaZonaInput.addEventListener('change', filtrarInmuebles);
+            }
+        });
+    </script>
 </head>
 <body>
 <div class="layout">
@@ -367,8 +411,8 @@
         </div>
 
         <div class="menu-section-title">EXPLORAR</div>
-        <a class="menu-item active" href="#"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
-        <a class="menu-item" href="#"><i class="bi bi-house"></i> Inmuebles</a>
+        <a class="menu-item active" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
+        <a class="menu-item" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
         <a class="menu-item" href="#"><i class="bi bi-star"></i> Favoritos</a>
         <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Recomendados</a>
 
@@ -418,39 +462,48 @@
             <article class="section-card search-card">
                 <div class="section-head">
                     <h5>Buscar inmuebles</h5>
-                    <a href="#">Ver todos →</a>
+                    <a th:href="@{/inmuebles-cliente}">Ver todos →</a>
                 </div>
                 <div class="search-box">
                     <div class="search-row">
                         <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Zona, barrio o ciudad...">
+                        <input type="text" id="busquedaZona" placeholder="Zona, barrio o ciudad..." autocomplete="off">
                     </div>
                     <div class="search-row">
-                        <select>
-                            <option>Todos los tipos</option>
+                        <select name="tipo" th:value="${filtroTipo ?: ''}">
+                            <option value="">Todos los tipos</option>
+                            <option th:each="t : ${tiposDisponibles}" th:value="${t}" th:text="${t}" th:selected="${filtroTipo == t}">Tipo</option>
                         </select>
                     </div>
                     <div class="search-row">
-                        <select>
-                            <option>Precio máx.</option>
-                        </select>
+                        <input type="number" name="precioMax" placeholder="Precio máx." th:value="${filtroPrecioMax ?: ''}">
                     </div>
                     <div class="search-row">
-                        <select>
-                            <option>Hab. mín.</option>
-                        </select>
+                        <input type="number" name="habMin" placeholder="Hab. mín." th:value="${filtroHabMin ?: ''}">
                     </div>
+                    <button type="submit" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.12); background:rgba(246,194,62,0.2); color:#f6c23e; font-weight:600; cursor:pointer;">Buscar</button>
                 </div>
 
-                <div class="list-item" th:each="item : ${itemsPrincipales}">
-                    <div class="list-icon"><i class="bi bi-folder2"></i></div>
+                <div class="list-item" th:each="item : ${itemsPrincipales}" data-inmueble="true" th:attr="data-nombre=${item.nombre ?: ''}, data-barrio=${item.barrio ?: ''}, data-ciudad=${item.ciudad ?: ''}">
+                    <div class="list-icon" th:if="${item.fotoPortada}">
+                        <img th:src="${item.fotoPortada}" alt="Foto inmueble">
+                    </div>
+                    <div class="list-icon" th:unless="${item.fotoPortada}">
+                        <i class="bi bi-folder2"></i>
+                    </div>
                     <div>
-                        <div class="list-title" th:text="${item.titulo}">Título</div>
-                        <div class="list-sub" th:text="${item.subtitulo}">Subtítulo</div>
+                        <div class="list-title" th:text="${item.nombre ?: 'Inmueble'}">Título</div>
+                        <div class="list-sub">
+                            <span th:text="${item.tipoInmueble ?: 'Tipo'}">Tipo</span>
+                            <span> · </span>
+                            <span th:text="${item.barrio ?: 'Zona'}">Zona</span>
+                            <span> · </span>
+                            <span th:text="${item.precio}">Precio</span>
+                        </div>
                     </div>
                     <div class="actions">
-                        <span class="tag" th:text="${item.estado ?: 'Estado'}">Estado</span>
-                        <a class="btn-soft" href="#">Ver</a>
+                        <span class="tag" th:text="${item.disponibilidad ?: 'Estado'}">Estado</span>
+                        <a class="btn-soft" th:href="@{/detalle-inmueble/{codigo}(codigo=${item.codigo})}">Ver</a>
                     </div>
                 </div>
 
