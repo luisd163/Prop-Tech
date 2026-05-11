@@ -527,7 +527,7 @@
                 <button class="btn-primary-custom" onclick="agendar()">
                     <i class="bi bi-calendar-check"></i> Agendar Visita
                 </button>
-                <button class="btn-secondary-custom" onclick="agregarFavorito()">
+                <button id="btnFavorito" class="btn-secondary-custom" type="button" th:attr="data-codigo=${inmueble.codigo}">
                     <i class="bi bi-heart"></i> Favorito
                 </button>
             </div>
@@ -546,6 +546,15 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnFavorito = document.getElementById('btnFavorito');
+            if (btnFavorito) {
+                btnFavorito.addEventListener('click', function(event) {
+                    agregarFavorito(event, this.dataset.codigo);
+                });
+            }
+        });
+
         function cambiarImagenPrincipal(elemento) {
             document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
@@ -557,10 +566,41 @@
             alert('Funcionalidad de agendamiento disponible pronto');
         }
 
-        function agregarFavorito() {
+        function agregarFavorito(event, codigoInmuebleActual) {
             const btn = event.target.closest('.btn-secondary-custom');
-            btn.classList.toggle('active');
-            alert('Inmueble agregado a favoritos');
+            
+            console.log('DEBUG: Enviando código:', codigoInmuebleActual);
+            
+            fetch('/favoritos/agregar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'codigoInmueble=' + encodeURIComponent(codigoInmuebleActual)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('DEBUG: Respuesta del servidor:', data);
+                if (data.exito) {
+                    btn.classList.toggle('active');
+                    // Cambiar icono según estado
+                    const icon = btn.querySelector('i');
+                    if (data.enFavoritos) {
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill');
+                    } else {
+                        icon.classList.remove('bi-heart-fill');
+                        icon.classList.add('bi-heart');
+                    }
+                    alert(data.mensaje);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar favorito');
+            });
         }
     </script>
 </body>

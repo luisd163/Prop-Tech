@@ -22,6 +22,7 @@ public class Cliente implements Usuario {
 	private Inmueble.TipoInmueble tipoInmuebleDeseado;
 	private int cantidadMinimaHabitaciones;
 	private EstadoBusqueda estadoBusqueda;
+	private List<Inmueble> favoritos;
 
 	@Override
 	public String getCorreo() {

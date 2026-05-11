@@ -100,17 +100,21 @@
             align-items: center;
             gap: 10px;
             background: rgba(255, 255, 255, 0.03);
+            position: sticky;
+            bottom: 14px;
+            z-index: 2;
         }
 
         .avatar {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 1px solid var(--gold);
             display: grid;
             place-items: center;
             color: var(--gold);
-            font-size: .8rem;
+            font-size: .85rem;
+            font-weight: 700;
             flex: 0 0 auto;
         }
 
@@ -418,7 +422,7 @@
         <div class="menu-section-title">EXPLORAR</div>
         <a class="menu-item" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
         <a class="menu-item active" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
-        <a class="menu-item" href="#"><i class="bi bi-star"></i> Favoritos</a>
+        <a class="menu-item" th:href="@{/favoritos}"><i class="bi bi-star"></i> Favoritos</a>
         <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Recomendados</a>
 
         <div class="menu-section-title">MI CUENTA</div>
@@ -590,5 +594,59 @@
         </section>
     </main>
 </div>
+
+<script>
+    // Agregar funcionalidad a los botones de favoritos
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const card = this.closest('.card-inmueble');
+            const codigoElement = card.querySelector('.card-code');
+            const codigoInmueble = codigoElement ? codigoElement.textContent.trim() : null;
+            
+            console.log('DEBUG: Código capturado de la tarjeta:', codigoInmueble);
+            console.log('DEBUG: Elemento del código:', codigoElement?.textContent);
+            
+            if (!codigoInmueble) {
+                alert('No se pudo identificar el inmueble');
+                return;
+            }
+            
+            fetch('/favoritos/agregar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'codigoInmueble=' + encodeURIComponent(codigoInmueble)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('DEBUG: Respuesta del servidor:', data);
+                if (data.exito) {
+                    // Cambiar icono según estado
+                    const icon = this.querySelector('i');
+                    if (data.enFavoritos) {
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill');
+                        this.classList.add('active');
+                    } else {
+                        icon.classList.remove('bi-heart-fill');
+                        icon.classList.add('bi-heart');
+                        this.classList.remove('active');
+                    }
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar favorito');
+            });
+        });
+    });
+</script>
+
 </body>
 </html>

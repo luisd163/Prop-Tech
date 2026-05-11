@@ -217,7 +217,7 @@
             border: 1px solid var(--line);
             border-radius: 10px;
             background: rgba(255,255,255,.03);
-            padding: 10px;
+            padding: 10px 12px;
             margin-bottom: 10px;
         }
 
@@ -413,7 +413,7 @@
         <div class="menu-section-title">EXPLORAR</div>
         <a class="menu-item active" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
         <a class="menu-item" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
-        <a class="menu-item" href="#"><i class="bi bi-star"></i> Favoritos</a>
+        <a class="menu-item" th:href="@{/favoritos}"><i class="bi bi-star"></i> Favoritos</a>
         <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Recomendados</a>
 
         <div class="menu-section-title">MI CUENTA</div>
