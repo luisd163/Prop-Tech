@@ -147,6 +147,22 @@
             font-size: .85rem;
         }
 
+        .btn-logout {
+            border: 1px solid rgba(255,77,77,0.25);
+            background: rgba(255,77,77,0.08);
+            color: #ff4d4d;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-logout:hover {
+            background: #ff4d4d;
+            color: #ffffff;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -436,7 +452,10 @@
                 <h3 th:text="${saludo ?: 'Bienvenida, [Nombre]'}">Bienvenida, [Nombre]</h3>
                 <div class="sub" th:text="${subtitulo ?: 'Tienes [n] inmuebles recomendados nuevos hoy'}">Tienes [n] inmuebles recomendados nuevos hoy</div>
             </div>
-            <div class="pill" th:text="${infoDerecha ?: 'Presupuesto: $[valor]/mes'}">Presupuesto: $[valor]/mes</div>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <div class="pill" th:text="${infoDerecha ?: 'Presupuesto: $[valor]/mes'}">Presupuesto: $[valor]/mes</div>
+                <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
+            </div>
         </div>
 
         <section class="stats-grid">

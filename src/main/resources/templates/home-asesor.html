@@ -183,6 +183,21 @@
             background: #f6c23e;
         }
 
+        .btn-logout {
+            border: 1px solid rgba(255,77,77,0.25);
+            color: #ff4d4d;
+            background: rgba(255,77,77,0.08);
+            border-radius: 8px;
+            padding: 8px 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: #ff4d4d;
+            color: #ffffff;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -364,6 +379,7 @@
             <div class="actions">
                 <span class="pill-alert" th:text="${alertasTotalesTexto ?: '0 alertas'}">0 alertas</span>
                 <a class="btn btn-acento" th:href="@{/inmuebles/crear}">+ Nuevo inmueble</a>
+                <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
             </div>
         </div>
 
