@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Grafo de Inmuebles</title>
+
+  <style>
+
+    body{
+        font-family: Arial;
+        background: #f5f5f5;
+        padding: 40px;
+    }
+
+    .contenedor{
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    pre{
+            font-size: 18px;
+            color: #333;
+        }
+
+  </style>
+
+</head>
+<body>
+
+<div class="contenedor">
+
+  <h1>Grafo de inmuebles</h1>
+
+  <h2 th:text="${ciudad}"></h2>
+
+  <pre th:text="${grafo}"></pre>
+</div>
+
+</body>
+</html>

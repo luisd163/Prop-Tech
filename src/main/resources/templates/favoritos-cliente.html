@@ -87,11 +87,12 @@
             position: relative;
             transition: .2s ease;
             font-size: .95rem;
+            border-left: 3px solid transparent;
         }
 
         .menu-item i { color: #6d86ad; }
-        .menu-item:hover { background: rgba(255,255,255,.04); color: #fff; }
-        .menu-item.active { background: rgba(246, 194, 62, .10); color: #fff; }
+        .menu-item:hover { background: var(--active); color: #fff; border-left-color: #f6c23e; }
+        .menu-item.active { background: var(--active); color: #f6c23e; border-left: 3px solid #f6c23e; }
         .menu-item.active i { color: var(--gold); }
 
         .menu-badge {
@@ -472,7 +473,7 @@
         @media (max-width: 1100px) {
             body { overflow: auto; }
             .layout { grid-template-columns: 1fr; height: auto; }
-            .sidebar { position: sticky; top: 0; z-index: 20; }
+            .sidebar { display: none; }
             .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .topbar { flex-direction: column; align-items: flex-start; }
             .view-switch { width: 100%; }

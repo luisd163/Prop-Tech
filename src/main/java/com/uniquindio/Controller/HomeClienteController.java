@@ -2,8 +2,10 @@ package com.uniquindio.Controller;
 
 import com.uniquindio.Model.Cliente;
 import com.uniquindio.Model.Inmueble;
+import com.uniquindio.Model.Visita;
 import com.uniquindio.Repositorio.ClienteRepositorio;
 import com.uniquindio.Repositorio.InmuebleRepositorio;
+import com.uniquindio.Repositorio.VisitaRepositorio;
 import com.uniquindio.Service.InmuebleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -88,12 +90,18 @@ public class HomeClienteController {
 
         int favoritosCount = cliente.getFavoritos() != null ? cliente.getFavoritos().size() : 0;
 
+        // Contar visitas agendadas del cliente
+        VisitaRepositorio visitaRepositorio = new VisitaRepositorio();
+        long visitasAgendadas = visitaRepositorio.obtenerVisitas().values().stream()
+                .filter(v -> v != null && v.getCliente() != null && v.getCliente().getIdentificacion().equals(cliente.getIdentificacion()))
+                .count();
+
         // Métricas (por defecto vacías) y etiquetas
         model.addAttribute("metric1", inmuebles.size());
         model.addAttribute("metric1Label", "Consultados");
         model.addAttribute("metric2", favoritosCount);
         model.addAttribute("metric2Label", "Favoritos");
-        model.addAttribute("metric3", "--");
+        model.addAttribute("metric3", (int) visitasAgendadas);
         model.addAttribute("metric3Label", "Visitas agendadas");
         model.addAttribute("metric4", "--");
         model.addAttribute("metric4Label", "En negociación");
