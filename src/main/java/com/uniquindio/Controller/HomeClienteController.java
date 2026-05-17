@@ -2,7 +2,6 @@ package com.uniquindio.Controller;
 
 import com.uniquindio.Model.Cliente;
 import com.uniquindio.Model.Inmueble;
-import com.uniquindio.Model.Visita;
 import com.uniquindio.Repositorio.ClienteRepositorio;
 import com.uniquindio.Repositorio.InmuebleRepositorio;
 import com.uniquindio.Repositorio.VisitaRepositorio;

@@ -48,8 +48,13 @@ public class VisitaService {
             }
 
             String idCliente = visita.getCliente().getIdentificacion();
-            boolean existe = clientes.stream()
-                    .anyMatch(c -> c != null && idCliente.equals(c.getIdentificacion()));
+            boolean existe = false;
+            for (Cliente cliente : clientes) {
+                if (cliente != null && idCliente.equals(cliente.getIdentificacion())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
                 clientes.add(visita.getCliente());
