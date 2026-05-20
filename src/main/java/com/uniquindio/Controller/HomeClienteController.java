@@ -145,34 +145,7 @@ public class HomeClienteController {
         return "detalle-inmueble";
     }
 
-    @GetMapping("/inmuebles-cliente")
-    public String showInmueblesCliente(
-            @SessionAttribute(name = "clienteSesion", required = false) Cliente cliente,
-            Model model) {
-        if (cliente == null) {
-            return "redirect:/login";
-        }
-
-        String nombre = cliente.getNombre() != null ? cliente.getNombre().trim() : "";
-        String iniciales = "CL";
-        if (!nombre.isEmpty()) {
-            String[] parts = nombre.split("\\s+");
-            if (parts.length == 1) {
-                iniciales = parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
-            } else {
-                String p1 = parts[0].substring(0, 1);
-                String p2 = parts[1].substring(0, 1);
-                iniciales = (p1 + p2).toUpperCase();
-            }
-        }
-
-        model.addAttribute("titulo", "Inmuebles disponibles");
-        model.addAttribute("nombreCliente", cliente.getNombre());
-        model.addAttribute("inicialesCliente", iniciales);
-        model.addAttribute("rolCliente", "Cliente activa");
-
-        return "inmuebles-cliente";
-    }
+    
 
     @GetMapping("/favoritos")
     public String showFavoritos(

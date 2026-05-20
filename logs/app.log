@@ -1,0 +1,50 @@
+2026-05-20T08:28:55.347-05:00  INFO 17936 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 17936 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in C:\Users\luisd\Downloads\Prop-Tech)
+2026-05-20T08:28:55.351-05:00  INFO 17936 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-20T08:28:56.490-05:00  INFO 17936 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-05-20T08:28:56.513-05:00  INFO 17936 --- [Prop-Tech] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-20T08:28:56.514-05:00  INFO 17936 --- [Prop-Tech] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-20T08:28:56.585-05:00  INFO 17936 --- [Prop-Tech] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1173 ms
+2026-05-20T08:28:57.186-05:00  INFO 17936 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 59531 (http) with context path '/'
+2026-05-20T08:28:57.193-05:00  INFO 17936 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Started PropTechApplication in 2.461 seconds (process running for 2.912)
+2026-05-20T08:29:31.446-05:00  INFO 17936 --- [Prop-Tech] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-05-20T08:29:31.464-05:00  INFO 17936 --- [Prop-Tech] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-05-20T08:30:29.743-05:00  INFO 14872 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 14872 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in c:\Users\luisd\Downloads\Prop-Tech)
+2026-05-20T08:30:29.749-05:00  INFO 14872 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-20T08:30:31.733-05:00  INFO 14872 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-05-20T08:30:31.801-05:00  INFO 14872 --- [Prop-Tech] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-20T08:30:31.805-05:00  INFO 14872 --- [Prop-Tech] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-20T08:30:32.112-05:00  INFO 14872 --- [Prop-Tech] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2284 ms
+2026-05-20T08:30:34.808-05:00  INFO 14872 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 57580 (http) with context path '/'
+2026-05-20T08:30:34.833-05:00  INFO 14872 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Started PropTechApplication in 5.946 seconds (process running for 6.488)
+2026-05-20T08:30:59.252-05:00  INFO 7936 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 7936 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in C:\Users\luisd\Downloads\Prop-Tech)
+2026-05-20T08:30:59.260-05:00  INFO 7936 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-20T08:31:00.824-05:00  INFO 7936 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-05-20T08:31:00.852-05:00  INFO 7936 --- [Prop-Tech] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-20T08:31:00.853-05:00  INFO 7936 --- [Prop-Tech] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-20T08:31:00.956-05:00  INFO 7936 --- [Prop-Tech] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1615 ms
+2026-05-20T08:31:03.581-05:00  INFO 7936 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 65193 (http) with context path '/'
+2026-05-20T08:31:03.613-05:00  INFO 7936 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Started PropTechApplication in 5.039 seconds (process running for 5.58)
+2026-05-20T08:31:45.722-05:00  INFO 25400 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 25400 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in C:\Users\luisd\Downloads\Prop-Tech)
+2026-05-20T08:31:45.728-05:00  INFO 25400 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-20T08:31:47.320-05:00  INFO 25400 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-05-20T08:31:47.347-05:00  INFO 25400 --- [Prop-Tech] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-20T08:31:47.348-05:00  INFO 25400 --- [Prop-Tech] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-20T08:31:47.632-05:00  INFO 25400 --- [Prop-Tech] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1829 ms
+2026-05-20T08:31:50.418-05:00  INFO 25400 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 64832 (http) with context path '/'
+2026-05-20T08:31:50.444-05:00  INFO 25400 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Started PropTechApplication in 5.514 seconds (process running for 6.048)
+2026-05-20T08:32:50.262-05:00  INFO 13732 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 13732 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in c:\Users\luisd\Downloads\Prop-Tech)
+2026-05-20T08:32:50.269-05:00  INFO 13732 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-20T08:32:51.688-05:00  INFO 13732 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-05-20T08:32:51.709-05:00  INFO 13732 --- [Prop-Tech] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-20T08:32:51.711-05:00  INFO 13732 --- [Prop-Tech] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-20T08:32:51.796-05:00  INFO 13732 --- [Prop-Tech] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1436 ms
+2026-05-20T08:32:52.446-05:00  INFO 13732 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 60041 (http) with context path '/'
+2026-05-20T08:32:52.452-05:00  INFO 13732 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Started PropTechApplication in 2.849 seconds (process running for 3.419)
+2026-05-20T10:43:41.959-05:00  INFO 5672 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 5672 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in C:\Users\luisd\Downloads\Prop-Tech)
+2026-05-20T10:43:41.963-05:00  INFO 5672 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-20T10:43:43.097-05:00  INFO 5672 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-05-20T10:43:43.121-05:00  INFO 5672 --- [Prop-Tech] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-20T10:43:43.122-05:00  INFO 5672 --- [Prop-Tech] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-20T10:43:43.199-05:00  INFO 5672 --- [Prop-Tech] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1154 ms
+2026-05-20T10:43:43.704-05:00  INFO 5672 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 55198 (http) with context path '/'
+2026-05-20T10:43:43.709-05:00  INFO 5672 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Started PropTechApplication in 2.377 seconds (process running for 2.788)

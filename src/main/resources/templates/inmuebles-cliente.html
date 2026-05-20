@@ -443,8 +443,7 @@
     <main class="main">
         <div class="topbar">
             <div class="title">
-                <h3>[Título principal]</h3>
-                <p>[Subtítulo de resultados y filtros]</p>
+                <h3>Inmuebles</h3>
             </div>
             <div class="view-switch">
                 <button class="switch-btn active"><i class="bi bi-grid"></i> Tarjetas</button>
@@ -458,11 +457,13 @@
                     <i class="bi bi-search"></i>
                     <input class="search-input" type="text" placeholder="[Buscar por zona o barrio]">
                 </div>
-                <select class="select">
-                    <option>[Tipo de inmueble]</option>
+                <select class="select" name="tipo">
+                    <option value="">Tipo de inmueble</option>
+                    <option th:each="t : ${tiposDisponibles}" th:value="${t}" th:text="${t}"></option>
                 </select>
-                <select class="select">
-                    <option>[Finalidad]</option>
+                <select class="select" name="finalidad">
+                    <option value="">Finalidad</option>
+                    <option th:each="f : ${finalidadesDisponibles}" th:value="${f}" th:text="${f}"></option>
                 </select>
                 <select class="select">
                     <option>[Rango de precio]</option>
@@ -470,33 +471,29 @@
             </div>
 
             <div class="filter-row second">
-                <select class="select">
-                    <option>[Habitaciones mínimas]</option>
+                <select class="select" name="habMin">
+                    <option value="">Habitaciones mínimas</option>
+                    <option th:each="h : ${habitacionesDisponibles}" th:value="${h}" th:text="${h}"></option>
                 </select>
-                <select class="select">
-                    <option>[Baños mínimos]</option>
+                <select class="select" name="baMin">
+                    <option value="">Baños mínimos</option>
+                    <option th:each="b : ${banosDisponibles}" th:value="${b}" th:text="${b}"></option>
                 </select>
                 <button class="btn-search">Buscar</button>
             </div>
 
-            <div class="chips">
-                <span class="chip active">[Filtro 1]</span>
-                <span class="chip">[Filtro 2]</span>
-                <span class="chip">[Filtro 3]</span>
-                <span class="chip">[Filtro 4]</span>
-                <span class="chip">[Filtro 5]</span>
-                <span class="chip">[Filtro 6]</span>
-                <span class="chip">[Filtro 7]</span>
-                <span class="chip">[Filtro 8]</span>
-            </div>
         </section>
 
         <div class="list-head">
-            <div class="list-count">[Cantidad de inmuebles encontrados]</div>
+            <div class="list-count" th:text="${totalInmuebles} + ' inmuebles encontrados'">0 inmuebles encontrados</div>
             <div class="sort-box">
                 <span>Ordenar por</span>
                 <select class="sort-select">
-                    <option>[Criterio de orden]</option>
+                    <option value="">Criterio de orden</option>
+                    <option value="precio">Precio</option>
+                    <option value="metros">Metros cuadrados</option>
+                    <option value="banos">Baños</option>
+                    <option value="habitaciones">Habitaciones</option>
                 </select>
             </div>
         </div>

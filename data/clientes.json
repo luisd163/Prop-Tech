@@ -50,24 +50,6 @@
         "disponibilidad": "DISPONIBLE",
         "fotoPortada": "/uploads/inmuebles/portada_3d3f45ad-837f-4ebc-a931-b5b8f2b03c4f.png",
         "fotosGaleria": []
-      },
-      {
-        "codigo": "9268",
-        "nombre": "Casa Sevilla",
-        "direccion": "calle 60 #48-20",
-        "ciudad": "Sevilla",
-        "barrio": "Obrero",
-        "codigoAsesorResponsable": "1020302622",
-        "tipoInmueble": "APARTAMENTO",
-        "finalidad": "VENTA",
-        "precio": 1500000.0,
-        "area": 80.0,
-        "numeroHabitaciones": 4,
-        "numeroBanos": 2,
-        "estadoInmueble": "USADO",
-        "disponibilidad": "DISPONIBLE",
-        "fotoPortada": "/uploads/inmuebles/portada_7e1a8909-c960-404c-9e34-d48f9ade8e54.png",
-        "fotosGaleria": []
       }
     ]
   },
