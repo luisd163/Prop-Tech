@@ -1,740 +1,662 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${titulo ?: 'Mis favoritos'}">Mis favoritos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #071429;
-            --sidebar: #0a1b33;
-            --sidebar-2: #0d213f;
-            --panel: #10284a;
-            --panel-2: #132f57;
-            --line: rgba(255,255,255,.10);
-            --text: #e8eef7;
-            --muted: #7f96b8;
-            --gold: #f6c23e;
-            --gold-2: #d8a71d;
-            --good: #32d583;
-            --warn: #f4b740;
-            --blue: #5b8cff;
-            --red: #ff7b7b;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PropTech · Mis Favoritos</title>
 
-        * { box-sizing: border-box; }
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at top left, #1d3a60 0%, #0a1f3d 48%, var(--bg) 100%);
-            color: var(--text);
-            overflow: hidden;
-        }
+  <style>
+    /* ── VARIABLES ─────────────────────────────────────── */
+    :root {
+      --navy:    #0d1b2e;
+      --navy2:   #0a1628;
+      --navy3:   #122340;
+      --navy4:   #1a3050;
+      --gold:    #c9a84c;
+      --gold2:   #e8c96a;
+      --white:   #e8dfc8;
+      --muted:   #4a6080;
+      --text:    #c8d8ea;
+      --border:  rgba(255,255,255,0.06);
+      --gold-b:  rgba(201,168,76,0.15);
+      --radius:  9px;
+    }
 
-        .layout {
-            display: grid;
-            grid-template-columns: 230px minmax(0, 1fr);
-            height: 100vh;
-        }
+    /* ── BASE ──────────────────────────────────────────── */
+    * { box-sizing: border-box; }
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      margin: 0;
+    }
 
-        .sidebar {
-            background: linear-gradient(180deg, var(--sidebar) 0%, #091527 100%);
-            border-right: 1px solid var(--line);
-            display: flex;
-            flex-direction: column;
-            padding: 18px 14px;
-            gap: 14px;
-        }
+    /* ── LAYOUT ────────────────────────────────────────── */
+    .layout-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
 
-        .brand {
-            padding: 8px 10px 16px;
-            border-bottom: 1px solid var(--line);
-        }
+    /* ── SIDEBAR ───────────────────────────────────────── */
+    .sidebar {
+      width: 210px;
+      background: var(--navy2);
+      border-right: 0.5px solid var(--gold-b);
+      padding: 20px 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
 
-        .brand h4 {
-            margin: 0;
-            color: var(--gold);
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
+    .sb-logo {
+      padding: 0 18px 18px;
+      border-bottom: 0.5px solid var(--gold-b);
+      margin-bottom: 4px;
+    }
+    .sb-logo-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .03em;
+    }
+    .sb-logo-sub {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-top: 2px;
+    }
 
-        .brand p {
-            margin: 4px 0 0;
-            color: var(--muted);
-            font-size: .74rem;
-            letter-spacing: 1px;
-        }
+    .sb-section {
+      padding: 14px 14px 5px;
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
 
-        .menu-section-title {
-            font-size: .72rem;
-            color: #6f84a8;
-            letter-spacing: 1.6px;
-            margin: 4px 10px 0;
-        }
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 16px;
+      color: #7a90a8;
+      font-size: 13px;
+      border-left: 2px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+      transition: color .15s, background .15s;
+    }
+    .sb-item:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.02);
+      text-decoration: none;
+    }
+    .sb-item.active {
+      background: rgba(201,168,76,0.08);
+      color: var(--gold);
+      border-left-color: var(--gold);
+    }
+    .sb-item i { font-size: 14px; flex-shrink: 0; }
 
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #b8c8e2;
-            text-decoration: none;
-            padding: 11px 12px;
-            border-radius: 12px;
-            position: relative;
-            transition: .2s ease;
-            font-size: .95rem;
-            border-left: 3px solid transparent;
-        }
+    .sb-badge {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 17px;
+      height: 17px;
+      border-radius: 10px;
+      background: #e05c5c;
+      font-size: 9px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
 
-        .menu-item i { color: #6d86ad; }
-        .menu-item:hover { background: var(--active); color: #fff; border-left-color: #f6c23e; }
-        .menu-item.active { background: var(--active); color: #f6c23e; border-left: 3px solid #f6c23e; }
-        .menu-item.active i { color: var(--gold); }
+    .sb-footer {
+      margin: auto 12px 18px;
+      padding: 11px;
+      background: rgba(201,168,76,0.05);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 0.5px solid var(--gold-b);
+    }
+    .sb-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--navy4);
+      border: 1.5px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .sb-user-name  { font-size: 12px; font-weight: 500; color: var(--gold); }
+    .sb-user-role  { font-size: 9px; color: var(--muted); }
 
-        .menu-badge {
-            position: absolute;
-            right: 10px;
-            min-width: 20px;
-            height: 20px;
-            padding: 0 6px;
-            border-radius: 999px;
-            background: #ef6666;
-            color: #fff;
-            font-size: .72rem;
-            display: grid;
-            place-items: center;
-            font-weight: 700;
-        }
+    /* ── MAIN CONTENT ──────────────────────────────────── */
+    .main-content {
+      margin-left: 210px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
 
-        .profile-box {
-            margin-top: auto;
-            background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    /* ── TOPBAR ────────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--navy);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title { font-size: 16px; font-weight: 600; color: var(--white); }
+    .topbar-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(246,194,62,.65);
-            color: var(--gold);
-            display: grid;
-            place-items: center;
-            font-weight: 700;
-            background: rgba(246,194,62,.08);
-            flex-shrink: 0;
-        }
+    .view-toggle .btn {
+      font-size: 11px;
+      padding: 5px 11px;
+      border-radius: 6px;
+      border: 0.5px solid rgba(255,255,255,0.08);
+      background: transparent;
+      color: #8a9ab5;
+    }
+    .view-toggle .btn.active {
+      background: rgba(201,168,76,0.1);
+      color: var(--gold);
+      border-color: rgba(201,168,76,0.25);
+    }
 
-        .main {
-            min-width: 0;
-            overflow-y: auto;
-            padding: 18px 18px 24px;
-        }
+    /* ── BODY ──────────────────────────────────────────── */
+    .body-content { padding: 18px 24px; }
 
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 14px;
-        }
+    /* ── STAT CARDS ────────────────────────────────────── */
+    .stat-card {
+      background: var(--navy3);
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 0.5px solid var(--border);
+    }
+    .stat-number { font-size: 22px; font-weight: 600; color: var(--white); }
+    .stat-label  { font-size: 10px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+    .stat-dot    { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
-        .topbar h3 {
-            margin: 0;
-            font-size: 1.45rem;
-            font-weight: 700;
-        }
+    /* ── FILTROS ───────────────────────────────────────── */
+    .filter-wrap {
+      background: var(--navy3);
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .filter-input {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--navy);
+      border: 0.5px solid rgba(255,255,255,0.09);
+      border-radius: 7px;
+      padding: 7px 12px;
+    }
+    .filter-input input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 12px;
+      width: 100%;
+      font-family: 'Sora', sans-serif;
+    }
+    .filter-input input::placeholder { color: var(--muted); }
+    .filter-input i { color: var(--muted); font-size: 13px; }
 
-        .sub {
-            color: var(--muted);
-            margin-top: 4px;
-            font-size: .92rem;
-        }
+    .form-select-dark {
+      background: var(--navy);
+      border: 0.5px solid rgba(255,255,255,0.09);
+      border-radius: 7px;
+      padding: 7px 10px;
+      color: #8a9ab5;
+      font-size: 11px;
+      font-family: 'Sora', sans-serif;
+      outline: none;
+      cursor: pointer;
+    }
+    .form-select-dark:focus { border-color: var(--gold-b); box-shadow: none; }
 
-        .view-switch {
-            display: flex;
-            gap: 10px;
-        }
+    .ftag {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: 11px;
+      cursor: pointer;
+      border: 0.5px solid rgba(255,255,255,0.07);
+      background: var(--navy);
+      color: #8a9ab5;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+    .ftag.active, .ftag:hover {
+      background: rgba(201,168,76,0.1);
+      color: var(--gold);
+      border-color: rgba(201,168,76,0.3);
+    }
 
-        .btn-view {
-            border: 1px solid rgba(255,255,255,.18);
-            background: rgba(255,255,255,.03);
-            color: var(--text);
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-weight: 700;
-            min-width: 120px;
-        }
+    /* ── RESULT HEADER ─────────────────────────────────── */
+    .result-count { font-size: 12px; color: var(--muted); }
+    .sort-select {
+      background: var(--navy3);
+      border: 0.5px solid rgba(255,255,255,0.07);
+      border-radius: 6px;
+      padding: 4px 9px;
+      color: #8a9ab5;
+      font-size: 11px;
+      font-family: 'Sora', sans-serif;
+      outline: none;
+    }
 
-        .btn-view.active {
-            background: rgba(246,194,62,.16);
-            border-color: rgba(246,194,62,.55);
-            color: #fff;
-        }
+    /* ── INMUEBLE CARD ─────────────────────────────────── */
+    .prop-card {
+      background: var(--navy3);
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .15s, transform .12s;
+    }
+    .prop-card:hover {
+      border-color: rgba(201,168,76,0.25);
+      transform: translateY(-2px);
+    }
+    /* Borde especial para inmuebles en negociación */
+    .prop-card.en-negociacion {
+      border-color: rgba(46,204,143,0.25);
+    }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 12px;
-        }
+    .prop-thumb {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .prop-thumb i { font-size: 32px; color: var(--gold); opacity: .6; }
 
-        .stat-card {
-            background: linear-gradient(180deg, var(--panel) 0%, rgba(18, 44, 82, .82) 100%);
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 16px 14px;
-            min-height: 88px;
-        }
+    /* Etiqueta encima del thumb */
+    .prop-tag {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+    .prop-tag.negociando { background: rgba(46,204,143,0.85);  color: #fff; }
+    .prop-tag.visitado   { background: rgba(75,141,232,0.85);  color: #fff; }
+    .prop-tag.reservado  { background: rgba(240,168,48,0.85);  color: #fff; }
 
-        .stat-value {
-            font-size: 2rem;
-            line-height: 1;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
+    /* Botón favorito sobre el thumb */
+    .fav-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 16px;
+      color: var(--gold);
+      cursor: pointer;
+      text-shadow: 0 1px 3px rgba(0,0,0,.5);
+      background: none;
+      border: none;
+      padding: 0;
+      line-height: 1;
+    }
 
-        .stat-label {
-            color: var(--muted);
-            font-size: .92rem;
-        }
+    .prop-body { padding: 11px 13px; }
+    .prop-name { font-size: 12px; font-weight: 600; color: var(--text); }
+    .prop-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-        .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; }
-        .good { background: var(--good); }
-        .blue { background: var(--blue); }
-        .warn { background: var(--warn); }
-        .red { background: var(--red); }
+    .prop-icons { display: flex; gap: 10px; margin-top: 6px; }
+    .prop-icon  { display: flex; align-items: center; gap: 3px; font-size: 10px; color: var(--muted); }
+    .prop-icon i { font-size: 11px; }
 
-        .panel {
-            background: linear-gradient(180deg, rgba(16,40,74,.92), rgba(11,31,61,.92));
-            border: 1px solid var(--line);
-            border-radius: 18px;
-            padding: 14px;
-        }
+    .prop-price   { font-size: 13px; color: var(--gold); font-weight: 600; margin-top: 6px; }
+    .prop-fav-date { font-size: 9px; color: var(--muted); margin-top: 3px; }
 
-        .filters {
-            display: grid;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
+    .prop-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 0.5px solid rgba(255,255,255,0.05);
+    }
 
-        .search-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,.035);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 0 14px;
-            min-height: 58px;
-        }
+    /* Badges de estado */
+    .prop-badge {
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+    .badge-disp { background: rgba(46,204,143,0.1);  color: #2ecc8f; border: 0.5px solid rgba(46,204,143,0.2); }
+    .badge-res  { background: rgba(240,168,48,0.1);  color: #f0a830; border: 0.5px solid rgba(240,168,48,0.2); }
+    .badge-neg  { background: rgba(75,141,232,0.1);  color: #4b8de8; border: 0.5px solid rgba(75,141,232,0.2); }
+    .badge-nod  { background: rgba(224,92,92,0.1);   color: #e05c5c; border: 0.5px solid rgba(224,92,92,0.2); }
 
-        .search-row i { color: #6d86ad; }
+    /* Botones de acción en cada tarjeta */
+    .prop-btn {
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 10px;
+      cursor: pointer;
+      border: 0.5px solid rgba(255,255,255,0.08);
+      background: transparent;
+      color: #8a9ab5;
+      font-family: 'Sora', sans-serif;
+      transition: color .12s, border-color .12s;
+    }
+    .prop-btn:hover        { color: var(--gold); border-color: rgba(201,168,76,0.3); }
+    .prop-btn.primary      { background: rgba(201,168,76,0.1); color: var(--gold); border-color: rgba(201,168,76,0.25); }
+    .prop-btn.danger:hover { color: #e05c5c; border-color: rgba(224,92,92,0.3); }
 
-        .search-row input,
-        .search-row select {
-            width: 100%;
-            background: transparent;
-            border: 0;
-            outline: none;
-            color: var(--text);
-            font-size: 1.02rem;
-        }
+    /* ── PAGINACIÓN ────────────────────────────────────── */
+    .pag-btn {
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      border: 0.5px solid rgba(255,255,255,0.07);
+      background: transparent;
+      color: #8a9ab5;
+      cursor: pointer;
+      font-family: 'Sora', sans-serif;
+      transition: all .12s;
+    }
+    .pag-btn:hover, .pag-btn.active {
+      background: rgba(201,168,76,0.1);
+      color: var(--gold);
+      border-color: rgba(201,168,76,0.25);
+    }
 
-        .search-row select { cursor: pointer; }
-        .search-row input::placeholder { color: #8b9dbc; }
-
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip {
-            border: 1px solid rgba(255,255,255,.12);
-            color: #b9c8de;
-            background: rgba(255,255,255,.03);
-            border-radius: 999px;
-            padding: 7px 13px;
-            font-size: .88rem;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .chip.active {
-            background: rgba(246,194,62,.14);
-            color: #fff;
-            border-color: rgba(246,194,62,.5);
-        }
-
-        .toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            margin: 8px 0 12px;
-            color: var(--muted);
-            font-size: .92rem;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .cards-grid.list-mode {
-            grid-template-columns: 1fr;
-        }
-
-        .favorite-card {
-            background: linear-gradient(180deg, rgba(19,47,87,.98), rgba(13,34,63,.98));
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            overflow: hidden;
-            min-height: 340px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .favorite-card.list-mode {
-            min-height: 0;
-            display: grid;
-            grid-template-columns: 220px 1fr;
-        }
-
-        .cover {
-            position: relative;
-            height: 168px;
-            background: radial-gradient(circle at top, rgba(246,194,62,.17), rgba(11,31,61,.95));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .list-mode .cover {
-            height: auto;
-            min-height: 100%;
-            border-bottom: 0;
-            border-right: 1px solid var(--line);
-        }
-
-        .cover i.main-icon {
-            font-size: 3.2rem;
-            color: rgba(246,194,62,.9);
-        }
-
-        .badge-top {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(16,40,74,.88);
-            color: var(--gold);
-            border: 1px solid rgba(246,194,62,.45);
-            border-radius: 999px;
-            padding: 5px 10px;
-            font-size: .78rem;
-            font-weight: 700;
-        }
-
-        .heart-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: rgba(11,31,61,.85);
-            border: 1px solid rgba(246,194,62,.35);
-            color: var(--gold);
-            display: grid;
-            place-items: center;
-        }
-
-        .body {
-            padding: 14px;
-            display: grid;
-            gap: 10px;
-        }
-
-        .title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            line-height: 1.15;
-        }
-
-        .subline {
-            color: #8ea2c6;
-            font-size: .88rem;
-            line-height: 1.35;
-        }
-
-        .meta {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .meta span {
-            background: rgba(255,255,255,.03);
-            border: 1px solid rgba(255,255,255,.08);
-            border-radius: 10px;
-            padding: 7px 8px;
-            text-align: center;
-            font-size: .8rem;
-            color: #c9d6ea;
-        }
-
-        .price {
-            color: var(--gold);
-            font-size: 1.18rem;
-            font-weight: 800;
-        }
-
-        .foot {
-            margin-top: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            border-radius: 999px;
-            padding: 6px 10px;
-            font-size: .8rem;
-            font-weight: 700;
-            border: 1px solid transparent;
-        }
-
-        .status.disponible { background: rgba(50,213,131,.1); color: #5de09e; border-color: rgba(50,213,131,.25); }
-        .status.negociacion { background: rgba(91,140,255,.12); color: #9cb8ff; border-color: rgba(91,140,255,.25); }
-        .status.reservado { background: rgba(244,183,64,.12); color: #f4c565; border-color: rgba(244,183,64,.25); }
-
-        .btn-remove,
-        .btn-view {
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-remove {
-            background: rgba(255,255,255,.03);
-            border: 1px solid rgba(255,255,255,.16);
-            color: #fff;
-        }
-
-        .btn-remove:hover { border-color: rgba(246,194,62,.45); color: #fff; }
-
-        .btn-view {
-            background: rgba(246,194,62,.14);
-            border: 1px solid rgba(246,194,62,.42);
-            color: #fff;
-        }
-
-        .empty-state {
-            min-height: 280px;
-            display: grid;
-            place-items: center;
-            text-align: center;
-            color: var(--muted);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: var(--gold);
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        @media (max-width: 1280px) {
-            .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
-
-        @media (max-width: 1100px) {
-            body { overflow: auto; }
-            .layout { grid-template-columns: 1fr; height: auto; }
-            .sidebar { display: none; }
-            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .topbar { flex-direction: column; align-items: flex-start; }
-            .view-switch { width: 100%; }
-            .btn-view { flex: 1; }
-            .favorite-card.list-mode { grid-template-columns: 1fr; }
-            .list-mode .cover { min-height: 168px; border-right: 0; border-bottom: 1px solid var(--line); }
-        }
-
-        @media (max-width: 760px) {
-            .cards-grid, .stats-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    /* ── ESTADO VACÍO ──────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+    }
+    .empty-state i   { font-size: 40px; color: rgba(201,168,76,0.3); margin-bottom: 12px; }
+    .empty-state p   { font-size: 13px; }
+  </style>
 </head>
+
 <body>
-<div class="layout">
-    <aside class="sidebar">
-        <div class="brand">
-            <h4>PropTech</h4>
-            <p>PORTAL CLIENTE</p>
+<div class="layout-wrapper">
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <!-- TIP: Extrae esto a fragments/sidebar.html y úsalo con th:replace -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-title">PropTech</div>
+      <div class="sb-logo-sub">Portal cliente</div>
+    </div>
+
+    <div class="sb-section">Explorar</div>
+    <a th:href="@{/home-cliente}" class="sb-item"><i class="bi bi-grid"></i> Inicio</a>
+    <a th:href="@{/inmuebles-cliente}" class="sb-item"><i class="bi bi-house"></i> Inmuebles</a>
+    <a th:href="@{/favoritos}" class="sb-item active"><i class="bi bi-star-fill"></i> Favoritos</a>
+    <a href="#" class="sb-item"><i class="bi bi-lightning"></i> Recomendados</a>
+
+    <div class="sb-section">Mi cuenta</div>
+    <a href="#" class="sb-item"><i class="bi bi-calendar3"></i> Mis visitas</a>
+    <a href="#" class="sb-item"><i class="bi bi-clock-history"></i> Mi historial</a>
+    <a href="#" class="sb-item"><i class="bi bi-file-text"></i> Mis operaciones</a>
+    <a href="#" class="sb-item"><i class="bi bi-bell"></i> Notificaciones</a>
+
+    <div class="sb-footer">
+      <div class="sb-avatar" th:text="${#strings.abbreviate(cliente.nombre, 2)}">LG</div>
+      <div>
+        <div class="sb-user-name" th:text="${cliente.nombre}">Laura Gil</div>
+        <div class="sb-user-role">Cliente activa</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════ MAIN ══════════════ -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Mis favoritos</div>
+        <!-- th:text muestra datos dinámicos del modelo -->
+           <div class="topbar-sub"
+             th:text="${favoritosTotal} + ' inmuebles guardados · ' + ${favoritosNegociacion} + ' en negociación'">
+          4 inmuebles guardados · 1 en negociación
         </div>
+      </div>
+      <div class="view-toggle d-flex gap-2">
+        <button class="btn active"><i class="bi bi-grid-3x3-gap"></i> Tarjetas</button>
+        <button class="btn"><i class="bi bi-list-ul"></i> Lista</button>
+      </div>
+    </div>
 
-        <div class="menu-section-title">EXPLORAR</div>
-        <a class="menu-item" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
-        <a class="menu-item" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
-        <a class="menu-item active" th:href="@{/favoritos}"><i class="bi bi-star"></i> Favoritos <span class="menu-badge" th:text="${favoritosTotal ?: 0}">0</span></a>
-        <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Recomendados</a>
+    <!-- BODY -->
+    <div class="body-content">
 
-        <div class="menu-section-title">MI CUENTA</div>
-        <a class="menu-item" href="#"><i class="bi bi-calendar-event"></i> Mis visitas</a>
-        <a class="menu-item" href="#"><i class="bi bi-clock-history"></i> Mi historial</a>
-        <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
-        <a class="menu-item" href="#"><i class="bi bi-bell"></i> Notificaciones</a>
-
-        <div class="profile-box">
-            <div class="avatar" th:text="${inicialesCliente ?: 'CL'}">CL</div>
-            <div>
-                <div class="fw-semibold" th:text="${nombreCliente ?: 'Perfil'}">Perfil</div>
-                <div class="small" style="color:#8aa2c2" th:text="${rolCliente ?: 'Cliente'}">Cliente</div>
+      <!-- STATS -->
+      <div class="row g-2 mb-3">
+        <div class="col-3">
+          <div class="stat-card">
+            <div class="stat-number" th:text="${favoritosTotal}">4</div>
+            <div class="stat-label">
+              <span class="stat-dot" style="background:#c9a84c"></span> Total favoritos
             </div>
+          </div>
         </div>
-    </aside>
-
-    <main class="main">
-        <div class="topbar">
-            <div>
-                <h3>Mis favoritos</h3>
-                <div class="sub">
-                    <span th:text="${favoritosTotal ?: 0}">0</span> inmuebles guardados ·
-                    <span th:text="${favoritosNegociacion ?: 0}">0</span> en negociación
-                </div>
+        <div class="col-3">
+          <div class="stat-card">
+            <div class="stat-number" th:text="${favoritosDisponibles}">2</div>
+            <div class="stat-label">
+              <span class="stat-dot" style="background:#2ecc8f"></span> Disponibles
             </div>
-            <div class="view-switch">
-                <button class="btn-view active" type="button" data-view="cards"><i class="bi bi-grid-3x3-gap"></i> Tarjetas</button>
-                <button class="btn-view" type="button" data-view="list"><i class="bi bi-list"></i> Lista</button>
-            </div>
+          </div>
         </div>
+        <div class="col-3">
+          <div class="stat-card">
+            <div class="stat-number" th:text="${favoritosNegociacion}">1</div>
+            <div class="stat-label">
+              <span class="stat-dot" style="background:#4b8de8"></span> En negociación
+            </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="stat-card">
+            <div class="stat-number" th:text="${favoritosReservados}">1</div>
+            <div class="stat-label">
+              <span class="stat-dot" style="background:#f0a830"></span> Reservados
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <section class="stats-grid">
-            <article class="stat-card">
-                <div class="stat-value" th:text="${favoritosTotal ?: 0}">0</div>
-                <div class="stat-label"><span class="dot warn"></span>Total favoritos</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-value" th:text="${favoritosDisponibles ?: 0}">0</div>
-                <div class="stat-label"><span class="dot good"></span>Disponibles</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-value" th:text="${favoritosNegociacion ?: 0}">0</div>
-                <div class="stat-label"><span class="dot blue"></span>En negociación</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-value" th:text="${favoritosReservados ?: 0}">0</div>
-                <div class="stat-label"><span class="dot warn"></span>Reservado</div>
-            </article>
-        </section>
+      <!-- FILTROS -->
+      <div class="filter-wrap">
+        <form th:action="@{/favoritos}" method="get">
+          <div class="d-flex gap-2 flex-wrap mb-2">
+            <div class="filter-input flex-grow-1">
+              <i class="bi bi-search"></i>
+              <input type="text" name="q" placeholder="Buscar en mis favoritos…"
+                     th:value="${param.q}"/>
+            </div>
+            <select class="form-select-dark" name="tipo">
+              <option value="">Todos los tipos</option>
+              <option value="APARTAMENTO" th:selected="${param.tipo == 'APARTAMENTO'}">Apartamento</option>
+              <option value="CASA"        th:selected="${param.tipo == 'CASA'}">Casa</option>
+              <option value="LOCAL"       th:selected="${param.tipo == 'LOCAL'}">Local comercial</option>
+              <option value="OFICINA"     th:selected="${param.tipo == 'OFICINA'}">Oficina</option>
+            </select>
+            <select class="form-select-dark" name="estado">
+              <option value="">Todos los estados</option>
+              <option value="DISPONIBLE"  th:selected="${param.estado == 'DISPONIBLE'}">Disponible</option>
+              <option value="RESERVADO"   th:selected="${param.estado == 'RESERVADO'}">Reservado</option>
+              <option value="NEGOCIANDO"  th:selected="${param.estado == 'NEGOCIANDO'}">En negociación</option>
+            </select>
+            <button type="submit" class="prop-btn primary px-3">Filtrar</button>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <a th:href="@{/favoritos}"                         class="ftag" th:classappend="${param.filtro == null}    ? 'active' : ''">Todos</a>
+            <a th:href="@{/favoritos(filtro='disponibles')}"   class="ftag" th:classappend="${param.filtro == 'disponibles'}  ? 'active' : ''">Disponibles</a>
+            <a th:href="@{/favoritos(filtro='con-visita')}"    class="ftag" th:classappend="${param.filtro == 'con-visita'}    ? 'active' : ''">Con visita agendada</a>
+            <a th:href="@{/favoritos(filtro='negociacion')}"   class="ftag" th:classappend="${param.filtro == 'negociacion'}   ? 'active' : ''">En negociación</a>
+          </div>
+        </form>
+      </div>
 
-        <section class="panel">
-            <div class="filters">
-                <div class="search-row">
-                    <i class="bi bi-search"></i>
-                    <input id="favoritosSearch" type="text" placeholder="Buscar en mis favoritos..." autocomplete="off">
-                </div>
-                <div class="search-row">
-                    <select id="tipoFiltro">
-                        <option value="">Todos los tipos</option>
-                        <option value="APARTAMENTO">Apartamento</option>
-                        <option value="CASA">Casa</option>
-                        <option value="LOTE">Lote</option>
-                        <option value="BODEGA">Bodega</option>
-                        <option value="LOCAL_COMERCIAL">Local comercial</option>
-                        <option value="OFICINA">Oficina</option>
-                    </select>
-                </div>
-                <div class="search-row">
-                    <select id="estadoFiltro">
-                        <option value="">Todos los estados</option>
-                        <option value="DISPONIBLE">Disponibles</option>
-                        <option value="NO_DISPONIBLE">En negociación</option>
-                        <option value="RESERVADO">Reservado</option>
-                    </select>
-                </div>
-                <div class="chips" id="chipsEstados">
-                    <span class="chip active" data-estado="">Todos</span>
-                    <span class="chip" data-estado="DISPONIBLE">Disponibles</span>
-                    <span class="chip" data-estado="NO_DISPONIBLE">Con negociación</span>
-                    <span class="chip" data-estado="RESERVADO">Reservado</span>
-                </div>
+      <!-- RESULTADO HEADER -->
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="result-count"
+             th:text="${favoritosTotal} + ' inmuebles favoritos'">4 inmuebles favoritos</div>
+        <div class="d-flex align-items-center gap-2" style="font-size:11px;color:var(--muted)">
+          Ordenar por
+          <select class="sort-select" onchange="window.location.href='?ordenar='+this.value">
+            <option value="reciente">Más reciente</option>
+            <option value="precio-asc">Menor precio</option>
+            <option value="precio-desc">Mayor precio</option>
+            <option value="area">Mayor área</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ═══════ GRID INMUEBLES ═══════ -->
+      <!-- Estado vacío: si la lista de favoritos está vacía -->
+      <div class="empty-state" th:if="${#lists.isEmpty(favoritos)}">
+        <i class="bi bi-star"></i>
+        <p>Aún no tienes inmuebles favoritos.<br/>
+           <a th:href="@{/inmuebles-cliente}" style="color:var(--gold)">Explorar inmuebles</a>
+        </p>
+      </div>
+
+      <!-- Grid con los favoritos -->
+      <div class="row g-3 mb-3" th:unless="${#lists.isEmpty(favoritos)}">
+
+        <!-- th:each recorre la ListaEnlazada de favoritos del cliente -->
+        <div class="col-md-4" th:each="inmueble : ${favoritos}">
+          <div class="prop-card"
+            th:classappend="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'NO_DISPONIBLE'} ? 'en-negociacion' : ''">
+
+            <!-- THUMB -->
+            <div class="prop-thumb" style="background:#1a3050;">
+              <i class="bi"
+                 th:classappend="${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'CASA'} ? 'bi-house-fill' :
+                      (${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'LOCAL_COMERCIAL'} ? 'bi-shop' :
+                      (${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'BODEGA'} ? 'bi-box-seam' :
+                      (${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'OFICINA'} ? 'bi-building' : 'bi-grid')))"></i>
+
+              <span class="prop-tag visitado"
+                th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'DISPONIBLE'}">Disponible</span>
+              <span class="prop-tag reservado"
+                th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'RESERVADO'}">Reservado</span>
+              <span class="prop-tag negociando"
+                th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'NO_DISPONIBLE'}">No disponible</span>
+
+              <!-- Botón quitar favorito -->
+              <form th:action="@{/favoritos/quitar}" method="post" style="position:absolute;top:8px;right:8px">
+                <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}"/>
+                <button type="submit" class="fav-btn" title="Quitar de favoritos">♥</button>
+              </form>
             </div>
 
-            <div class="toolbar">
-                <div><span th:text="${favoritosTotal ?: 0}">0</span> inmuebles favoritos</div>
-                <div>
-                    <span style="margin-right:8px;">Ordenar por</span>
-                    <select id="sortSelect" style="background:rgba(255,255,255,.03);color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;">
-                        <option value="reciente">Más reciente</option>
-                        <option value="precioAsc">Precio: menor a mayor</option>
-                        <option value="precioDesc">Precio: mayor a menor</option>
-                        <option value="nombre">Nombre</option>
-                    </select>
+            <!-- BODY -->
+            <div class="prop-body">
+              <div class="prop-name"
+                   th:text="${inmueble.tipoInmueble.name()} + ' · ' + ${inmueble.barrio}">
+                Apartamento · El Poblado
+              </div>
+              <div class="prop-meta"
+                   th:text="${inmueble.direccion} + ' · ' + ${inmueble.ciudad} + ' · ' + ${inmueble.codigo}">
+                Cll 10 #43-20 · Medellín · COD-002
+              </div>
+
+              <!-- Íconos: área, habitaciones, baños -->
+              <div class="prop-icons">
+                <div class="prop-icon">
+                  <i class="bi bi-aspect-ratio"></i>
+                  <span th:text="${inmueble.area} + ' m²'">68 m²</span>
                 </div>
-            </div>
-
-            <div id="favoritosEmpty" class="empty-state" th:if="${favoritos == null || favoritos.isEmpty()}">
-                <div>
-                    <i class="bi bi-star"></i>
-                    <h4>No tienes inmuebles favoritos aún</h4>
-                    <p>Guarda inmuebles desde el detalle o desde el catálogo para verlos aquí.</p>
-                    <a class="btn-view" th:href="@{/inmuebles-cliente}">Explorar inmuebles</a>
+                <div class="prop-icon">
+                  <i class="bi bi-door-open"></i>
+                  <span th:text="${inmueble.numeroHabitaciones} + ' hab'">2 hab</span>
                 </div>
+                <div class="prop-icon">
+                  <i class="bi bi-droplet"></i>
+                  <span th:text="${inmueble.numeroBanos} + ' baños'">2 baños</span>
+                </div>
+              </div>
+
+              <!-- Precio -->
+              <div class="prop-price">
+                <span th:text="${currencyFormatter.format(inmueble.precio)}">$350.000.000</span>
+              </div>
+
+              <div class="prop-fav-date">Guardado recientemente</div>
+
+              <!-- Footer: badge + botones -->
+              <div class="prop-footer">
+                    <span class="prop-badge badge-disp"
+                      th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'DISPONIBLE'}">Disponible</span>
+                    <span class="prop-badge badge-res"
+                      th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'RESERVADO'}">Reservado</span>
+                    <span class="prop-badge badge-neg"
+                      th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'NO_DISPONIBLE'}">No disponible</span>
+
+                <div class="d-flex gap-1">
+                  <!-- Quitar de favoritos -->
+                  <form th:action="@{/favoritos/quitar}" method="post">
+                    <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}"/>
+                    <button type="submit" class="prop-btn danger">✕ Quitar</button>
+                  </form>
+
+                  <!-- Ver detalle -->
+                  <a th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}"
+                     class="prop-btn">Ver</a>
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <div id="favoritosGrid" class="cards-grid" th:unless="${favoritos == null || favoritos.isEmpty()}">
-                <article class="favorite-card" th:each="inmueble : ${favoritos}"
-                         th:attr="data-search=${(inmueble.nombre ?: '') + ' ' + (inmueble.direccion ?: '') + ' ' + (inmueble.ciudad ?: '') + ' ' + (inmueble.barrio ?: '') + ' ' + (inmueble.codigo ?: '')}, data-tipo=${inmueble.tipoInmueble}, data-estado=${inmueble.disponibilidad}, data-precio=${inmueble.precio}, data-nombre=${inmueble.nombre ?: ''}">
-                    <div class="cover" th:classappend="${inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).DISPONIBLE ? ' disponible' : (inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).RESERVADO ? ' reservado' : ' negociacion')}">
-                        <span class="badge-top" th:text="${inmueble.disponibilidad ?: 'Favorito'}">Favorito</span>
-                        <i class="bi bi-house-door main-icon"></i>
-                        <i class="bi bi-heart-fill heart-btn"></i>
-                    </div>
-                    <div class="body">
-                        <div class="title" th:text="${inmueble.nombre ?: 'Inmueble'}">Inmueble</div>
-                        <div class="subline">
-                            <span th:text="${inmueble.direccion ?: 'Sin dirección'}">Dirección</span>
-                            ·
-                            <span th:text="${inmueble.ciudad ?: 'Ciudad'}">Ciudad</span>
-                            ·
-                            <span th:text="${inmueble.codigo ?: 'Código'}">Código</span>
-                        </div>
-                        <div class="meta">
-                            <span th:text="${inmueble.area + ' m²'}">0 m²</span>
-                            <span th:text="${inmueble.numeroHabitaciones + ' hab'}">0 hab</span>
-                            <span th:text="${inmueble.numeroBanos + ' baños'}">0 baños</span>
-                        </div>
-                        <div class="price" th:text="${currencyFormatter.format(inmueble.precio)}">$0</div>
-                        <div class="subline">Guardado en tus favoritos</div>
-                        <div class="foot">
-                            <span class="status" th:classappend="${inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).DISPONIBLE ? ' disponible' : (inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).RESERVADO ? ' reservado' : ' negociacion')}"
-                                  th:text="${inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).DISPONIBLE ? 'Disponible' : (inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).RESERVADO ? 'Reservado' : 'En negociación')}">Disponible</span>
-                            <div style="display:flex; gap:10px;">
-                                <a class="btn-view" th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}"><i class="bi bi-eye"></i> Ver</a>
-                                <form th:action="@{/favoritos/quitar}" method="post" style="margin:0;">
-                                    <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}">
-                                    <button class="btn-remove" type="submit"><i class="bi bi-x-lg"></i> Quitar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </section>
-    </main>
-</div>
+    </div><!-- /body-content -->
+  </div><!-- /main-content -->
+</div><!-- /layout-wrapper -->
 
-<script>
-    const searchInput = document.getElementById('favoritosSearch');
-    const tipoFiltro = document.getElementById('tipoFiltro');
-    const estadoFiltro = document.getElementById('estadoFiltro');
-    const sortSelect = document.getElementById('sortSelect');
-    const grid = document.getElementById('favoritosGrid');
-    const empty = document.getElementById('favoritosEmpty');
-    const chips = document.querySelectorAll('#chipsEstados .chip');
-    const viewButtons = document.querySelectorAll('.btn-view[data-view]');
-    const stateClasses = ['disponible', 'negociacion', 'reservado'];
-
-    function normalize(text) {
-        return (text || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    }
-
-    function getCards() {
-        return Array.from(document.querySelectorAll('.favorite-card'));
-    }
-
-    function applyFilters() {
-        if (!grid) return;
-
-        const q = normalize(searchInput?.value || '');
-        const tipo = normalize(tipoFiltro?.value || '');
-        const estado = normalize(estadoFiltro?.value || '');
-
-        let visible = 0;
-        getCards().forEach(card => {
-            const search = normalize(card.dataset.search);
-            const cardTipo = normalize(card.dataset.tipo);
-            const cardEstado = normalize(card.dataset.estado);
-            const matches = (!q || search.includes(q)) && (!tipo || cardTipo === tipo) && (!estado || cardEstado === estado);
-            card.style.display = matches ? '' : 'none';
-            if (matches) visible++;
-        });
-
-        if (empty) empty.style.display = visible === 0 ? 'grid' : 'none';
-        if (grid) grid.style.display = visible === 0 ? 'none' : '';
-    }
-
-    function applySort() {
-        if (!grid) return;
-        const mode = sortSelect?.value || 'reciente';
-        const cards = getCards();
-
-        cards.sort((a, b) => {
-            const priceA = parseFloat(a.dataset.precio || '0');
-            const priceB = parseFloat(b.dataset.precio || '0');
-            const nameA = normalize(a.dataset.nombre);
-            const nameB = normalize(b.dataset.nombre);
-            if (mode === 'precioAsc') return priceA - priceB;
-            if (mode === 'precioDesc') return priceB - priceA;
-            if (mode === 'nombre') return nameA.localeCompare(nameB);
-            return 0;
-        });
-
-        cards.forEach(card => grid.appendChild(card));
-    }
-
-    searchInput?.addEventListener('input', applyFilters);
-    tipoFiltro?.addEventListener('change', applyFilters);
-    estadoFiltro?.addEventListener('change', applyFilters);
-    sortSelect?.addEventListener('change', () => { applySort(); applyFilters(); });
-
-    chips.forEach(chip => {
-        chip.addEventListener('click', function() {
-            chips.forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            const estado = this.dataset.estado || '';
-            if (estadoFiltro) estadoFiltro.value = estado;
-            applyFilters();
-        });
-    });
-
-    viewButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            viewButtons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const view = this.dataset.view;
-            if (grid) {
-                grid.classList.toggle('list-mode', view === 'list');
-                getCards().forEach(card => card.classList.toggle('list-mode', view === 'list'));
-            }
-        });
-    });
-
-    applySort();
-    applyFilters();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

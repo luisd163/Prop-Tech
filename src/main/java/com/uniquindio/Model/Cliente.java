@@ -2,6 +2,7 @@ package com.uniquindio.Model;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,8 @@ public class Cliente implements Usuario {
 	private int cantidadMinimaHabitaciones;
 	private EstadoBusqueda estadoBusqueda;
 	private List<Inmueble> favoritos;
+	private ArrayList<Inmueble> intenciones;
+	private List<Inmueble> historialConsultas;
 
 	@Override
 	public String getCorreo() {
@@ -55,4 +58,38 @@ public class Cliente implements Usuario {
 		PAUSADA,
 		FINALIZADA
 	}
+	public void registrarIntencion(
+        Cliente cliente,
+        Inmueble inmueble) {
+
+    	// Si la lista no existe, crearla
+
+    	if (cliente.getIntenciones() == null) {
+        	cliente.setIntenciones(new ArrayList<>());
+    	}
+
+    	// Evitar duplicados
+
+    	boolean existe = cliente.getIntenciones()
+            .stream()
+            .anyMatch(i ->
+                    i.getCodigo()
+                            .equals(inmueble.getCodigo())
+            );
+
+    	if (!existe) {
+    	    cliente.getIntenciones().add(inmueble);
+    	}
+	}
+
+	public List<Inmueble> consultarHistorial(
+        Cliente cliente
+	) {
+
+    if (cliente.getHistorialConsultas() == null) {
+        cliente.setHistorialConsultas(new ArrayList<>());
+    }
+
+    return cliente.getHistorialConsultas();
+}
 }

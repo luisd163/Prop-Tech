@@ -29,10 +29,10 @@ public class GrafoInmuebles {
     }
 
     // Crear conexiones automáticas por ciudad
-    public void conectarPorCiudad(List<Inmueble> inmuebles, String ciudad) {
+    public void conectarPorCiudad(HashMap<String, Inmueble> inmuebles, String ciudad) {
 
         List<Inmueble> inmueblesCiudad = new ArrayList<>();
-        for (Inmueble inmueble : inmuebles) {
+        for (Inmueble inmueble : inmuebles.values()) {
 
             if (inmueble.getCiudad().equalsIgnoreCase(ciudad)) {
 

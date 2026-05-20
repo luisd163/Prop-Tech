@@ -2,9 +2,12 @@ package com.uniquindio.Repositorio;
 
 import java.util.HashMap;
 
+import org.springframework.stereotype.Repository;
+
 import com.uniquindio.Model.Inmueble;
 import com.uniquindio.Persistencia.InmueblePersistencia;
 
+@Repository
 public class InmuebleRepositorio {
     
     private final HashMap<String, Inmueble> inmuebles;
