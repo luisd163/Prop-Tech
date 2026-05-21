@@ -68,6 +68,13 @@ public class HomeClienteController {
         // Limitar a 5 inmuebles para la página principal
         List<Inmueble> inmuebles = inmueblesFiltered.size() > 5 ? inmueblesFiltered.subList(0, 5) : inmueblesFiltered;
         
+        // Obtener inmuebles recomendados basados en presupuesto del cliente
+        List<Inmueble> recomendados = todosInmuebles.stream()
+                .filter(i -> i.getPrecio() <= presupuestoCliente)
+                .filter(i -> i.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE)
+                .limit(5)
+                .collect(Collectors.toList());
+        
         // Generar opciones dinámicas para selects
         Set<String> zonas = todosInmuebles.stream()
                 .map(Inmueble::getBarrio)
@@ -109,6 +116,7 @@ public class HomeClienteController {
 
         // Lista principal de inmuebles reales
         model.addAttribute("itemsPrincipales", inmuebles);
+        model.addAttribute("recomendados", recomendados);
         model.addAttribute("currencyFormatter", NumberFormat.getCurrencyInstance(Locale.of("es", "CO")));
         return "home-cliente";
     }

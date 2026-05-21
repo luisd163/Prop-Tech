@@ -340,6 +340,95 @@
             padding: 14px;
         }
 
+        .recomendados-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .recomendado-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+
+        .recomendado-item:hover {
+            background: rgba(255,255,255,.05);
+        }
+
+        .recomendado-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #214476 0%, #16335d 100%);
+        }
+
+        .recomendado-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .recomendado-title {
+            font-weight: 600;
+            color: #e8eef7;
+            font-size: 0.95rem;
+        }
+
+        .recomendado-meta {
+            font-size: 0.85rem;
+            color: #7f96b8;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .recomendado-status {
+            display: flex;
+            justify-content: center;
+        }
+
+        .badge-status {
+            background: rgba(0, 208, 140, .15);
+            border: 1px solid rgba(0, 208, 140, .35);
+            color: #2dd9a1;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .recomendado-action {
+            padding: 0 8px;
+        }
+
+        .btn-ver {
+            background: rgba(246,194,62,.12);
+            border: 1px solid rgba(246,194,62,.35);
+            color: #f6c23e;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn-ver:hover {
+            background: rgba(246,194,62,.2);
+            color: #ffd966;
+        }
+
         .placeholder-area {
             height: calc(100% - 46px);
             border: 1px dashed rgba(255,255,255,.16);
@@ -542,12 +631,42 @@
             <article class="section-card placeholder-box">
                 <div class="section-head">
                     <h5>Recomendados</h5>
-                    <a href="#">Ver todos →</a>
+                    <a th:href="@{/inmuebles-cliente}">Ver todos →</a>
                 </div>
-                <div class="placeholder-area">
+                <div th:if="${recomendados != null and !recomendados.isEmpty()}" class="recomendados-list">
+                    <div class="recomendado-item" th:each="inmueble : ${recomendados}">
+                        <div class="recomendado-img">
+                            <img th:if="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}"
+                                 th:src="${inmueble.fotoPortada}"
+                                 th:alt="${inmueble.nombre}"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                            <div th:unless="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}"
+                                 style="width: 100%; height: 100%; display: grid; place-items: center; background: linear-gradient(135deg, #214476 0%, #16335d 100%); color: #f6c23e; font-size: 1.5rem;">
+                                <i class="bi bi-house"></i>
+                            </div>
+                        </div>
+                        <div class="recomendado-content">
+                            <div class="recomendado-title" th:text="${inmueble.nombre}">Nombre</div>
+                            <div class="recomendado-meta">
+                                <span th:text="${inmueble.tipoInmueble != null ? inmueble.tipoInmueble.name() : 'Inmueble'}">TIPO</span>
+                                <span>·</span>
+                                <span th:text="${inmueble.ciudad}">Ciudad</span>
+                                <span>·</span>
+                                <span th:text="${currencyFormatter.format(inmueble.precio)}">Precio</span>
+                            </div>
+                        </div>
+                        <div class="recomendado-status">
+                            <span class="badge-status" th:text="${inmueble.disponibilidad != null ? inmueble.disponibilidad.name() : 'DISPONIBLE'}">DISPONIBLE</span>
+                        </div>
+                        <div class="recomendado-action">
+                            <a class="btn-ver" th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}">Ver</a>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${recomendados == null or recomendados.isEmpty()}" class="placeholder-area">
                     <div>
-                        <div class="fw-semibold mb-2">[Elemento]</div>
-                        <div>[Descripción breve]</div>
+                        <div class="fw-semibold mb-2">Sin recomendaciones</div>
+                        <div>No hay inmuebles disponibles dentro de tu presupuesto</div>
                     </div>
                 </div>
             </article>

@@ -6,7 +6,7 @@
     "telefono": "3205729072",
     "contrasena": "123",
     "tipoCliente": "PERSONA_NATURAL",
-    "presupuesto": 1.0E9,
+    "presupuesto": 30000,
     "zonasDeInteres": [
       "Armenia",
       "Medellin"
