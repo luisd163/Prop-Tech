@@ -508,13 +508,20 @@
             <div class="list-count" th:text="${totalInmuebles} + ' inmuebles encontrados'">0 inmuebles encontrados</div>
             <div class="sort-box">
                 <span>Ordenar por</span>
-                <select class="sort-select">
-                    <option value="">Criterio de orden</option>
-                    <option value="precio">Precio</option>
-                    <option value="metros">Metros cuadrados</option>
-                    <option value="banos">Baños</option>
-                    <option value="habitaciones">Habitaciones</option>
-                </select>
+                <form method="get" th:action="@{/inmuebles-cliente}" style="display:inline; margin:0;">
+                    <input type="hidden" name="ciudad" th:value="${searchCiudad}">
+                    <input type="hidden" name="tipo" th:value="${selectedTipo}">
+                    <input type="hidden" name="finalidad" th:value="${selectedFinalidad}">
+                    <input type="hidden" name="habMin" th:value="${selectedHabMin}">
+                    <input type="hidden" name="baMin" th:value="${selectedBaMin}">
+                    <select class="sort-select" name="sortBy" onchange="this.form.submit()">
+                        <option value="" th:selected="${selectedSortBy == null or selectedSortBy == ''}">Criterio de orden</option>
+                        <option value="precio" th:selected="${selectedSortBy == 'precio'}">Precio</option>
+                        <option value="metros" th:selected="${selectedSortBy == 'metros'}">Metros cuadrados</option>
+                        <option value="banos" th:selected="${selectedSortBy == 'banos'}">Baños</option>
+                        <option value="habitaciones" th:selected="${selectedSortBy == 'habitaciones'}">Habitaciones</option>
+                    </select>
+                </form>
             </div>
         </div>
 

@@ -26,6 +26,7 @@ public class InmueblesClienteController {
 			@RequestParam(name = "finalidad", required = false) String finalidad,
 			@RequestParam(name = "habMin", required = false) String habMin,
 			@RequestParam(name = "baMin", required = false) String baMin,
+			@RequestParam(name = "sortBy", required = false) String sortBy,
 			Model model) {
 		if (cliente == null) {
 			return "redirect:/login";
@@ -118,6 +119,25 @@ public class InmueblesClienteController {
 			}
 		}
 
+		// Aplicar ordenamiento (de mayor a menor)
+		if (sortBy != null && !sortBy.trim().isEmpty()) {
+			String sort = sortBy.trim().toLowerCase();
+			switch(sort) {
+				case "precio":
+					itemsPrincipales.sort((a, b) -> Float.compare(b.getPrecio(), a.getPrecio()));
+					break;
+				case "metros":
+					itemsPrincipales.sort((a, b) -> Double.compare(b.getArea(), a.getArea()));
+					break;
+				case "banos":
+					itemsPrincipales.sort((a, b) -> Integer.compare(b.getNumeroBanos(), a.getNumeroBanos()));
+					break;
+				case "habitaciones":
+					itemsPrincipales.sort((a, b) -> Integer.compare(b.getNumeroHabitaciones(), a.getNumeroHabitaciones()));
+					break;
+			}
+		}
+
 		int totalInmuebles = itemsPrincipales.size();
 
 		model.addAttribute("titulo", "Inmuebles disponibles");
@@ -131,6 +151,7 @@ public class InmueblesClienteController {
 		model.addAttribute("selectedFinalidad", finalidad != null ? finalidad : "");
 		model.addAttribute("selectedHabMin", habMin != null ? habMin : "");
 		model.addAttribute("selectedBaMin", baMin != null ? baMin : "");
+		model.addAttribute("selectedSortBy", sortBy != null ? sortBy : "");
 		model.addAttribute("itemsPrincipales", itemsPrincipales);
 		model.addAttribute("currencyFormatter", NumberFormat.getCurrencyInstance(Locale.of("es", "CO")));
 		model.addAttribute("tiposDisponibles", tiposDisponibles);

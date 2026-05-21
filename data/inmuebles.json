@@ -17,6 +17,24 @@
     "fotoPortada": "/uploads/inmuebles/portada_7e1a8909-c960-404c-9e34-d48f9ade8e54.png",
     "fotosGaleria": []
   },
+  "5028": {
+    "codigo": "5028",
+    "nombre": "Oficina Armenia",
+    "direccion": "calle 15 Norte #14-99",
+    "ciudad": "Armenia",
+    "barrio": "Obrero",
+    "codigoAsesorResponsable": "1020302622",
+    "tipoInmueble": "OFICINA",
+    "finalidad": "ARRIENDO",
+    "precio": 500000.0,
+    "area": 15.0,
+    "numeroHabitaciones": 1,
+    "numeroBanos": 1,
+    "estadoInmueble": "USADO",
+    "disponibilidad": "DISPONIBLE",
+    "fotoPortada": "/uploads/inmuebles/portada_50a92471-0d3a-4ccc-a6fa-0972e2f3b6c2.webp",
+    "fotosGaleria": []
+  },
   "3676": {
     "codigo": "3676",
     "nombre": "Prueba de imagenes",
@@ -33,6 +51,24 @@
     "estadoInmueble": "USADO",
     "disponibilidad": "DISPONIBLE",
     "fotoPortada": "/uploads/inmuebles/portada_57244be2-b4c3-4035-9076-aa55c2b48838.jpg",
+    "fotosGaleria": []
+  },
+  "1182": {
+    "codigo": "1182",
+    "nombre": "Casa mesi",
+    "direccion": "123",
+    "ciudad": "Armenia",
+    "barrio": "La fogata",
+    "codigoAsesorResponsable": "1020302622",
+    "tipoInmueble": "APARTAMENTO",
+    "finalidad": "ARRIENDO",
+    "precio": 600000.0,
+    "area": 500.0,
+    "numeroHabitaciones": 7,
+    "numeroBanos": 7,
+    "estadoInmueble": "USADO",
+    "disponibilidad": "DISPONIBLE",
+    "fotoPortada": "/uploads/inmuebles/portada_61c5b43c-27da-4149-96db-539abe4b2921.jpg",
     "fotosGaleria": []
   }
 }
