@@ -46,21 +46,80 @@
       min-height: 100vh;
     }
 
-    /* ── SIDEBAR ───────────────────────────────────────── */
     .sidebar {
-      width: 210px;
-      background: var(--navy2);
-      border-right: 0.5px solid var(--gold-b);
-      padding: 20px 0;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      z-index: 100;
-    }
+    background: linear-gradient(180deg, #061a33 0%, #031228 100%);
+    border-right: 1px solid #17365e;
+    padding: 22px 0 18px;
+    display: flex;
+    flex-direction: column;
+    width: 210px; /* mantén el ancho que ya tenías */
+}
+.brand {
+    padding: 0 22px 18px;
+    border-bottom: 1px solid #17365e;
+    margin-bottom: 12px;
+}
+.brand h4 {
+    margin: 0;
+    color: #f6c23e;
+    font-size: 1.45rem;
+    font-weight: 700;
+}
+.brand p {
+    margin: 2px 0 0;
+    color: #7f96b8;
+    font-size: .82rem;
+    letter-spacing: .8px;
+}
+.menu-section-title {
+    color: #7f96b8;
+    font-size: .76rem;
+    letter-spacing: 1.4px;
+    margin: 16px 22px 8px;
+}
+.menu-item {
+    color: #b5c7df;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 22px;
+    border-left: 3px solid transparent;
+    font-size: .95rem;
+    transition: .2s;
+}
+.menu-item:hover,
+.menu-item.active {
+    background: #1d3658;
+    color: #f6c23e;
+    border-left-color: #f6c23e;
+}
+.profile-box {
+    margin: auto 14px 0;
+    border: 1px solid #1f416e;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.03);
+    position: sticky;
+    bottom: 14px;
+}
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #f6c23e;
+    display: grid;
+    place-items: center;
+    color: #f6c23e;
+    font-size: .85rem;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+
 
     .sb-logo {
       padding: 0 18px 18px;
@@ -421,32 +480,32 @@
 
   <!-- ══════════════ SIDEBAR ══════════════ -->
   <!-- TIP: Extrae esto a fragments/sidebar.html y úsalo con th:replace -->
-  <nav class="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-title">PropTech</div>
-      <div class="sb-logo-sub">Portal cliente</div>
+<aside class="sidebar">
+    <div class="brand">
+        <h4>PropTech</h4>
+        <p>PORTAL CLIENTE</p>
     </div>
 
-    <div class="sb-section">Explorar</div>
-    <a th:href="@{/home-cliente}" class="sb-item"><i class="bi bi-grid"></i> Inicio</a>
-    <a th:href="@{/inmuebles-cliente}" class="sb-item"><i class="bi bi-house"></i> Inmuebles</a>
-    <a th:href="@{/favoritos}" class="sb-item active"><i class="bi bi-star-fill"></i> Favoritos</a>
-    <a href="#" class="sb-item"><i class="bi bi-lightning"></i> Recomendados</a>
+    <div class="menu-section-title">EXPLORAR</div>
+    <a class="menu-item" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
+    <a class="menu-item" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
+    <a class="menu-item active" th:href="@{/favoritos}"><i class="bi bi-star"></i> Favoritos</a>
+    <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Locaciones Cercanas</a>
 
-    <div class="sb-section">Mi cuenta</div>
-    <a href="#" class="sb-item"><i class="bi bi-calendar3"></i> Mis visitas</a>
-    <a href="#" class="sb-item"><i class="bi bi-clock-history"></i> Mi historial</a>
-    <a href="#" class="sb-item"><i class="bi bi-file-text"></i> Mis operaciones</a>
-    <a href="#" class="sb-item"><i class="bi bi-bell"></i> Notificaciones</a>
+    <div class="menu-section-title">MI CUENTA</div>
+    <a class="menu-item" href="#"><i class="bi bi-calendar-event"></i> Mis visitas</a>
+    <a class="menu-item" href="#"><i class="bi bi-clock-history"></i> Mi historial</a>
+    <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
+    <a class="menu-item" href="#"><i class="bi bi-bell"></i> Notificaciones</a>
 
-    <div class="sb-footer">
-      <div class="sb-avatar" th:text="${#strings.abbreviate(cliente.nombre, 2)}">LG</div>
-      <div>
-        <div class="sb-user-name" th:text="${cliente.nombre}">Laura Gil</div>
-        <div class="sb-user-role">Cliente activa</div>
-      </div>
+    <div class="profile-box">
+        <div class="avatar" th:text="${inicialesCliente != null ? inicialesCliente : 'CL'}">CL</div>
+        <div>
+            <div class="fw-semibold" th:text="${nombreCliente != null ? nombreCliente : '[Nombre cliente]'}">[Nombre cliente]</div>
+            <div class="small" style="color:#8aa2c2" th:text="${rolCliente != null ? rolCliente : '[Rol]'}">[Rol]</div>
+        </div>
     </div>
-  </nav>
+</aside>
 
   <!-- ══════════════ MAIN ══════════════ -->
   <div class="main-content">
