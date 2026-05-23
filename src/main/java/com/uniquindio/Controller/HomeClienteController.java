@@ -204,7 +204,21 @@ public class HomeClienteController {
             }
         }
 
-        List<Inmueble> favoritos = cliente.getFavoritos() != null ? new ArrayList<>(cliente.getFavoritos()) : new ArrayList<>();
+            InmuebleService inmuebleService = new InmuebleService();
+            List<Inmueble> inmueblesExistentes = inmuebleService.obtenerTodosInmuebles();
+            Set<String> codigosExistentes = inmueblesExistentes.stream()
+                .map(Inmueble::getCodigo)
+                .filter(Objects::nonNull)
+                .map(codigo -> codigo.trim().toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+
+            List<Inmueble> favoritos = cliente.getFavoritos() != null ? new ArrayList<>(cliente.getFavoritos()) : new ArrayList<>();
+            favoritos = favoritos.stream()
+                .filter(Objects::nonNull)
+                .filter(i -> i.getCodigo() != null)
+                .filter(i -> codigosExistentes.contains(i.getCodigo().trim().toLowerCase(Locale.ROOT)))
+                .collect(Collectors.toList());
+
         List<Inmueble> favoritosFiltrados = aplicarFiltrosFavoritos(favoritos, q, tipo, estado, filtro, ordenar);
 
         long disponibles = favoritosFiltrados.stream().filter(i -> i != null && i.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE).count();

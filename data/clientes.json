@@ -104,6 +104,24 @@
         "disponibilidad": "DISPONIBLE",
         "fotoPortada": "/uploads/inmuebles/portada_7e1a8909-c960-404c-9e34-d48f9ade8e54.png",
         "fotosGaleria": []
+      },
+      {
+        "codigo": "4613",
+        "nombre": "Casa Medellin",
+        "direccion": "calle 60 #48-245",
+        "ciudad": "Medellin",
+        "barrio": "Guayabal",
+        "codigoAsesorResponsable": "1020302622",
+        "tipoInmueble": "CASA",
+        "finalidad": "VENTA",
+        "precio": 250.0,
+        "area": 100.0,
+        "numeroHabitaciones": 6,
+        "numeroBanos": 3,
+        "estadoInmueble": "USADO",
+        "disponibilidad": "DISPONIBLE",
+        "fotoPortada": "/uploads/inmuebles/portada_f9be3b54-3af6-49af-844a-2c23049b0947.jpg",
+        "fotosGaleria": []
       }
     ]
   },

@@ -488,24 +488,7 @@
                             <i class="bi bi-search"></i>
                             <input type="text" name="q"
                                    placeholder="Buscar en mis favoritos…"
-                                   th:value="${param.q}"/>
-                        </div>
-                        <div class="search-row" style="margin-bottom:0;flex:0 0 160px">
-                            <select name="tipo">
-                                <option value="">Todos los tipos</option>
-                                <option value="APARTAMENTO" th:selected="${param.tipo == 'APARTAMENTO'}">Apartamento</option>
-                                <option value="CASA"        th:selected="${param.tipo == 'CASA'}">Casa</option>
-                                <option value="LOCAL"       th:selected="${param.tipo == 'LOCAL'}">Local comercial</option>
-                                <option value="OFICINA"     th:selected="${param.tipo == 'OFICINA'}">Oficina</option>
-                            </select>
-                        </div>
-                        <div class="search-row" style="margin-bottom:0;flex:0 0 160px">
-                            <select name="estado">
-                                <option value="">Todos los estados</option>
-                                <option value="DISPONIBLE" th:selected="${param.estado == 'DISPONIBLE'}">Disponible</option>
-                                <option value="RESERVADO"  th:selected="${param.estado == 'RESERVADO'}">Reservado</option>
-                                <option value="NEGOCIANDO" th:selected="${param.estado == 'NEGOCIANDO'}">Negociando</option>
-                            </select>
+                                   th:value="${param.q != null ? param.q[0] : ''}"/>
                         </div>
                         <button type="submit"
                                 style="border:1px solid rgba(246,194,62,.35);background:rgba(246,194,62,.12);color:var(--gold);border-radius:8px;padding:0 16px;font-weight:600;cursor:pointer;font-family:inherit">
@@ -515,34 +498,9 @@
                 </form>
             </div>
 
-            <!-- TAGS RÁPIDOS -->
-            <div class="filter-tags">
-                <a th:href="@{/favoritos}"
-                   class="ftag"
-                   th:classappend="${param.filtro == null} ? ' active' : ''">Todos</a>
-                <a th:href="@{/favoritos(filtro='disponibles')}"
-                   class="ftag"
-                   th:classappend="${param.filtro == 'disponibles'} ? ' active' : ''">Disponibles</a>
-                <a th:href="@{/favoritos(filtro='con-visita')}"
-                   class="ftag"
-                   th:classappend="${param.filtro == 'con-visita'} ? ' active' : ''">Con visita agendada</a>
-                <a th:href="@{/favoritos(filtro='negociacion')}"
-                   class="ftag"
-                   th:classappend="${param.filtro == 'negociacion'} ? ' active' : ''">En negociación</a>
-            </div>
-
             <!-- BARRA RESULTADO -->
             <div class="result-bar">
                 <span th:text="${favoritosTotal} + ' inmuebles favoritos'">4 inmuebles favoritos</span>
-                <div class="d-flex align-items-center gap-2">
-                    Ordenar por
-                    <select class="sort-select" onchange="window.location.href='?ordenar='+this.value">
-                        <option value="reciente">Más reciente</option>
-                        <option value="precio-asc">Menor precio</option>
-                        <option value="precio-desc">Mayor precio</option>
-                        <option value="area">Mayor área</option>
-                    </select>
-                </div>
             </div>
 
             
