@@ -6,7 +6,7 @@
     "telefono": "3205729072",
     "contrasena": "123",
     "tipoCliente": "PERSONA_NATURAL",
-    "presupuesto": 300000000.0,
+    "presupuesto": 3.0E8,
     "zonasDeInteres": [
       "Armenia",
       "Medellin"
@@ -85,24 +85,6 @@
         "estadoInmueble": "USADO",
         "disponibilidad": "DISPONIBLE",
         "fotoPortada": "/uploads/inmuebles/portada_57244be2-b4c3-4035-9076-aa55c2b48838.jpg",
-        "fotosGaleria": []
-      },
-      {
-        "codigo": "1182",
-        "nombre": "Casa mesi",
-        "direccion": "123",
-        "ciudad": "Armenia",
-        "barrio": "La fogata",
-        "codigoAsesorResponsable": "1020302622",
-        "tipoInmueble": "APARTAMENTO",
-        "finalidad": "ARRIENDO",
-        "precio": 600000.0,
-        "area": 500.0,
-        "numeroHabitaciones": 7,
-        "numeroBanos": 7,
-        "estadoInmueble": "USADO",
-        "disponibilidad": "DISPONIBLE",
-        "fotoPortada": "/uploads/inmuebles/portada_61c5b43c-27da-4149-96db-539abe4b2921.jpg",
         "fotosGaleria": []
       },
       {

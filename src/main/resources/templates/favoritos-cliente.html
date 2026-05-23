@@ -444,8 +444,8 @@
             <div>
                 <h3>Mis favoritos</h3>
                 <div class="sub"
-                     th:text="${totalFavoritos} + ' inmuebles guardados · ' + ${favoritosEnNegociacion} + ' en negociación'">
-                    4 inmuebles guardados · 1 en negociación
+                     th:text="${favoritosTotal} + ' inmuebles guardados · ' + ${favoritosDisponibles} + ' disponibles'">
+                    4 inmuebles guardados · 2 disponibles
                 </div>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
@@ -456,7 +456,7 @@
         <!-- STATS -->
         <section class="stats-grid">
             <article class="stat-card">
-                <div class="stat-value" th:text="${totalFavoritos ?: '--'}">4</div>
+                <div class="stat-value" th:text="${favoritosTotal ?: '--'}">4</div>
                 <div class="stat-label">Total favoritos</div>
             </article>
             <article class="stat-card">
@@ -464,7 +464,7 @@
                 <div class="stat-label">Disponibles</div>
             </article>
             <article class="stat-card">
-                <div class="stat-value" th:text="${favoritosEnNegociacion ?: '--'}">1</div>
+                <div class="stat-value" th:text="${favoritosNegociacion ?: '--'}">1</div>
                 <div class="stat-label">En negociación</div>
             </article>
             <article class="stat-card">
@@ -533,7 +533,7 @@
 
             <!-- BARRA RESULTADO -->
             <div class="result-bar">
-                <span th:text="${totalFavoritos} + ' inmuebles favoritos'">4 inmuebles favoritos</span>
+                <span th:text="${favoritosTotal} + ' inmuebles favoritos'">4 inmuebles favoritos</span>
                 <div class="d-flex align-items-center gap-2">
                     Ordenar por
                     <select class="sort-select" onchange="window.location.href='?ordenar='+this.value">
@@ -549,9 +549,9 @@
 
            <div class="prop-grid" th:unless="${#lists.isEmpty(favoritos)}">
 
-  <article class="card-inmueble"
-           th:each="inmueble : ${favoritos}"
-           th:classappend="${inmueble.estado.name() == 'NEGOCIANDO'} ? ' en-negociacion' : ''">
+    <article class="card-inmueble"
+                     th:each="inmueble : ${favoritos}"
+                     th:classappend="${inmueble.disponibilidad.name() == 'NO_DISPONIBLE'} ? ' en-negociacion' : ''">
 
     <!-- COVER -->
     <div class="card-cover">
@@ -588,11 +588,11 @@
       </div>
       <div class="card-code" th:text="${inmueble.codigo}">COD-002</div>
 
-      <div class="meta">
-        <span th:text="${inmueble.area} + ' m²'">68 m²</span>
-        <span th:text="${inmueble.habitaciones} + ' hab'">2 hab</span>
-        <span th:text="${inmueble.banos} + ' baños'">2 baños</span>
-      </div>
+            <div class="meta">
+                <span th:text="${inmueble.area} + ' m²'">68 m²</span>
+                <span th:text="${inmueble.numeroHabitaciones} + ' hab'">2 hab</span>
+                <span th:text="${inmueble.numeroBanos} + ' baños'">2 baños</span>
+            </div>
 
       <div class="price"
            th:text="'$' + ${#numbers.formatDecimal(inmueble.precio, 0, 'POINT', 0, 'COMMA')}">
@@ -603,19 +603,14 @@
         ARRIENDO
       </div>
 
-      <div class="prop-fav-date"
-           th:text="'Guardado ' + ${inmueble.fechaFavorito}">
-        Guardado hace 1 día
-      </div>
-
-      <!-- ACCIONES -->
+            <!-- ACCIONES -->
       <div class="card-actions">
-        <!-- Badge estado -->
-        <span class="state"
-              th:classappend="${inmueble.estado.name() == 'RESERVADO'}    ? ' reservado'     :
-                              (${inmueble.estado.name() == 'NEGOCIANDO'}  ? ' negociando'    :
-                              (${inmueble.estado.name() == 'NO_DISPONIBLE'} ? ' no-disponible' : ''))"
-              th:text="${inmueble.estado.name()}">DISPONIBLE</span>
+          <!-- Badge disponibilidad -->
+          <span class="state"
+              th:classappend="${inmueble.disponibilidad.name() == 'RESERVADO'}    ? ' reservado'     :
+                        (${inmueble.disponibilidad.name() == 'NO_DISPONIBLE'}  ? ' negociando'    :
+                        (${inmueble.disponibilidad.name() == 'DISPONIBLE'} ? '' : ''))"
+              th:text="${inmueble.disponibilidad.name()}">DISPONIBLE</span>
 
         <!-- Botón quitar favorito -->
         <form th:action="@{/favoritos/quitar}" method="post">
@@ -637,7 +632,7 @@
             <!-- PAGINACIÓN -->
             <div class="pag-wrap" th:unless="${#lists.isEmpty(favoritos)}">
                 <div class="pag-info"
-                     th:text="'Mostrando ' + ${totalFavoritos} + ' favoritos'">
+                     th:text="'Mostrando ' + ${favoritosTotal} + ' favoritos'">
                     Mostrando 4 favoritos
                 </div>
                 <div class="d-flex gap-1">
