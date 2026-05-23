@@ -334,6 +334,12 @@
             box-shadow: 0 8px 20px rgba(246, 194, 62, 0.2);
         }
 
+        .btn-secondary-custom.active {
+            background: rgba(246, 194, 62, 0.18);
+            border-color: rgba(246, 194, 62, 0.75);
+            box-shadow: 0 0 0 1px rgba(246, 194, 62, 0.18) inset;
+        }
+
         .agent-section {
             background: var(--panel);
             border: 1px solid var(--line);
@@ -524,8 +530,12 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <button id="btnFavorito" class="btn-secondary-custom" type="button" th:attr="data-codigo=${inmueble.codigo}">
-                    <i class="bi bi-heart"></i> Favorito
+                <button id="btnFavorito"
+                        class="btn-secondary-custom"
+                        type="button"
+                        th:attr="data-codigo=${inmueble.codigo}"
+                        th:classappend="${esFavorito} ? ' active' : ''">
+                    <i class="bi" th:classappend="${esFavorito} ? ' bi-heart-fill' : ' bi-heart'"></i> Favorito
                 </button>
             </div>
 
@@ -565,8 +575,10 @@
 
         function agregarFavorito(event, codigoInmuebleActual) {
             const btn = event.target.closest('.btn-secondary-custom');
-            
-            console.log('DEBUG: Enviando código:', codigoInmuebleActual);
+            if (!btn || !codigoInmuebleActual) {
+                alert('No se pudo identificar el inmueble');
+                return;
+            }
             
             fetch('/favoritos/agregar', {
                 method: 'POST',
@@ -575,12 +587,20 @@
                 },
                 body: 'codigoInmueble=' + encodeURIComponent(codigoInmuebleActual)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error HTTP ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('DEBUG: Respuesta del servidor:', data);
                 if (data.exito) {
-                    btn.classList.toggle('active');
-                    // Cambiar icono según estado
+                    if (data.enFavoritos) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+
                     const icon = btn.querySelector('i');
                     if (data.enFavoritos) {
                         icon.classList.remove('bi-heart');
@@ -589,14 +609,13 @@
                         icon.classList.remove('bi-heart-fill');
                         icon.classList.add('bi-heart');
                     }
-                    alert(data.mensaje);
                 } else {
                     alert('Error: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al procesar favorito');
+                alert('Error al procesar favorito: ' + error.message);
             });
         }
     </script>

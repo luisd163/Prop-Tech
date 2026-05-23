@@ -412,6 +412,21 @@
             height: 44px;
         }
 
+        .icon-btn {
+            transition: all .2s ease;
+        }
+
+        .icon-btn.active {
+            border-color: rgba(246,194,62,.55);
+            background: rgba(246,194,62,.16);
+            color: var(--gold);
+            box-shadow: 0 0 0 1px rgba(246,194,62,.18) inset;
+        }
+
+        .icon-btn.active i {
+            color: var(--gold);
+        }
+
         .view-btn {
             font-size: 1.05rem;
             font-weight: 600;
@@ -550,9 +565,14 @@
                     </div>
                     <div class="price" th:text="${#numbers.formatDecimal(inmueble.precio, 0, 'POINT', 0, 'COMMA')}">[Precio]</div>
                     <div class="price-note" th:text="${inmueble.finalidad != null ? inmueble.finalidad.name() : '—'}">[Período]</div>
-                    <div class="card-actions">
+                    <div class="card-actions" th:with="esFavorito=${favoritosCodigos != null and inmueble.codigo != null and favoritosCodigos.contains(inmueble.codigo.trim())}">
                         <span class="state" th:text="${inmueble.disponibilidad != null ? inmueble.disponibilidad.name() : '—'}">[Estado]</span>
-                        <button class="icon-btn" type="button"><i class="bi bi-heart"></i></button>
+                        <button class="icon-btn"
+                                type="button"
+                                th:attr="data-codigo=${inmueble.codigo}"
+                                th:classappend="${esFavorito} ? ' active' : ''">
+                            <i class="bi" th:classappend="${esFavorito} ? ' bi-heart-fill' : ' bi-heart'"></i>
+                        </button>
                         <a class="view-btn" th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}">Ver</a>
                     </div>
                 </div>
@@ -571,18 +591,13 @@
 </div>
 
 <script>
-    // Agregar funcionalidad a los botones de favoritos
+    // Toggle de favoritos en tarjetas
     document.querySelectorAll('.icon-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
-            const card = this.closest('.card-inmueble');
-            const codigoElement = card.querySelector('.card-code');
-            const codigoInmueble = codigoElement ? codigoElement.textContent.trim() : null;
-            
-            console.log('DEBUG: Código capturado de la tarjeta:', codigoInmueble);
-            console.log('DEBUG: Elemento del código:', codigoElement?.textContent);
+
+            const codigoInmueble = (this.dataset.codigo || '').trim();
             
             if (!codigoInmueble) {
                 alert('No se pudo identificar el inmueble');
@@ -596,11 +611,14 @@
                 },
                 body: 'codigoInmueble=' + encodeURIComponent(codigoInmueble)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error HTTP ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('DEBUG: Respuesta del servidor:', data);
                 if (data.exito) {
-                    // Cambiar icono según estado
                     const icon = this.querySelector('i');
                     if (data.enFavoritos) {
                         icon.classList.remove('bi-heart');
@@ -617,7 +635,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al procesar favorito');
+                alert('Error al procesar favorito: ' + error.message);
             });
         });
     });

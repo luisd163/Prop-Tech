@@ -473,38 +473,8 @@
         }
     </style>
     <script>
-        function filtrarInmuebles() {
-            const busquedaZona = document.getElementById('busquedaZona').value.toLowerCase().trim();
-            const items = document.querySelectorAll('.list-item[data-inmueble]');
-            let conteoVisible = 0;
-
-            items.forEach(item => {
-                const nombre = item.getAttribute('data-nombre').toLowerCase();
-                const barrio = item.getAttribute('data-barrio').toLowerCase();
-                const ciudad = item.getAttribute('data-ciudad').toLowerCase();
-                
-                if (busquedaZona === '' || nombre.includes(busquedaZona) || barrio.includes(busquedaZona) || ciudad.includes(busquedaZona)) {
-                    item.style.display = '';
-                    conteoVisible++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            // Actualizar contador dinámico
-            const contadorElement = document.getElementById('contadorInmuebles');
-            if (contadorElement) {
-                contadorElement.textContent = conteoVisible;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const busquedaZonaInput = document.getElementById('busquedaZona');
-            if (busquedaZonaInput) {
-                busquedaZonaInput.addEventListener('keyup', filtrarInmuebles);
-                busquedaZonaInput.addEventListener('change', filtrarInmuebles);
-            }
-        });
+        // Los filtros ahora se manejan en el servidor
+        // El formulario enviará los parámetros a /home-cliente
     </script>
 </head>
 <body>
@@ -572,10 +542,10 @@
                     <h5>Buscar inmuebles</h5>
                     <a th:href="@{/inmuebles-cliente}">Ver todos →</a>
                 </div>
-                <div class="search-box">
+                <form method="get" th:action="@{/home-cliente}" class="search-box">
                     <div class="search-row">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="busquedaZona" placeholder="Zona, barrio o ciudad..." autocomplete="off">
+                        <input type="text" id="busquedaZona" name="zona" placeholder="Zona, barrio o ciudad..." autocomplete="off" th:value="${filtroZona ?: ''}">
                     </div>
                     <div class="search-row">
                         <select name="tipo" th:value="${filtroTipo ?: ''}">
@@ -590,7 +560,7 @@
                         <input type="number" name="habMin" placeholder="Hab. mín." th:value="${filtroHabMin ?: ''}">
                     </div>
                     <button type="submit" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.12); background:rgba(246,194,62,0.2); color:#f6c23e; font-weight:600; cursor:pointer;">Buscar</button>
-                </div>
+                </form>
 
                 <div class="list-item" th:each="item : ${itemsPrincipales}" data-inmueble="true" th:attr="data-nombre=${item.nombre ?: ''}, data-barrio=${item.barrio ?: ''}, data-ciudad=${item.ciudad ?: ''}">
                     <div class="list-icon" th:if="${item.fotoPortada}">

@@ -10,10 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.stream.Stream;
 
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Controller
@@ -69,11 +69,25 @@ public class HomeClienteController {
         List<Inmueble> inmuebles = inmueblesFiltered.size() > 5 ? inmueblesFiltered.subList(0, 5) : inmueblesFiltered;
         
         // Obtener inmuebles recomendados basados en presupuesto del cliente
+        // y sus preferencias (zona de interés, tipo de inmueble, cantidad de habitaciones)
         List<Inmueble> recomendados = todosInmuebles.stream()
-                .filter(i -> i.getPrecio() <= presupuestoCliente)
-                .filter(i -> i.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE)
-                .limit(5)
-                .collect(Collectors.toList());
+            .filter(i -> i.getPrecio() <= presupuestoCliente)
+            .filter(i -> i.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE)
+            // Filtrar por zonas de interés del cliente (comparar por ciudad o barrio)
+            .filter(i -> cliente.getZonasDeInteres() == null || cliente.getZonasDeInteres().isEmpty() ||
+                cliente.getZonasDeInteres().stream().anyMatch(z -> coincideConZonaInteres(z, i)))
+            // Filtrar por tipo de inmueble deseado
+            .filter(i -> cliente.getTipoInmuebleDeseado() == null ||
+                i.getTipoInmueble() == cliente.getTipoInmuebleDeseado())
+            // Filtrar por cantidad mínima de habitaciones
+            .filter(i -> cliente.getCantidadMinimaHabitaciones() <= 0 ||
+                i.getNumeroHabitaciones() >= cliente.getCantidadMinimaHabitaciones())
+            // Priorizar coincidencias más fuertes para que aparezcan primero en el bloque recomendado
+            .sorted(Comparator
+                .comparingInt((Inmueble i) -> calcularPuntajeRecomendado(i, cliente))
+                .reversed()
+                .thenComparing(Inmueble::getPrecio))
+            .collect(Collectors.toList());
         
         // Generar opciones dinámicas para selects
         Set<String> zonas = todosInmuebles.stream()
@@ -145,9 +159,18 @@ public class HomeClienteController {
             return "redirect:/home-cliente";
         }
 
+        final Inmueble inmuebleFinal = inmueble;
+        boolean esFavorito = cliente.getFavoritos() != null
+            && cliente.getFavoritos().stream()
+            .anyMatch(i -> i != null
+                && i.getCodigo() != null
+                && inmuebleFinal.getCodigo() != null
+                && i.getCodigo().trim().equals(inmuebleFinal.getCodigo().trim()));
+
         model.addAttribute("titulo", "Detalle del Inmueble");
         model.addAttribute("cliente", cliente);
         model.addAttribute("inmueble", inmueble);
+        model.addAttribute("esFavorito", esFavorito);
         model.addAttribute("currencyFormatter", NumberFormat.getCurrencyInstance(Locale.of("es", "CO")));
         
         return "detalle-inmueble";
@@ -158,6 +181,11 @@ public class HomeClienteController {
     @GetMapping("/favoritos")
     public String showFavoritos(
             @SessionAttribute(name = "clienteSesion", required = false) Cliente cliente,
+            @RequestParam(name = "q", required = false) String q,
+            @RequestParam(name = "tipo", required = false) String tipo,
+            @RequestParam(name = "estado", required = false) String estado,
+            @RequestParam(name = "filtro", required = false) String filtro,
+            @RequestParam(name = "ordenar", required = false) String ordenar,
             Model model) {
         if (cliente == null) {
             return "redirect:/login";
@@ -177,23 +205,90 @@ public class HomeClienteController {
         }
 
         List<Inmueble> favoritos = cliente.getFavoritos() != null ? new ArrayList<>(cliente.getFavoritos()) : new ArrayList<>();
-        long disponibles = favoritos.stream().filter(i -> i != null && i.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE).count();
-        long enNegociacion = favoritos.stream().filter(i -> i != null && i.getDisponibilidad() == Inmueble.Disponibilidad.NO_DISPONIBLE).count();
-        long reservados = favoritos.stream().filter(i -> i != null && i.getDisponibilidad() == Inmueble.Disponibilidad.RESERVADO).count();
+        List<Inmueble> favoritosFiltrados = aplicarFiltrosFavoritos(favoritos, q, tipo, estado, filtro, ordenar);
+
+        long disponibles = favoritosFiltrados.stream().filter(i -> i != null && i.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE).count();
+        long enNegociacion = favoritosFiltrados.stream().filter(i -> i != null && i.getDisponibilidad() == Inmueble.Disponibilidad.NO_DISPONIBLE).count();
+        long reservados = favoritosFiltrados.stream().filter(i -> i != null && i.getDisponibilidad() == Inmueble.Disponibilidad.RESERVADO).count();
 
         model.addAttribute("titulo", "Mis favoritos");
         model.addAttribute("cliente", cliente);
         model.addAttribute("nombreCliente", cliente.getNombre());
         model.addAttribute("inicialesCliente", iniciales);
         model.addAttribute("rolCliente", "Cliente activa");
-        model.addAttribute("favoritos", favoritos);
-        model.addAttribute("favoritosTotal", favoritos.size());
+        model.addAttribute("favoritos", favoritosFiltrados);
+        model.addAttribute("favoritosTotal", favoritosFiltrados.size());
         model.addAttribute("favoritosDisponibles", disponibles);
         model.addAttribute("favoritosNegociacion", enNegociacion);
         model.addAttribute("favoritosReservados", reservados);
+        model.addAttribute("tituloEncabezado", "Mis favoritos");
+        model.addAttribute("resumenFavoritos", favoritosFiltrados.size() + " inmuebles guardados · " + disponibles + " disponibles");
+        model.addAttribute("resultadoFavoritos", favoritosFiltrados.size() + " inmuebles favoritos");
         model.addAttribute("currencyFormatter", NumberFormat.getCurrencyInstance(Locale.of("es", "CO")));
 
         return "favoritos-cliente";
+    }
+
+    private List<Inmueble> aplicarFiltrosFavoritos(List<Inmueble> favoritos,
+                                                  String q,
+                                                  String tipo,
+                                                  String estado,
+                                                  String filtro,
+                                                  String ordenar) {
+        Stream<Inmueble> stream = favoritos.stream().filter(Objects::nonNull);
+
+        if (q != null && !q.trim().isEmpty()) {
+            String consulta = q.trim().toLowerCase(Locale.ROOT);
+            stream = stream.filter(i -> contieneTexto(i.getNombre(), consulta)
+                    || contieneTexto(i.getDireccion(), consulta)
+                    || contieneTexto(i.getCiudad(), consulta)
+                    || contieneTexto(i.getBarrio(), consulta)
+                    || contieneTexto(i.getCodigo(), consulta));
+        }
+
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            stream = stream.filter(i -> i.getTipoInmueble() != null && i.getTipoInmueble().name().equalsIgnoreCase(tipo.trim()));
+        }
+
+        if (estado != null && !estado.trim().isEmpty()) {
+            stream = stream.filter(i -> coincideEstado(i, estado));
+        }
+
+        if (filtro != null && !filtro.trim().isEmpty()) {
+            switch (filtro.trim().toLowerCase(Locale.ROOT)) {
+                case "disponibles" -> stream = stream.filter(i -> i.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE);
+                case "con-visita" -> { /* pendiente de integración con visitas */ }
+                case "negociacion" -> stream = stream.filter(i -> i.getDisponibilidad() == Inmueble.Disponibilidad.NO_DISPONIBLE);
+                default -> { }
+            }
+        }
+
+        Comparator<Inmueble> comparator = switch (ordenar != null ? ordenar.trim().toLowerCase(Locale.ROOT) : "") {
+    case "precio-asc" -> Comparator.comparingDouble(Inmueble::getPrecio);
+    case "precio-desc" -> Comparator.comparingDouble(Inmueble::getPrecio).reversed();
+    case "area" -> Comparator.comparingDouble(Inmueble::getArea).reversed();
+    default -> Comparator.comparing(Inmueble::getCodigo, Comparator.nullsLast(String::compareToIgnoreCase)).reversed();
+};
+
+        return stream.sorted(comparator).collect(Collectors.toList());
+    }
+
+    private boolean contieneTexto(String valor, String consulta) {
+        return valor != null && valor.trim().toLowerCase(Locale.ROOT).contains(consulta);
+    }
+
+    private boolean coincideEstado(Inmueble inmueble, String estado) {
+        if (inmueble == null || estado == null) {
+            return false;
+        }
+
+        String estadoNormalizado = estado.trim().toUpperCase(Locale.ROOT);
+        return switch (estadoNormalizado) {
+            case "DISPONIBLE" -> inmueble.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE;
+            case "RESERVADO" -> inmueble.getDisponibilidad() == Inmueble.Disponibilidad.RESERVADO;
+            case "NEGOCIANDO" -> inmueble.getDisponibilidad() == Inmueble.Disponibilidad.NO_DISPONIBLE;
+            default -> true;
+        };
     }
     
     private List<Inmueble> aplicarFiltros(List<Inmueble> inmuebles, String zona, String tipo, String precioMax, String habMin) {
@@ -207,6 +302,45 @@ public class HomeClienteController {
                 .filter(i -> habMin == null || habMin.isEmpty() || 
                         (i.getNumeroHabitaciones() >= Integer.parseInt(habMin)))
                 .collect(Collectors.toList());
+    }
+
+    private int calcularPuntajeRecomendado(Inmueble inmueble, Cliente cliente) {
+        int puntaje = 0;
+
+        if (inmueble == null || cliente == null) {
+            return puntaje;
+        }
+
+        if (cliente.getZonasDeInteres() != null && !cliente.getZonasDeInteres().isEmpty()
+                && inmueble.getCiudad() != null
+                && cliente.getZonasDeInteres().stream().anyMatch(z -> z != null && z.equalsIgnoreCase(inmueble.getCiudad()))) {
+            puntaje += 4;
+        }
+
+        if (cliente.getTipoInmuebleDeseado() != null && inmueble.getTipoInmueble() == cliente.getTipoInmuebleDeseado()) {
+            puntaje += 3;
+        }
+
+        if (cliente.getCantidadMinimaHabitaciones() > 0
+                && inmueble.getNumeroHabitaciones() >= cliente.getCantidadMinimaHabitaciones()) {
+            puntaje += 2;
+        }
+
+        return puntaje;
+    }
+
+    private boolean coincideConZonaInteres(String zonaInteres, Inmueble inmueble) {
+        if (zonaInteres == null || inmueble == null) {
+            return false;
+        }
+
+        String zonaNormalizada = zonaInteres.trim().toLowerCase(Locale.ROOT);
+        String ciudadNormalizada = inmueble.getCiudad() != null ? inmueble.getCiudad().trim().toLowerCase(Locale.ROOT) : "";
+        String barrioNormalizado = inmueble.getBarrio() != null ? inmueble.getBarrio().trim().toLowerCase(Locale.ROOT) : "";
+
+        return !zonaNormalizada.isEmpty()
+                && (zonaNormalizada.equals(ciudadNormalizada)
+                || zonaNormalizada.equals(barrioNormalizado));
     }
     
     @PostMapping("/favoritos/agregar")

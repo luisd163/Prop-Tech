@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.List;
+import java.util.Set;
 import java.text.NumberFormat;
 import java.util.stream.Collectors;
 
@@ -140,6 +141,13 @@ public class InmueblesClienteController {
 
 		int totalInmuebles = itemsPrincipales.size();
 
+		Set<String> favoritosCodigos = cliente.getFavoritos() == null
+				? Set.of()
+				: cliente.getFavoritos().stream()
+						.filter(i -> i != null && i.getCodigo() != null)
+						.map(i -> i.getCodigo().trim())
+						.collect(Collectors.toSet());
+
 		model.addAttribute("titulo", "Inmuebles disponibles");
 		model.addAttribute("cliente", cliente);
 		model.addAttribute("nombreCliente", cliente.getNombre());
@@ -152,6 +160,7 @@ public class InmueblesClienteController {
 		model.addAttribute("selectedHabMin", habMin != null ? habMin : "");
 		model.addAttribute("selectedBaMin", baMin != null ? baMin : "");
 		model.addAttribute("selectedSortBy", sortBy != null ? sortBy : "");
+		model.addAttribute("favoritosCodigos", favoritosCodigos);
 		model.addAttribute("itemsPrincipales", itemsPrincipales);
 		model.addAttribute("currencyFormatter", NumberFormat.getCurrencyInstance(Locale.of("es", "CO")));
 		model.addAttribute("tiposDisponibles", tiposDisponibles);

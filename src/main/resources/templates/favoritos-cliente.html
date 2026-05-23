@@ -1,721 +1,664 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PropTech · Mis Favoritos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PropTech · Mis Favoritos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+      .prop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    padding: 14px;
+}
 
-  <style>
-    /* ── VARIABLES ─────────────────────────────────────── */
-    :root {
-      --navy:    #0d1b2e;
-      --navy2:   #0a1628;
-      --navy3:   #122340;
-      --navy4:   #1a3050;
-      --gold:    #c9a84c;
-      --gold2:   #e8c96a;
-      --white:   #e8dfc8;
-      --muted:   #4a6080;
-      --text:    #c8d8ea;
-      --border:  rgba(255,255,255,0.06);
-      --gold-b:  rgba(201,168,76,0.15);
-      --radius:  9px;
-    }
-
-    /* ── BASE ──────────────────────────────────────────── */
-    * { box-sizing: border-box; }
-    body {
-      background: var(--navy);
-      color: var(--text);
-      font-family: 'Sora', sans-serif;
-      font-size: 14px;
-      min-height: 100vh;
-      margin: 0;
-    }
-
-    /* ── LAYOUT ────────────────────────────────────────── */
-    .layout-wrapper {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-    background: linear-gradient(180deg, #061a33 0%, #031228 100%);
-    border-right: 1px solid #17365e;
-    padding: 22px 0 18px;
+.card-inmueble {
+    background: #10284a;
+    border: 1px solid #1d3d69;
+    border-radius: 14px;
+    overflow: hidden;
+    min-height: 320px;
     display: flex;
     flex-direction: column;
-    width: 210px; /* mantén el ancho que ya tenías */
 }
-.brand {
-    padding: 0 22px 18px;
-    border-bottom: 1px solid #17365e;
-    margin-bottom: 12px;
-}
-.brand h4 {
-    margin: 0;
-    color: #f6c23e;
-    font-size: 1.45rem;
-    font-weight: 700;
-}
-.brand p {
-    margin: 2px 0 0;
-    color: #7f96b8;
-    font-size: .82rem;
-    letter-spacing: .8px;
-}
-.menu-section-title {
-    color: #7f96b8;
-    font-size: .76rem;
-    letter-spacing: 1.4px;
-    margin: 16px 22px 8px;
-}
-.menu-item {
-    color: #b5c7df;
-    text-decoration: none;
+
+.card-cover {
+    height: 96px;
+    background: linear-gradient(135deg, #214476 0%, #16335d 100%);
+    border-bottom: 1px solid var(--line);
+    position: relative;
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-    padding: 10px 22px;
-    border-left: 3px solid transparent;
-    font-size: .95rem;
-    transition: .2s;
+    color: var(--gold);
+    font-size: 1.8rem;
+    overflow: hidden;
 }
-.menu-item:hover,
-.menu-item.active {
-    background: #1d3658;
-    color: #f6c23e;
-    border-left-color: #f6c23e;
+
+.card-image {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
 }
-.profile-box {
-    margin: auto 14px 0;
-    border: 1px solid #1f416e;
-    border-radius: 12px;
-    padding: 10px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255,255,255,0.03);
-    position: sticky;
-    bottom: 14px;
+
+.card-image-placeholder {
+    width: 100%; height: 100%;
+    display: grid; place-items: center;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #214476 0%, #16335d 100%);
 }
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1px solid #f6c23e;
+
+.badge-top {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(173,126,255,.9);
+    color: #fff; border-radius: 8px;
+    padding: 3px 10px; font-size: .75rem;
+}
+
+.fav-icon {
+    position: absolute; top: 8px; right: 10px;
+    color: var(--gold); font-size: .9rem;
+}
+
+.card-body {
+    padding: 12px;
+    display: flex; flex-direction: column;
+    gap: 8px; flex: 1;
+}
+
+.card-title { font-size: 1.05rem; line-height: 1.2; font-weight: 500; }
+.card-sub, .card-code { color: var(--muted); font-size: .92rem; line-height: 1.2; }
+
+.meta {
     display: grid;
-    place-items: center;
-    color: #f6c23e;
-    font-size: .85rem;
-    font-weight: 700;
-    flex: 0 0 auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    color: var(--muted); font-size: .88rem; margin: 4px 0;
 }
 
+.price      { color: var(--gold); font-size: 1.8rem; line-height: 1; font-weight: 700; margin: 4px 0; }
+.price-note { color: var(--gold); font-size: 1.05rem; font-weight: 600; }
+.prop-fav-date { color: var(--muted); font-size: .78rem; }
+
+.card-actions {
+    margin-top: auto;
+    border-top: 1px solid rgba(255,255,255,.10);
+    padding-top: 10px;
+    display: grid;
+    grid-template-columns: auto 44px 1fr;
+    gap: 8px; align-items: center;
+}
+
+.state {
+    border: 1px solid rgba(0,208,140,.45);
+    color: #2dd9a1;
+    background: rgba(0,208,140,.12);
+    border-radius: 8px; font-size: .78rem;
+    padding: 2px 8px; width: max-content;
+}
+.state.reservado { border-color: rgba(240,168,48,.45); color: #f0a830; background: rgba(240,168,48,.12); }
+.state.negociando { border-color: rgba(75,141,232,.45); color: #4b8de8; background: rgba(75,141,232,.12); }
+.state.no-disponible { border-color: rgba(224,92,92,.45); color: #e05c5c; background: rgba(224,92,92,.12); }
+
+.icon-btn, .view-btn {
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: transparent;
+    color: #dbe7f8; height: 44px;
+}
+
+.icon-btn.active {
+    border-color: rgba(246,194,62,.55);
+    background: rgba(246,194,62,.16);
+    color: var(--gold);
+}
+
+.view-btn {
+    font-size: 1.05rem; font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+}
+
+/* Estado vacío */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+.empty-state i { font-size: 40px; color: rgba(246,194,62,.3); display: block; margin-bottom: 12px; }
+.empty-state a { color: var(--gold); }
+
+        /* ── VARIABLES (idénticas al home-cliente) ───────── */
+        :root {
+            --bg:       #071429;
+            --bg-soft:  #0b1f3d;
+            --panel:    #10284a;
+            --panel-2:  #132f57;
+            --line:     rgba(255,255,255,.10);
+            --text:     #e8eef7;
+            --muted:    #7f96b8;
+            --gold:     #f6c23e;
+            --active:   #1d3658;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #203d63 0%, #0a1f3d 55%, #071429 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ── LAYOUT ──────────────────────────────────────── */
+        .layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        /* ══════════════════════════════════════════════════
+           SIDEBAR — estructura idéntica al home-cliente.html
+           Solo cambia el .active al ítem correspondiente.
+           Para reutilizar en todas las vistas extrae esto a:
+             src/main/resources/templates/fragments/sidebar.html
+           y en cada vista usa:
+             <div th:replace="fragments/sidebar :: sidebar(activeItem='favoritos')"></div>
+        ══════════════════════════════════════════════════ */
+        .sidebar {
+            background: linear-gradient(180deg, #061a33 0%, #031228 100%);
+            border-right: 1px solid #17365e;
+            padding: 22px 0 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 0 22px 18px;
+            border-bottom: 1px solid #17365e;
+            margin-bottom: 12px;
+        }
+        .brand h4 { margin: 0; color: var(--gold); font-size: 1.45rem; font-weight: 700; }
+        .brand p  { margin: 2px 0 0; color: var(--muted); font-size: .82rem; letter-spacing: .8px; }
+
+        .menu-section-title {
+            color: var(--muted);
+            font-size: .76rem;
+            letter-spacing: 1.4px;
+            margin: 16px 22px 8px;
+        }
+
+        .menu-item {
+            color: #b5c7df;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px;
+            border-left: 3px solid transparent;
+            font-size: .95rem;
+            transition: .2s;
+        }
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--active);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .profile-box {
+            margin: auto 14px 0;
+            border: 1px solid #1f416e;
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,.03);
+        }
+        .avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--gold);
+            display: grid; place-items: center;
+            color: var(--gold);
+            font-size: .8rem;
+            flex: 0 0 auto;
+        }
+
+        /* ── MAIN ────────────────────────────────────────── */
+        .main { padding: 16px; overflow: auto; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1d3d69;
+            margin-bottom: 14px;
+        }
+        .topbar h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+        .topbar .sub { color: var(--muted); font-size: .9rem; }
+
+        .btn-logout {
+            border: 1px solid rgba(255,77,77,.25);
+            background: rgba(255,77,77,.08);
+            color: #ff4d4d;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .btn-logout:hover { background: #ff4d4d; color: #fff; }
+
+        /* ── STATS ───────────────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0,1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .stat-value { font-size: 1.65rem; font-weight: 700; line-height: 1; margin-bottom: 8px; }
+        .stat-label { color: var(--muted); font-size: .92rem; }
+
+        /* ── SECTION CARD ────────────────────────────────── */
+        .section-card {
+            background: var(--panel-2);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+        .section-head h5 { margin: 0; color: var(--gold); font-weight: 600; font-size: 1rem; }
+        .section-head a  { color: var(--muted); text-decoration: none; font-size: .88rem; }
+
+        /* ── FILTROS ─────────────────────────────────────── */
+        .filter-wrap { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+
+        .search-row {
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .search-row i {
+            position: absolute;
+            left: 12px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+        .search-row input,
+        .search-row select {
+            width: 100%; height: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.12);
+            background: #3b392f;
+            color: #f4f4f4;
+            padding: 0 14px 0 38px;
+            font-size: .93rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .search-row select { padding-left: 14px; appearance: none; }
+
+        .filter-tags {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+        .ftag {
+            border: 1px solid rgba(255,255,255,.12);
+            background: rgba(255,255,255,.03);
+            color: #b9c9e4;
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: .8rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: .2s;
+        }
+        .ftag:hover, .ftag.active {
+            background: rgba(246,194,62,.15);
+            border-color: rgba(246,194,62,.4);
+            color: var(--gold);
+        }
+
+        .result-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--line);
+            font-size: .88rem;
+            color: var(--muted);
+        }
+        .sort-select {
+            background: #0e2040;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 6px;
+            padding: 3px 9px;
+            color: var(--muted);
+            font-size: .82rem;
+            outline: none;
+            font-family: inherit;
+        }
 
 
-    .sb-logo {
-      padding: 0 18px 18px;
-      border-bottom: 0.5px solid var(--gold-b);
-      margin-bottom: 4px;
-    }
-    .sb-logo-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--gold);
-      letter-spacing: .03em;
-    }
-    .sb-logo-sub {
-      font-size: 9px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-top: 2px;
-    }
 
-    .sb-section {
-      padding: 14px 14px 5px;
-      font-size: 9px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-    }
+        /* Paginación */
+        .pag-wrap { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; }
+        .pag-info { font-size: .85rem; color: var(--muted); }
+        .pag-btn {
+            border: 1px solid rgba(255,255,255,.14);
+            background: transparent; color: #b9c9e4;
+            border-radius: 8px; padding: 4px 11px;
+            font-size: .82rem; cursor: pointer;
+            font-family: inherit; transition: .15s;
+        }
+        .pag-btn:hover, .pag-btn.active {
+            background: rgba(246,194,62,.15);
+            border-color: rgba(246,194,62,.4);
+            color: var(--gold);
+        }
+        .pag-btn.disabled { opacity: .35; pointer-events: none; }
 
-    .sb-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 8px 16px;
-      color: #7a90a8;
-      font-size: 13px;
-      border-left: 2px solid transparent;
-      cursor: pointer;
-      text-decoration: none;
-      position: relative;
-      transition: color .15s, background .15s;
-    }
-    .sb-item:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.02);
-      text-decoration: none;
-    }
-    .sb-item.active {
-      background: rgba(201,168,76,0.08);
-      color: var(--gold);
-      border-left-color: var(--gold);
-    }
-    .sb-item i { font-size: 14px; flex-shrink: 0; }
-
-    .sb-badge {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      min-width: 17px;
-      height: 17px;
-      border-radius: 10px;
-      background: #e05c5c;
-      font-size: 9px;
-      font-weight: 600;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 4px;
-    }
-
-    .sb-footer {
-      margin: auto 12px 18px;
-      padding: 11px;
-      background: rgba(201,168,76,0.05);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      border: 0.5px solid var(--gold-b);
-    }
-    .sb-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--navy4);
-      border: 1.5px solid var(--gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--gold);
-      flex-shrink: 0;
-    }
-    .sb-user-name  { font-size: 12px; font-weight: 500; color: var(--gold); }
-    .sb-user-role  { font-size: 9px; color: var(--muted); }
-
-    /* ── MAIN CONTENT ──────────────────────────────────── */
-    .main-content {
-      margin-left: 210px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    /* ── TOPBAR ────────────────────────────────────────── */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 24px;
-      border-bottom: 0.5px solid var(--border);
-      background: var(--navy);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .topbar-title { font-size: 16px; font-weight: 600; color: var(--white); }
-    .topbar-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    .view-toggle .btn {
-      font-size: 11px;
-      padding: 5px 11px;
-      border-radius: 6px;
-      border: 0.5px solid rgba(255,255,255,0.08);
-      background: transparent;
-      color: #8a9ab5;
-    }
-    .view-toggle .btn.active {
-      background: rgba(201,168,76,0.1);
-      color: var(--gold);
-      border-color: rgba(201,168,76,0.25);
-    }
-
-    /* ── BODY ──────────────────────────────────────────── */
-    .body-content { padding: 18px 24px; }
-
-    /* ── STAT CARDS ────────────────────────────────────── */
-    .stat-card {
-      background: var(--navy3);
-      border-radius: 8px;
-      padding: 12px 14px;
-      border: 0.5px solid var(--border);
-    }
-    .stat-number { font-size: 22px; font-weight: 600; color: var(--white); }
-    .stat-label  { font-size: 10px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
-    .stat-dot    { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-
-    /* ── FILTROS ───────────────────────────────────────── */
-    .filter-wrap {
-      background: var(--navy3);
-      border-radius: var(--radius);
-      border: 0.5px solid var(--border);
-      padding: 12px 14px;
-      margin-bottom: 14px;
-    }
-    .filter-input {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--navy);
-      border: 0.5px solid rgba(255,255,255,0.09);
-      border-radius: 7px;
-      padding: 7px 12px;
-    }
-    .filter-input input {
-      background: none;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-size: 12px;
-      width: 100%;
-      font-family: 'Sora', sans-serif;
-    }
-    .filter-input input::placeholder { color: var(--muted); }
-    .filter-input i { color: var(--muted); font-size: 13px; }
-
-    .form-select-dark {
-      background: var(--navy);
-      border: 0.5px solid rgba(255,255,255,0.09);
-      border-radius: 7px;
-      padding: 7px 10px;
-      color: #8a9ab5;
-      font-size: 11px;
-      font-family: 'Sora', sans-serif;
-      outline: none;
-      cursor: pointer;
-    }
-    .form-select-dark:focus { border-color: var(--gold-b); box-shadow: none; }
-
-    .ftag {
-      padding: 5px 12px;
-      border-radius: 7px;
-      font-size: 11px;
-      cursor: pointer;
-      border: 0.5px solid rgba(255,255,255,0.07);
-      background: var(--navy);
-      color: #8a9ab5;
-      white-space: nowrap;
-      transition: all .15s;
-    }
-    .ftag.active, .ftag:hover {
-      background: rgba(201,168,76,0.1);
-      color: var(--gold);
-      border-color: rgba(201,168,76,0.3);
-    }
-
-    /* ── RESULT HEADER ─────────────────────────────────── */
-    .result-count { font-size: 12px; color: var(--muted); }
-    .sort-select {
-      background: var(--navy3);
-      border: 0.5px solid rgba(255,255,255,0.07);
-      border-radius: 6px;
-      padding: 4px 9px;
-      color: #8a9ab5;
-      font-size: 11px;
-      font-family: 'Sora', sans-serif;
-      outline: none;
-    }
-
-    /* ── INMUEBLE CARD ─────────────────────────────────── */
-    .prop-card {
-      background: var(--navy3);
-      border-radius: var(--radius);
-      border: 0.5px solid var(--border);
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color .15s, transform .12s;
-    }
-    .prop-card:hover {
-      border-color: rgba(201,168,76,0.25);
-      transform: translateY(-2px);
-    }
-    /* Borde especial para inmuebles en negociación */
-    .prop-card.en-negociacion {
-      border-color: rgba(46,204,143,0.25);
-    }
-
-    .prop-thumb {
-      height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .prop-thumb i { font-size: 32px; color: var(--gold); opacity: .6; }
-
-    /* Etiqueta encima del thumb */
-    .prop-tag {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      font-size: 9px;
-      padding: 2px 7px;
-      border-radius: 5px;
-      font-weight: 600;
-    }
-    .prop-tag.negociando { background: rgba(46,204,143,0.85);  color: #fff; }
-    .prop-tag.visitado   { background: rgba(75,141,232,0.85);  color: #fff; }
-    .prop-tag.reservado  { background: rgba(240,168,48,0.85);  color: #fff; }
-
-    /* Botón favorito sobre el thumb */
-    .fav-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      font-size: 16px;
-      color: var(--gold);
-      cursor: pointer;
-      text-shadow: 0 1px 3px rgba(0,0,0,.5);
-      background: none;
-      border: none;
-      padding: 0;
-      line-height: 1;
-    }
-
-    .prop-body { padding: 11px 13px; }
-    .prop-name { font-size: 12px; font-weight: 600; color: var(--text); }
-    .prop-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-    .prop-icons { display: flex; gap: 10px; margin-top: 6px; }
-    .prop-icon  { display: flex; align-items: center; gap: 3px; font-size: 10px; color: var(--muted); }
-    .prop-icon i { font-size: 11px; }
-
-    .prop-price   { font-size: 13px; color: var(--gold); font-weight: 600; margin-top: 6px; }
-    .prop-fav-date { font-size: 9px; color: var(--muted); margin-top: 3px; }
-
-    .prop-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 0.5px solid rgba(255,255,255,0.05);
-    }
-
-    /* Badges de estado */
-    .prop-badge {
-      font-size: 9px;
-      padding: 2px 7px;
-      border-radius: 5px;
-      font-weight: 600;
-    }
-    .badge-disp { background: rgba(46,204,143,0.1);  color: #2ecc8f; border: 0.5px solid rgba(46,204,143,0.2); }
-    .badge-res  { background: rgba(240,168,48,0.1);  color: #f0a830; border: 0.5px solid rgba(240,168,48,0.2); }
-    .badge-neg  { background: rgba(75,141,232,0.1);  color: #4b8de8; border: 0.5px solid rgba(75,141,232,0.2); }
-    .badge-nod  { background: rgba(224,92,92,0.1);   color: #e05c5c; border: 0.5px solid rgba(224,92,92,0.2); }
-
-    /* Botones de acción en cada tarjeta */
-    .prop-btn {
-      padding: 3px 8px;
-      border-radius: 5px;
-      font-size: 10px;
-      cursor: pointer;
-      border: 0.5px solid rgba(255,255,255,0.08);
-      background: transparent;
-      color: #8a9ab5;
-      font-family: 'Sora', sans-serif;
-      transition: color .12s, border-color .12s;
-    }
-    .prop-btn:hover        { color: var(--gold); border-color: rgba(201,168,76,0.3); }
-    .prop-btn.primary      { background: rgba(201,168,76,0.1); color: var(--gold); border-color: rgba(201,168,76,0.25); }
-    .prop-btn.danger:hover { color: #e05c5c; border-color: rgba(224,92,92,0.3); }
-
-    /* ── PAGINACIÓN ────────────────────────────────────── */
-    .pag-btn {
-      padding: 4px 10px;
-      border-radius: 5px;
-      font-size: 11px;
-      border: 0.5px solid rgba(255,255,255,0.07);
-      background: transparent;
-      color: #8a9ab5;
-      cursor: pointer;
-      font-family: 'Sora', sans-serif;
-      transition: all .12s;
-    }
-    .pag-btn:hover, .pag-btn.active {
-      background: rgba(201,168,76,0.1);
-      color: var(--gold);
-      border-color: rgba(201,168,76,0.25);
-    }
-
-    /* ── ESTADO VACÍO ──────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--muted);
-    }
-    .empty-state i   { font-size: 40px; color: rgba(201,168,76,0.3); margin-bottom: 12px; }
-    .empty-state p   { font-size: 13px; }
-  </style>
+        @media (max-width: 1100px) {
+            .layout     { grid-template-columns: 1fr; }
+            .sidebar    { display: none; }
+            .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .prop-grid  { grid-template-columns: repeat(2, minmax(0,1fr)); }
+        }
+        @media (max-width: 700px) {
+            .prop-grid  { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-
 <body>
-<div class="layout-wrapper">
+<div class="layout">
 
-  <!-- ══════════════ SIDEBAR ══════════════ -->
-  <!-- TIP: Extrae esto a fragments/sidebar.html y úsalo con th:replace -->
-<aside class="sidebar">
-    <div class="brand">
-        <h4>PropTech</h4>
-        <p>PORTAL CLIENTE</p>
-    </div>
-
-    <div class="menu-section-title">EXPLORAR</div>
-    <a class="menu-item" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
-    <a class="menu-item" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
-    <a class="menu-item active" th:href="@{/favoritos}"><i class="bi bi-star"></i> Favoritos</a>
-    <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Locaciones Cercanas</a>
-
-    <div class="menu-section-title">MI CUENTA</div>
-    <a class="menu-item" href="#"><i class="bi bi-calendar-event"></i> Mis visitas</a>
-    <a class="menu-item" href="#"><i class="bi bi-clock-history"></i> Mi historial</a>
-    <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
-    <a class="menu-item" href="#"><i class="bi bi-bell"></i> Notificaciones</a>
-
-    <div class="profile-box">
-        <div class="avatar" th:text="${inicialesCliente != null ? inicialesCliente : 'CL'}">CL</div>
-        <div>
-            <div class="fw-semibold" th:text="${nombreCliente != null ? nombreCliente : '[Nombre cliente]'}">[Nombre cliente]</div>
-            <div class="small" style="color:#8aa2c2" th:text="${rolCliente != null ? rolCliente : '[Rol]'}">[Rol]</div>
+    <!-- ══════════════════════════════════════════════════
+         SIDEBAR — idéntica al home-cliente.html
+         El único cambio entre vistas es qué .menu-item
+         tiene la clase "active".
+    ══════════════════════════════════════════════════ -->
+    <aside class="sidebar">
+        <div class="brand">
+            <h4>PropTech</h4>
+            <p>PORTAL CLIENTE</p>
         </div>
-    </div>
-</aside>
 
-  <!-- ══════════════ MAIN ══════════════ -->
-  <div class="main-content">
+        <div class="menu-section-title">EXPLORAR</div>
+        <a class="menu-item"        th:href="@{/home-cliente}">
+            <i class="bi bi-grid-3x3-gap"></i> Inicio
+        </a>
+        <a class="menu-item"        th:href="@{/inmuebles-cliente}">
+            <i class="bi bi-house"></i> Inmuebles
+        </a>
+        <a class="menu-item active" th:href="@{/favoritos}">
+            <i class="bi bi-star-fill"></i> Favoritos
+        </a>
+        <a class="menu-item"        href="#">
+            <i class="bi bi-hand-index-thumb"></i> Recomendados
+        </a>
 
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div>
-        <div class="topbar-title">Mis favoritos</div>
-        <!-- th:text muestra datos dinámicos del modelo -->
-           <div class="topbar-sub"
-             th:text="${favoritosTotal} + ' inmuebles guardados · ' + ${favoritosNegociacion} + ' en negociación'">
-          4 inmuebles guardados · 1 en negociación
+        <div class="menu-section-title">MI CUENTA</div>
+        <a class="menu-item" href="#">
+            <i class="bi bi-calendar-event"></i> Mis visitas
+        </a>
+        <a class="menu-item" href="#">
+            <i class="bi bi-clock-history"></i> Mi historial
+        </a>
+        <a class="menu-item" href="#">
+            <i class="bi bi-journal-text"></i> Mis operaciones
+        </a>
+
+        <div class="profile-box">
+            <div class="avatar" th:text="${inicialesCliente ?: 'CL'}">CL</div>
+            <div>
+                <div class="fw-semibold" th:text="${nombreCliente ?: 'Perfil'}">Perfil</div>
+                <div class="small" style="color:#8aa2c2"
+                     th:text="${rolCliente ?: 'Cliente'}">Cliente</div>
+            </div>
         </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════════════════
+         MAIN CONTENT
+    ══════════════════════════════════════════════════ -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <h3>Mis favoritos</h3>
+                <div class="sub"
+                     th:text="${totalFavoritos} + ' inmuebles guardados · ' + ${favoritosEnNegociacion} + ' en negociación'">
+                    4 inmuebles guardados · 1 en negociación
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+                <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-value" th:text="${totalFavoritos ?: '--'}">4</div>
+                <div class="stat-label">Total favoritos</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${favoritosDisponibles ?: '--'}">2</div>
+                <div class="stat-label">Disponibles</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${favoritosEnNegociacion ?: '--'}">1</div>
+                <div class="stat-label">En negociación</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${favoritosReservados ?: '--'}">1</div>
+                <div class="stat-label">Reservados</div>
+            </article>
+        </section>
+
+        <!-- PANEL PRINCIPAL -->
+        <div class="section-card">
+            <div class="section-head">
+                <h5>Inmuebles guardados</h5>
+                <a th:href="@{/inmuebles-cliente}">Explorar más →</a>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filter-wrap">
+                <form th:action="@{/favoritos}" method="get">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="search-row flex-grow-1" style="margin-bottom:0">
+                            <i class="bi bi-search"></i>
+                            <input type="text" name="q"
+                                   placeholder="Buscar en mis favoritos…"
+                                   th:value="${param.q}"/>
+                        </div>
+                        <div class="search-row" style="margin-bottom:0;flex:0 0 160px">
+                            <select name="tipo">
+                                <option value="">Todos los tipos</option>
+                                <option value="APARTAMENTO" th:selected="${param.tipo == 'APARTAMENTO'}">Apartamento</option>
+                                <option value="CASA"        th:selected="${param.tipo == 'CASA'}">Casa</option>
+                                <option value="LOCAL"       th:selected="${param.tipo == 'LOCAL'}">Local comercial</option>
+                                <option value="OFICINA"     th:selected="${param.tipo == 'OFICINA'}">Oficina</option>
+                            </select>
+                        </div>
+                        <div class="search-row" style="margin-bottom:0;flex:0 0 160px">
+                            <select name="estado">
+                                <option value="">Todos los estados</option>
+                                <option value="DISPONIBLE" th:selected="${param.estado == 'DISPONIBLE'}">Disponible</option>
+                                <option value="RESERVADO"  th:selected="${param.estado == 'RESERVADO'}">Reservado</option>
+                                <option value="NEGOCIANDO" th:selected="${param.estado == 'NEGOCIANDO'}">Negociando</option>
+                            </select>
+                        </div>
+                        <button type="submit"
+                                style="border:1px solid rgba(246,194,62,.35);background:rgba(246,194,62,.12);color:var(--gold);border-radius:8px;padding:0 16px;font-weight:600;cursor:pointer;font-family:inherit">
+                            Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TAGS RÁPIDOS -->
+            <div class="filter-tags">
+                <a th:href="@{/favoritos}"
+                   class="ftag"
+                   th:classappend="${param.filtro == null} ? ' active' : ''">Todos</a>
+                <a th:href="@{/favoritos(filtro='disponibles')}"
+                   class="ftag"
+                   th:classappend="${param.filtro == 'disponibles'} ? ' active' : ''">Disponibles</a>
+                <a th:href="@{/favoritos(filtro='con-visita')}"
+                   class="ftag"
+                   th:classappend="${param.filtro == 'con-visita'} ? ' active' : ''">Con visita agendada</a>
+                <a th:href="@{/favoritos(filtro='negociacion')}"
+                   class="ftag"
+                   th:classappend="${param.filtro == 'negociacion'} ? ' active' : ''">En negociación</a>
+            </div>
+
+            <!-- BARRA RESULTADO -->
+            <div class="result-bar">
+                <span th:text="${totalFavoritos} + ' inmuebles favoritos'">4 inmuebles favoritos</span>
+                <div class="d-flex align-items-center gap-2">
+                    Ordenar por
+                    <select class="sort-select" onchange="window.location.href='?ordenar='+this.value">
+                        <option value="reciente">Más reciente</option>
+                        <option value="precio-asc">Menor precio</option>
+                        <option value="precio-desc">Mayor precio</option>
+                        <option value="area">Mayor área</option>
+                    </select>
+                </div>
+            </div>
+
+            
+
+           <div class="prop-grid" th:unless="${#lists.isEmpty(favoritos)}">
+
+  <article class="card-inmueble"
+           th:each="inmueble : ${favoritos}"
+           th:classappend="${inmueble.estado.name() == 'NEGOCIANDO'} ? ' en-negociacion' : ''">
+
+    <!-- COVER -->
+    <div class="card-cover">
+      <img class="card-image"
+           th:if="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}"
+           th:src="${inmueble.fotoPortada}"
+           th:alt="${inmueble.nombre}"/>
+      <div class="card-image-placeholder"
+           th:unless="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}">
+        <i class="bi"
+           th:classappend="${inmueble.tipoInmueble.name() == 'CASA'}         ? 'bi-house-fill'  :
+                           (${inmueble.tipoInmueble.name() == 'APARTAMENTO'} ? 'bi-building'    :
+                           (${inmueble.tipoInmueble.name() == 'LOCAL'}        ? 'bi-shop'        :
+                           (${inmueble.tipoInmueble.name() == 'OFICINA'}      ? 'bi-briefcase'   : 'bi-grid')))"></i>
       </div>
-      <div class="view-toggle d-flex gap-2">
-        <button class="btn active"><i class="bi bi-grid-3x3-gap"></i> Tarjetas</button>
-        <button class="btn"><i class="bi bi-list-ul"></i> Lista</button>
-      </div>
+      <!-- Etiqueta finalidad -->
+      <span class="badge-top"
+            th:text="${inmueble.finalidad != null ? inmueble.finalidad.name() : 'INMUEBLE'}">
+        INMUEBLE
+      </span>
+      <!-- Corazón fijo (ya es favorito) -->
+      <i class="bi bi-heart-fill fav-icon"></i>
     </div>
 
     <!-- BODY -->
-    <div class="body-content">
+    <div class="card-body">
+      <div class="card-title"
+           th:text="${inmueble.nombre ?: (inmueble.tipoInmueble.name() + ' · ' + inmueble.barrio)}">
+        Apartamento · El Poblado
+      </div>
+      <div class="card-sub"
+           th:text="${inmueble.direccion} + ' · ' + ${inmueble.ciudad}">
+        Cll 10 #43-20 · Medellín
+      </div>
+      <div class="card-code" th:text="${inmueble.codigo}">COD-002</div>
 
-      <!-- STATS -->
-      <div class="row g-2 mb-3">
-        <div class="col-3">
-          <div class="stat-card">
-            <div class="stat-number" th:text="${favoritosTotal}">4</div>
-            <div class="stat-label">
-              <span class="stat-dot" style="background:#c9a84c"></span> Total favoritos
-            </div>
-          </div>
-        </div>
-        <div class="col-3">
-          <div class="stat-card">
-            <div class="stat-number" th:text="${favoritosDisponibles}">2</div>
-            <div class="stat-label">
-              <span class="stat-dot" style="background:#2ecc8f"></span> Disponibles
-            </div>
-          </div>
-        </div>
-        <div class="col-3">
-          <div class="stat-card">
-            <div class="stat-number" th:text="${favoritosNegociacion}">1</div>
-            <div class="stat-label">
-              <span class="stat-dot" style="background:#4b8de8"></span> En negociación
-            </div>
-          </div>
-        </div>
-        <div class="col-3">
-          <div class="stat-card">
-            <div class="stat-number" th:text="${favoritosReservados}">1</div>
-            <div class="stat-label">
-              <span class="stat-dot" style="background:#f0a830"></span> Reservados
-            </div>
-          </div>
-        </div>
+      <div class="meta">
+        <span th:text="${inmueble.area} + ' m²'">68 m²</span>
+        <span th:text="${inmueble.habitaciones} + ' hab'">2 hab</span>
+        <span th:text="${inmueble.banos} + ' baños'">2 baños</span>
       </div>
 
-      <!-- FILTROS -->
-      <div class="filter-wrap">
-        <form th:action="@{/favoritos}" method="get">
-          <div class="d-flex gap-2 flex-wrap mb-2">
-            <div class="filter-input flex-grow-1">
-              <i class="bi bi-search"></i>
-              <input type="text" name="q" placeholder="Buscar en mis favoritos…"
-                     th:value="${param.q}"/>
-            </div>
-            <select class="form-select-dark" name="tipo">
-              <option value="">Todos los tipos</option>
-              <option value="APARTAMENTO" th:selected="${param.tipo == 'APARTAMENTO'}">Apartamento</option>
-              <option value="CASA"        th:selected="${param.tipo == 'CASA'}">Casa</option>
-              <option value="LOCAL"       th:selected="${param.tipo == 'LOCAL'}">Local comercial</option>
-              <option value="OFICINA"     th:selected="${param.tipo == 'OFICINA'}">Oficina</option>
-            </select>
-            <select class="form-select-dark" name="estado">
-              <option value="">Todos los estados</option>
-              <option value="DISPONIBLE"  th:selected="${param.estado == 'DISPONIBLE'}">Disponible</option>
-              <option value="RESERVADO"   th:selected="${param.estado == 'RESERVADO'}">Reservado</option>
-              <option value="NEGOCIANDO"  th:selected="${param.estado == 'NEGOCIANDO'}">En negociación</option>
-            </select>
-            <button type="submit" class="prop-btn primary px-3">Filtrar</button>
-          </div>
-          <div class="d-flex gap-2 flex-wrap">
-            <a th:href="@{/favoritos}"                         class="ftag" th:classappend="${param.filtro == null}    ? 'active' : ''">Todos</a>
-            <a th:href="@{/favoritos(filtro='disponibles')}"   class="ftag" th:classappend="${param.filtro == 'disponibles'}  ? 'active' : ''">Disponibles</a>
-            <a th:href="@{/favoritos(filtro='con-visita')}"    class="ftag" th:classappend="${param.filtro == 'con-visita'}    ? 'active' : ''">Con visita agendada</a>
-            <a th:href="@{/favoritos(filtro='negociacion')}"   class="ftag" th:classappend="${param.filtro == 'negociacion'}   ? 'active' : ''">En negociación</a>
-          </div>
+      <div class="price"
+           th:text="'$' + ${#numbers.formatDecimal(inmueble.precio, 0, 'POINT', 0, 'COMMA')}">
+        $1.200.000
+      </div>
+      <div class="price-note"
+           th:text="${inmueble.finalidad != null ? inmueble.finalidad.name() : '—'}">
+        ARRIENDO
+      </div>
+
+      <div class="prop-fav-date"
+           th:text="'Guardado ' + ${inmueble.fechaFavorito}">
+        Guardado hace 1 día
+      </div>
+
+      <!-- ACCIONES -->
+      <div class="card-actions">
+        <!-- Badge estado -->
+        <span class="state"
+              th:classappend="${inmueble.estado.name() == 'RESERVADO'}    ? ' reservado'     :
+                              (${inmueble.estado.name() == 'NEGOCIANDO'}  ? ' negociando'    :
+                              (${inmueble.estado.name() == 'NO_DISPONIBLE'} ? ' no-disponible' : ''))"
+              th:text="${inmueble.estado.name()}">DISPONIBLE</span>
+
+        <!-- Botón quitar favorito -->
+        <form th:action="@{/favoritos/quitar}" method="post">
+          <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}"/>
+          <button type="submit" class="icon-btn active" title="Quitar de favoritos">
+            <i class="bi bi-heart-fill"></i>
+          </button>
         </form>
+
+        <!-- Ver detalle -->
+        <a class="view-btn"
+           th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}">Ver</a>
       </div>
+    </div>
+  </article>
 
-      <!-- RESULTADO HEADER -->
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <div class="result-count"
-             th:text="${favoritosTotal} + ' inmuebles favoritos'">4 inmuebles favoritos</div>
-        <div class="d-flex align-items-center gap-2" style="font-size:11px;color:var(--muted)">
-          Ordenar por
-          <select class="sort-select" onchange="window.location.href='?ordenar='+this.value">
-            <option value="reciente">Más reciente</option>
-            <option value="precio-asc">Menor precio</option>
-            <option value="precio-desc">Mayor precio</option>
-            <option value="area">Mayor área</option>
-          </select>
-        </div>
-      </div>
+</div>
 
-      <!-- ═══════ GRID INMUEBLES ═══════ -->
-      <!-- Estado vacío: si la lista de favoritos está vacía -->
-      <div class="empty-state" th:if="${#lists.isEmpty(favoritos)}">
-        <i class="bi bi-star"></i>
-        <p>Aún no tienes inmuebles favoritos.<br/>
-           <a th:href="@{/inmuebles-cliente}" style="color:var(--gold)">Explorar inmuebles</a>
-        </p>
-      </div>
-
-      <!-- Grid con los favoritos -->
-      <div class="row g-3 mb-3" th:unless="${#lists.isEmpty(favoritos)}">
-
-        <!-- th:each recorre la ListaEnlazada de favoritos del cliente -->
-        <div class="col-md-4" th:each="inmueble : ${favoritos}">
-          <div class="prop-card"
-            th:classappend="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'NO_DISPONIBLE'} ? 'en-negociacion' : ''">
-
-            <!-- THUMB -->
-            <div class="prop-thumb" style="background:#1a3050;">
-              <i class="bi"
-                 th:classappend="${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'CASA'} ? 'bi-house-fill' :
-                      (${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'LOCAL_COMERCIAL'} ? 'bi-shop' :
-                      (${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'BODEGA'} ? 'bi-box-seam' :
-                      (${inmueble.tipoInmueble != null and inmueble.tipoInmueble.name() == 'OFICINA'} ? 'bi-building' : 'bi-grid')))"></i>
-
-              <span class="prop-tag visitado"
-                th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'DISPONIBLE'}">Disponible</span>
-              <span class="prop-tag reservado"
-                th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'RESERVADO'}">Reservado</span>
-              <span class="prop-tag negociando"
-                th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'NO_DISPONIBLE'}">No disponible</span>
-
-              <!-- Botón quitar favorito -->
-              <form th:action="@{/favoritos/quitar}" method="post" style="position:absolute;top:8px;right:8px">
-                <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}"/>
-                <button type="submit" class="fav-btn" title="Quitar de favoritos">♥</button>
-              </form>
-            </div>
-
-            <!-- BODY -->
-            <div class="prop-body">
-              <div class="prop-name"
-                   th:text="${inmueble.tipoInmueble.name()} + ' · ' + ${inmueble.barrio}">
-                Apartamento · El Poblado
-              </div>
-              <div class="prop-meta"
-                   th:text="${inmueble.direccion} + ' · ' + ${inmueble.ciudad} + ' · ' + ${inmueble.codigo}">
-                Cll 10 #43-20 · Medellín · COD-002
-              </div>
-
-              <!-- Íconos: área, habitaciones, baños -->
-              <div class="prop-icons">
-                <div class="prop-icon">
-                  <i class="bi bi-aspect-ratio"></i>
-                  <span th:text="${inmueble.area} + ' m²'">68 m²</span>
+            <!-- PAGINACIÓN -->
+            <div class="pag-wrap" th:unless="${#lists.isEmpty(favoritos)}">
+                <div class="pag-info"
+                     th:text="'Mostrando ' + ${totalFavoritos} + ' favoritos'">
+                    Mostrando 4 favoritos
                 </div>
-                <div class="prop-icon">
-                  <i class="bi bi-door-open"></i>
-                  <span th:text="${inmueble.numeroHabitaciones} + ' hab'">2 hab</span>
-                </div>
-                <div class="prop-icon">
-                  <i class="bi bi-droplet"></i>
-                  <span th:text="${inmueble.numeroBanos} + ' baños'">2 baños</span>
-                </div>
-              </div>
-
-              <!-- Precio -->
-              <div class="prop-price">
-                <span th:text="${currencyFormatter.format(inmueble.precio)}">$350.000.000</span>
-              </div>
-
-              <div class="prop-fav-date">Guardado recientemente</div>
-
-              <!-- Footer: badge + botones -->
-              <div class="prop-footer">
-                    <span class="prop-badge badge-disp"
-                      th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'DISPONIBLE'}">Disponible</span>
-                    <span class="prop-badge badge-res"
-                      th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'RESERVADO'}">Reservado</span>
-                    <span class="prop-badge badge-neg"
-                      th:if="${inmueble.disponibilidad != null and inmueble.disponibilidad.name() == 'NO_DISPONIBLE'}">No disponible</span>
-
                 <div class="d-flex gap-1">
-                  <!-- Quitar de favoritos -->
-                  <form th:action="@{/favoritos/quitar}" method="post">
-                    <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}"/>
-                    <button type="submit" class="prop-btn danger">✕ Quitar</button>
-                  </form>
-
-                  <!-- Ver detalle -->
-                  <a th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}"
-                     class="prop-btn">Ver</a>
+                    <a class="pag-btn"
+                       th:classappend="${paginaActual == 0} ? ' disabled' : ''"
+                       th:href="@{/favoritos(pagina=${paginaActual - 1})}">‹</a>
+                    <th:block th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+                        <a class="pag-btn"
+                           th:classappend="${i == paginaActual} ? ' active' : ''"
+                           th:href="@{/favoritos(pagina=${i})}"
+                           th:text="${i + 1}">1</a>
+                    </th:block>
+                    <a class="pag-btn"
+                       th:classappend="${paginaActual == totalPaginas - 1} ? ' disabled' : ''"
+                       th:href="@{/favoritos(pagina=${paginaActual + 1})}">›</a>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
 
-    </div><!-- /body-content -->
-  </div><!-- /main-content -->
-</div><!-- /layout-wrapper -->
-
+    </main>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
