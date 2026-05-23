@@ -5,6 +5,7 @@ import com.uniquindio.Model.Inmueble.Disponibilidad;
 import com.uniquindio.Model.Inmueble.EstadoInmueble;
 import com.uniquindio.Model.Inmueble.Finalidad;
 import com.uniquindio.Model.Inmueble.TipoInmueble;
+import com.uniquindio.Service.GrafoService;
 import com.uniquindio.Service.InmuebleService;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Controller;
@@ -91,6 +92,9 @@ public class CrearInmuebleController {
                         rutaFotoPortada,
                         rutasGaleria
             );
+
+            GrafoService.getInstancia().registrarRelacionInmuebleZona(codigo, barrio);
+
             model.addAttribute("mensaje", "Inmueble registrado exitosamente.");
             cargarCombos(model);
             model.addAttribute("titulo", "Crear Inmueble");
@@ -107,6 +111,9 @@ public class CrearInmuebleController {
             model.addAttribute("numeroBanos", numeroBanos);
             cargarCombos(model);
             model.addAttribute("titulo", "Crear Inmueble");
+
+
+
             return "crear-inmueble";
         }
     }

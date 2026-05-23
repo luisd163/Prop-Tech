@@ -100,7 +100,22 @@ public class LoginController {
                 }
 
                 if (usuario.getTipo() == Usuario.TipoUsuario.CLIENTE) {
-                    session.setAttribute("clienteSesion", (Cliente) usuario);
+                    Cliente cliente = (Cliente) usuario;
+                    session.setAttribute("clienteSesion", cliente);
+                    session.setAttribute("clienteId", cliente.getIdentificacion());
+                    session.setAttribute("nombreCliente", cliente.getNombre());
+
+                    String nombre = cliente.getNombre() != null ? cliente.getNombre().trim() : "";
+                    String iniciales = "CL";
+                    if (!nombre.isEmpty()) {
+                        String[] partes = nombre.split("\\s+");
+                        if (partes.length == 1) {
+                            iniciales = partes[0].substring(0, 1).toUpperCase();
+                        } else {
+                            iniciales = (partes[0].substring(0, 1) + partes[1].substring(0, 1)).toUpperCase();
+                        }
+                    }
+                    session.setAttribute("inicialesCliente", iniciales);
                     return "redirect:/home-cliente";
                 }
 
