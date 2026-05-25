@@ -159,6 +159,10 @@ public class HomeClienteController {
             return "redirect:/home-cliente";
         }
 
+        cliente.registrarConsulta(inmueble);
+        ClienteRepositorio clienteRepositorio = new ClienteRepositorio();
+        clienteRepositorio.crearCliente(cliente);
+
         final Inmueble inmuebleFinal = inmueble;
         boolean esFavorito = cliente.getFavoritos() != null
             && cliente.getFavoritos().stream()

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PropTech · Mi Historial</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg:      #071429;
+            --bg-soft: #0b1f3d;
+            --panel:   #10284a;
+            --panel-2: #132f57;
+            --line:    rgba(255,255,255,.10);
+            --text:    #e8eef7;
+            --muted:   #7f96b8;
+            --gold:    #f6c23e;
+            --active:  #1d3658;
+            --input:   #38372f;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #203d63 0%, #0a1f3d 55%, #071429 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ── LAYOUT ───────────────────────────────── */
+        .layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        /* ── SIDEBAR ──────────────────────────────── */
+        .sidebar {
+            background: linear-gradient(180deg, #061a33 0%, #031228 100%);
+            border-right: 1px solid #17365e;
+            padding: 22px 0 18px;
+            display: flex;
+            flex-direction: column;
+        }
+        .brand { padding: 0 22px 18px; border-bottom: 1px solid #17365e; margin-bottom: 12px; }
+        .brand h4 { margin: 0; color: var(--gold); font-size: 1.45rem; font-weight: 700; }
+        .brand p  { margin: 2px 0 0; color: var(--muted); font-size: .82rem; letter-spacing: .8px; }
+
+        .menu-section-title { color: var(--muted); font-size: .76rem; letter-spacing: 1.4px; margin: 16px 22px 8px; }
+
+        .menu-item {
+            color: #b5c7df; text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 22px; border-left: 3px solid transparent;
+            font-size: .95rem; transition: .2s;
+        }
+        .menu-item:hover, .menu-item.active {
+            background: var(--active); color: var(--gold); border-left-color: var(--gold);
+        }
+
+        .profile-box {
+            margin: auto 14px 0; border: 1px solid #1f416e; border-radius: 12px;
+            padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,.03);
+        }
+        .avatar {
+            width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--gold);
+            display: grid; place-items: center; color: var(--gold);
+            font-size: .8rem; font-weight: 700; flex: 0 0 auto;
+        }
+
+        /* ── MAIN ─────────────────────────────────── */
+        .main { padding: 16px; overflow: auto; display: flex; flex-direction: column; gap: 14px; }
+
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 12px; border-bottom: 1px solid #1d3d69;
+        }
+        .topbar h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+        .topbar .sub { color: var(--muted); font-size: .9rem; margin-top: 2px; }
+
+        .btn-logout {
+            border: 1px solid rgba(255,77,77,.25); background: rgba(255,77,77,.08);
+            color: #ff4d4d; border-radius: 999px; padding: 7px 12px;
+            font-weight: 700; text-decoration: none; font-size: .85rem;
+        }
+        .btn-logout:hover { background: #ff4d4d; color: #fff; }
+
+        /* ── STATS ────────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0,1fr));
+            gap: 10px;
+        }
+        .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+        .stat-label { color: var(--muted); font-size: .82rem; display: flex; align-items: center; gap: 4px; }
+        .stat-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+        /* ── CONTENT GRID ─────────────────────────── */
+        .content-grid { display: grid; grid-template-columns: 1fr 260px; gap: 14px; }
+
+        /* ── PANEL ────────────────────────────────── */
+        .panel {
+            background: var(--panel-2); border: 1px solid var(--line);
+            border-radius: 14px; overflow: hidden; margin-bottom: 12px;
+        }
+        .panel:last-child { margin-bottom: 0; }
+
+        .panel-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 14px; border-bottom: 1px solid var(--line);
+        }
+        .panel-head h5 { margin: 0; color: var(--gold); font-weight: 600; font-size: .95rem; }
+        .panel-head a  { color: var(--muted); font-size: .82rem; text-decoration: none; }
+
+        /* ── FILTROS ──────────────────────────────── */
+        .filter-row {
+            display: flex; gap: 8px; padding: 10px 14px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            flex-wrap: wrap; align-items: center;
+        }
+        .search-box {
+            display: flex; align-items: center; gap: 7px;
+            background: #0e2040; border: 1px solid rgba(255,255,255,.1);
+            border-radius: 8px; padding: 7px 11px; flex: 1;
+        }
+        .search-box input {
+            background: none; border: none; outline: none;
+            color: var(--text); font-size: .85rem; width: 100%; font-family: inherit;
+        }
+        .search-box input::placeholder { color: var(--muted); }
+
+        .fsel {
+            background: #0e2040; border: 1px solid rgba(255,255,255,.1);
+            border-radius: 8px; padding: 7px 10px; color: var(--muted);
+            font-size: .82rem; font-family: inherit; outline: none;
+        }
+
+        .ftag {
+            padding: 5px 12px; border-radius: 999px; font-size: .78rem;
+            cursor: pointer; border: 1px solid rgba(255,255,255,.1);
+            background: rgba(255,255,255,.03); color: #b9c9e4;
+            white-space: nowrap; text-decoration: none; transition: .15s;
+        }
+        .ftag:hover, .ftag.active {
+            background: rgba(246,194,62,.12); color: var(--gold);
+            border-color: rgba(246,194,62,.35);
+        }
+
+        /* ── FILA HISTORIAL ───────────────────────── */
+        .h-row {
+            display: grid;
+            grid-template-columns: 42px 1fr auto;
+            align-items: center; gap: 12px;
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255,255,255,.05);
+            cursor: pointer; transition: background .12s;
+        }
+        .h-row:hover { background: rgba(246,194,62,.03); }
+        .h-row:last-of-type { border-bottom: none; }
+
+        .h-icon {
+            width: 38px; height: 38px; border-radius: 9px;
+            background: #0e2040; display: flex; align-items: center;
+            justify-content: center; font-size: 1rem; flex-shrink: 0;
+            color: var(--gold);
+        }
+        .h-name { font-size: .9rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+        .h-meta { font-size: .78rem; color: var(--muted); }
+        .h-date { font-size: .72rem; color: var(--muted); text-align: right; }
+
+        /* Badges de acción */
+        .h-tag { font-size: .72rem; padding: 2px 9px; border-radius: 999px; font-weight: 600; white-space: nowrap; border: 1px solid; }
+        .ht-consultado { background: rgba(75,141,232,.12);  color: #4b8de8; border-color: rgba(75,141,232,.2); }
+        .ht-favorito   { background: rgba(246,194,62,.12);  color: var(--gold); border-color: rgba(246,194,62,.2); }
+        .ht-visitado   { background: rgba(155,111,232,.12); color: #9b6fe8; border-color: rgba(155,111,232,.2); }
+        .ht-descartado { background: rgba(127,150,184,.1);  color: var(--muted); border-color: rgba(127,150,184,.15); }
+        .ht-negociando { background: rgba(46,204,143,.12);  color: #2ecc8f; border-color: rgba(46,204,143,.2); }
+
+        /* ── TIMELINE ─────────────────────────────── */
+        .timeline { padding: 6px 14px 14px; }
+        .tl-item {
+            display: flex; gap: 10px; padding: 8px 0; position: relative;
+        }
+        .tl-item::before {
+            content: ''; position: absolute; left: 14px; top: 28px;
+            bottom: -8px; width: 1px; background: rgba(255,255,255,.07);
+        }
+        .tl-item:last-child::before { display: none; }
+        .tl-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .72rem; font-weight: 700; flex-shrink: 0;
+            border: 1.5px solid; margin-top: 2px;
+        }
+        .tl-name { font-size: .82rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+        .tl-meta { font-size: .72rem; color: var(--muted); }
+
+        /* ── CHART BARS ───────────────────────────── */
+        .chart-bars {
+            display: flex; align-items: flex-end; gap: 6px;
+            padding: 14px; height: 110px;
+        }
+        .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; }
+        .bar-lbl { font-size: .72rem; color: var(--muted); }
+
+        /* ── ZONA BARS ────────────────────────────── */
+        .zona-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,.05);
+        }
+        .zona-row:last-child { border-bottom: none; }
+        .zona-name { font-size: .82rem; color: var(--text); min-width: 80px; }
+        .zona-bar  { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.06); overflow: hidden; }
+        .zona-fill { height: 100%; border-radius: 3px; background: var(--gold); }
+        .zona-n    { font-size: .78rem; color: var(--gold); font-weight: 600; min-width: 20px; text-align: right; }
+
+        /* ── VACÍO ────────────────────────────────── */
+        .empty-state { text-align: center; padding: 36px 16px; color: var(--muted); }
+        .empty-state i { font-size: 2rem; opacity: .3; display: block; margin-bottom: 10px; }
+
+        /* ── PAGINACIÓN ───────────────────────────── */
+        .pag-wrap {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; border-top: 1px solid var(--line);
+        }
+        .pag-info { font-size: .8rem; color: var(--muted); }
+        .pag-btns { display: flex; gap: 4px; }
+        .pag-btn {
+            padding: 4px 10px; border-radius: 6px; font-size: .78rem;
+            border: 1px solid rgba(255,255,255,.1); background: transparent;
+            color: #b9c9e4; cursor: pointer; font-family: inherit; transition: .15s;
+        }
+        .pag-btn:hover, .pag-btn.active {
+            background: rgba(246,194,62,.12); color: var(--gold);
+            border-color: rgba(246,194,62,.3);
+        }
+        .pag-btn.disabled { opacity: .35; pointer-events: none; }
+
+        @media (max-width: 1100px) {
+            .layout       { grid-template-columns: 1fr; }
+            .sidebar      { display: none; }
+            .stats-grid   { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="sidebar">
+        <div class="brand">
+            <h4>PropTech</h4>
+            <p>PORTAL CLIENTE</p>
+        </div>
+
+        <div class="menu-section-title">EXPLORAR</div>
+        <a class="menu-item"        th:href="@{/home-cliente}">
+            <i class="bi bi-grid-3x3-gap"></i> Inicio
+        </a>
+        <a class="menu-item"        th:href="@{/inmuebles-cliente}">
+            <i class="bi bi-house"></i> Inmuebles
+        </a>
+        <a class="menu-item"        th:href="@{/favoritos}">
+            <i class="bi bi-star"></i> Favoritos
+        </a>
+        <a class="menu-item"        th:href="@{/locaciones-cercanas}">
+            <i class="bi bi-geo-alt"></i> Locaciones cercanas
+        </a>
+
+        <div class="menu-section-title">MI CUENTA</div>
+        <a class="menu-item"        th:href="@{/mis-visitas}">
+            <i class="bi bi-calendar-event"></i> Mis visitas
+        </a>
+        <a class="menu-item active" th:href="@{/historial}">
+            <i class="bi bi-clock-history"></i> Mi historial
+        </a>
+        <a class="menu-item"        th:href="@{/mis-operaciones}">
+            <i class="bi bi-journal-text"></i> Mis operaciones
+        </a>
+        <a class="menu-item"        th:href="@{/notificaciones}">
+            <i class="bi bi-bell"></i> Notificaciones
+        </a>
+
+        <div class="profile-box">
+            <div class="avatar" th:text="${inicialesCliente ?: 'CL'}">CL</div>
+            <div>
+                <div class="fw-semibold" th:text="${nombreCliente ?: 'Perfil'}">Perfil</div>
+                <div class="small" style="color:#8aa2c2"
+                     th:text="${rolCliente ?: 'Cliente'}">Cliente</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══════════════ MAIN ══════════════ -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <h3>Mi historial de interés</h3>
+                <div class="sub">Registro completo de tus interacciones con inmuebles</div>
+            </div>
+            <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
+        </div>
+
+        <!-- ── STATS ──
+             Vienen del HistorialController:
+             totalInteracciones, totalConsultados, totalFavoritos,
+             totalVisitados, totalNegociados
+        -->
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-value" th:text="${totalInteracciones ?: '0'}">0</div>
+                <div class="stat-label">
+                    <span class="stat-dot" style="background:var(--muted)"></span>
+                    Total interacciones
+                </div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" style="color:#4b8de8"
+                     th:text="${totalConsultados ?: '0'}">0</div>
+                <div class="stat-label">
+                    <span class="stat-dot" style="background:#4b8de8"></span>
+                    Consultados
+                </div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" style="color:var(--gold)"
+                     th:text="${totalFavoritos ?: '0'}">0</div>
+                <div class="stat-label">
+                    <span class="stat-dot" style="background:var(--gold)"></span>
+                    Favoritos
+                </div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" style="color:#9b6fe8"
+                     th:text="${totalVisitados ?: '0'}">0</div>
+                <div class="stat-label">
+                    <span class="stat-dot" style="background:#9b6fe8"></span>
+                    Visitados
+                </div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" style="color:#2ecc8f"
+                     th:text="${totalNegociados ?: '0'}">0</div>
+                <div class="stat-label">
+                    <span class="stat-dot" style="background:#2ecc8f"></span>
+                    Negociados
+                </div>
+            </article>
+        </section>
+
+        <div class="content-grid">
+
+            <!-- ═══ COLUMNA PRINCIPAL ═══ -->
+            <div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <h5>Todas las interacciones</h5>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="filter-row">
+                        <form th:action="@{/historial}" method="get"
+                              style="display:contents">
+                            <div class="search-box flex-grow-1">
+                                <i class="bi bi-search" style="color:var(--muted)"></i>
+                                <input type="text" name="q"
+                                       placeholder="Buscar inmueble, zona o tipo…"
+                                       th:value="${param.q}"/>
+                            </div>
+                            <select class="fsel" name="accion">
+                                <option value="">Todas las acciones</option>
+                                <option value="CONSULTADO"  th:selected="${param.accion == 'CONSULTADO'}">Consultado</option>
+                                <option value="FAVORITO"    th:selected="${param.accion == 'FAVORITO'}">Favorito</option>
+                                <option value="VISITADO"    th:selected="${param.accion == 'VISITADO'}">Visitado</option>
+                                <option value="DESCARTADO"  th:selected="${param.accion == 'DESCARTADO'}">Descartado</option>
+                                <option value="NEGOCIANDO"  th:selected="${param.accion == 'NEGOCIANDO'}">Negociando</option>
+                            </select>
+                            <select class="fsel" name="periodo">
+                                <option value="">Todo el tiempo</option>
+                                <option value="semana" th:selected="${param.periodo == 'semana'}">Esta semana</option>
+                                <option value="mes"    th:selected="${param.periodo == 'mes'}">Este mes</option>
+                            </select>
+                            <button type="submit"
+                                    style="border:1px solid rgba(246,194,62,.35);background:rgba(246,194,62,.12);
+                                           color:var(--gold);border-radius:8px;padding:0 14px;
+                                           font-weight:600;cursor:pointer;font-family:inherit;height:36px">
+                                Filtrar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Tags rápidos -->
+                    <div class="filter-row" style="padding-top:8px;padding-bottom:8px">
+                        <a th:href="@{/historial}"
+                           class="ftag"
+                           th:classappend="${param.accion == null} ? ' active' : ''">Todos</a>
+                        <a th:href="@{/historial(accion='CONSULTADO')}"
+                           class="ftag"
+                           th:classappend="${param.accion == 'CONSULTADO'} ? ' active' : ''">Consultados</a>
+                        <a th:href="@{/historial(accion='FAVORITO')}"
+                           class="ftag"
+                           th:classappend="${param.accion == 'FAVORITO'} ? ' active' : ''">Favoritos</a>
+                        <a th:href="@{/historial(accion='VISITADO')}"
+                           class="ftag"
+                           th:classappend="${param.accion == 'VISITADO'} ? ' active' : ''">Visitados</a>
+                        <a th:href="@{/historial(accion='DESCARTADO')}"
+                           class="ftag"
+                           th:classappend="${param.accion == 'DESCARTADO'} ? ' active' : ''">Descartados</a>
+                        <a th:href="@{/historial(accion='NEGOCIANDO')}"
+                           class="ftag"
+                           th:classappend="${param.accion == 'NEGOCIANDO'} ? ' active' : ''">Negociando</a>
+                    </div>
+
+                    <!-- Estado vacío -->
+                    <div class="empty-state"
+                         th:if="${historial == null or #lists.isEmpty(historial)}">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Aún no tienes interacciones registradas.<br/>
+                           <a th:href="@{/inmuebles-cliente}"
+                              style="color:var(--gold)">Explorar inmuebles</a>
+                        </p>
+                    </div>
+
+                    <!-- ═══ th:each recorre ListaEnlazada<HistorialItem> ═══
+                         Cada HistorialItem debe tener:
+                         - inmueble      (objeto Inmueble)
+                         - accion        (String: CONSULTADO, FAVORITO, VISITADO, DESCARTADO, NEGOCIANDO)
+                         - acciones      (List<String> cuando tiene múltiples etiquetas)
+                         - fechaTexto    (String formateado: "Hace 1 día", etc.)
+                    -->
+                    <div th:unless="${historial == null or #lists.isEmpty(historial)}">
+                        <div class="h-row"
+                             th:each="item : ${historial}">
+
+                            <!-- Ícono según tipo de inmueble -->
+                            <div class="h-icon">
+                                <i class="bi"
+                                   th:classappend="${item.inmueble.tipoInmueble.name() == 'CASA'}         ? 'bi-house-fill'  :
+                                                   (${item.inmueble.tipoInmueble.name() == 'APARTAMENTO'} ? 'bi-building'    :
+                                                   (${item.inmueble.tipoInmueble.name() == 'LOCAL_COMERCIAL'} ? 'bi-shop'     :
+                                                   (${item.inmueble.tipoInmueble.name() == 'OFICINA'}      ? 'bi-briefcase'   : 'bi-grid')))"></i>
+                            </div>
+
+                            <!-- Info del inmueble -->
+                            <div>
+                                <div class="h-name"
+                                     th:text="${item.inmueble.tipoInmueble.name()} + ' · ' + ${item.inmueble.barrio}">
+                                    Tipo · Zona
+                                </div>
+                                <div class="h-meta"
+                                     th:text="${item.inmueble.codigo}
+                                              + ' · $' + ${#numbers.formatDecimal(item.inmueble.precio, 0, 'POINT', 0, 'COMMA')}
+                                              + ' · ' + ${item.inmueble.numeroHabitaciones} + ' hab'
+                                              + ' · ' + ${item.inmueble.area} + ' m²'">
+                                    COD · Precio · hab · m²
+                                </div>
+                            </div>
+
+                            <!-- Badges de acción + fecha -->
+                            <div style="text-align:right">
+                                <div style="display:flex;gap:5px;justify-content:flex-end;margin-bottom:4px;flex-wrap:wrap">
+                                    <!-- Una sola acción -->
+                                    <span class="h-tag"
+                                          th:if="${item.acciones == null or #lists.isEmpty(item.acciones)}"
+                                          th:classappend="${item.accion == 'CONSULTADO'}  ? ' ht-consultado' :
+                                                          (${item.accion == 'FAVORITO'}   ? ' ht-favorito'   :
+                                                          (${item.accion == 'VISITADO'}   ? ' ht-visitado'   :
+                                                          (${item.accion == 'DESCARTADO'} ? ' ht-descartado' :
+                                                          (${item.accion == 'NEGOCIANDO'} ? ' ht-negociando' : ''))))"
+                                          th:text="${item.accion}">
+                                        ACCIÓN
+                                    </span>
+
+                                    <!-- Múltiples acciones (favorito + visitado, etc.) -->
+                                    <span class="h-tag"
+                                          th:each="a : ${item.acciones}"
+                                          th:classappend="${a == 'CONSULTADO'}  ? ' ht-consultado' :
+                                                          (${a == 'FAVORITO'}   ? ' ht-favorito'   :
+                                                          (${a == 'VISITADO'}   ? ' ht-visitado'   :
+                                                          (${a == 'DESCARTADO'} ? ' ht-descartado' :
+                                                          (${a == 'NEGOCIANDO'} ? ' ht-negociando' : ''))))"
+                                          th:text="${a}">
+                                        ACCIÓN
+                                    </span>
+                                </div>
+                                <div class="h-date" th:text="${item.fechaTexto}">Hace N días</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="pag-wrap"
+                         th:unless="${historial == null or #lists.isEmpty(historial)}">
+                        <div class="pag-info"
+                             th:text="'Mostrando ' + ${#lists.size(historial)} + ' de ' + ${totalInteracciones} + ' interacciones'">
+                            Mostrando 0 de 0 interacciones
+                        </div>
+                        <div class="pag-btns">
+                            <a class="pag-btn"
+                               th:classappend="${paginaActual == 0} ? ' disabled' : ''"
+                               th:href="@{/historial(pagina=${paginaActual - 1}, accion=${param.accion}, q=${param.q})}">‹</a>
+                            <th:block th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+                                <a class="pag-btn"
+                                   th:classappend="${i == paginaActual} ? ' active' : ''"
+                                   th:href="@{/historial(pagina=${i}, accion=${param.accion}, q=${param.q})}"
+                                   th:text="${i + 1}">1</a>
+                            </th:block>
+                            <a class="pag-btn"
+                               th:classappend="${paginaActual == totalPaginas - 1} ? ' disabled' : ''"
+                               th:href="@{/historial(pagina=${paginaActual + 1}, accion=${param.accion}, q=${param.q})}">›</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ COLUMNA DERECHA ═══ -->
+            <div>
+
+                <!-- TIMELINE de actividad reciente
+                     actividadReciente: List<HistorialItem> (últimos 5)
+                -->
+                <div class="panel">
+                    <div class="panel-head"><h5>Actividad reciente</h5></div>
+
+                    <div class="empty-state"
+                         th:if="${actividadReciente == null or #lists.isEmpty(actividadReciente)}">
+                        <i class="bi bi-clock"></i>
+                        <p style="font-size:.82rem">Sin actividad reciente</p>
+                    </div>
+
+                    <div class="timeline"
+                         th:unless="${actividadReciente == null or #lists.isEmpty(actividadReciente)}">
+                        <div class="tl-item"
+                             th:each="item : ${actividadReciente}">
+                            <div class="tl-dot"
+                                 th:style="'background:' +
+                                    (${item.accion == 'NEGOCIANDO'}  ? 'rgba(46,204,143,.12);border-color:#2ecc8f;color:#2ecc8f'  :
+                                    (${item.accion == 'VISITADO'}    ? 'rgba(155,111,232,.12);border-color:#9b6fe8;color:#9b6fe8' :
+                                    (${item.accion == 'FAVORITO'}    ? 'rgba(246,194,62,.12);border-color:#f6c23e;color:#f6c23e'  :
+                                    (${item.accion == 'DESCARTADO'}  ? 'rgba(127,150,184,.1);border-color:#7f96b8;color:#7f96b8'  :
+                                    'rgba(75,141,232,.12);border-color:#4b8de8;color:#4b8de8'))))"
+                                 th:text="${#strings.substring(item.accion, 0, 1)}">C</div>
+                            <div class="tl-content">
+                                <div class="tl-name"
+                                     th:text="${item.accion} + ' ' + ${item.inmueble.tipoInmueble.name()} + ' · ' + ${item.inmueble.barrio}">
+                                    Acción Tipo · Zona
+                                </div>
+                                <div class="tl-meta" th:text="${item.fechaTexto}">Hace N días</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICA DE ACTIVIDAD POR DÍA
+                     actividadSemanal: List<Integer> con 7 valores (L-D)
+                     maxActividad: Integer (para calcular porcentaje de altura)
+                -->
+                <div class="panel">
+                    <div class="panel-head"><h5>Actividad por semana</h5></div>
+                    <div class="chart-bars"
+                         th:if="${actividadSemanal != null and !#lists.isEmpty(actividadSemanal)}">
+                        <th:block th:each="dia,stat : ${actividadSemanal}">
+                            <div class="bar-wrap">
+                                <div class="bar"
+                                     th:style="'height:' + (${maxActividad > 0} ? ${dia * 100 / maxActividad} : 0) + '%;background:' + (${stat.index == diaActual} ? '#f6c23e' : '#4b8de8')">
+                                </div>
+                                <div class="bar-lbl"
+                                     th:text="${{'L','M','X','J','V','S','D'}[stat.index]}">L</div>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="empty-state"
+                         th:unless="${actividadSemanal != null and !#lists.isEmpty(actividadSemanal)}">
+                        <i class="bi bi-bar-chart"></i>
+                        <p style="font-size:.82rem">Sin datos esta semana</p>
+                    </div>
+                </div>
+
+                <!-- ZONAS MÁS CONSULTADAS
+                     zonasRanking: Map<String, Integer> ordenado por valor desc
+                     maxZona: Integer (para calcular el ancho de la barra)
+                -->
+                <div class="panel">
+                    <div class="panel-head"><h5>Zonas más consultadas</h5></div>
+
+                    <div class="empty-state"
+                         th:if="${zonasRanking == null or zonasRanking.isEmpty()}">
+                        <i class="bi bi-geo-alt"></i>
+                        <p style="font-size:.82rem">Sin zonas registradas</p>
+                    </div>
+
+                    <div th:unless="${zonasRanking == null or zonasRanking.isEmpty()}">
+                        <div class="zona-row"
+                             th:each="entry : ${zonasRanking}">
+                            <div class="zona-name" th:text="${entry.key}">Zona</div>
+                            <div class="zona-bar">
+                                <div class="zona-fill"
+                                     th:style="'width:' + (${maxZona > 0} ? ${entry.value * 100 / maxZona} : 0) + '%'">
+                                </div>
+                            </div>
+                            <div class="zona-n" th:text="${entry.value}">0</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

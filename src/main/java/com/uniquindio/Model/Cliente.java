@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.uniquindio.Repositorio.InmuebleRepositorio;
 
 @Getter
 @Setter
@@ -92,4 +93,36 @@ public class Cliente implements Usuario {
 
     return cliente.getHistorialConsultas();
 }
+
+	public void registrarConsulta(Inmueble inmueble) {
+
+		if (inmueble == null || inmueble.getCodigo() == null) {
+			return;
+		}
+
+		String codigo = inmueble.getCodigo().trim();
+		if (codigo.isEmpty()) {
+			return;
+		}
+
+		// Intentar obtener la instancia canónica del repositorio
+		InmuebleRepositorio inmuebleRepositorio = new InmuebleRepositorio();
+		Inmueble real = inmuebleRepositorio.obtenerInmueble(codigo);
+		if (real == null) {
+			real = inmuebleRepositorio.obtenerInmuebles().values().stream()
+					.filter(i -> i != null && i.getCodigo() != null && i.getCodigo().trim().equalsIgnoreCase(codigo))
+					.findFirst()
+					.orElse(inmueble);
+		}
+
+		if (historialConsultas == null) {
+			historialConsultas = new ArrayList<>();
+		}
+
+		// Eliminar cualquier entrada previa con el mismo código
+		historialConsultas.removeIf(i -> i != null && i.getCodigo() != null && i.getCodigo().trim().equalsIgnoreCase(codigo));
+
+		// Añadir al inicio para que lo más reciente aparezca primero
+		historialConsultas.add(0, real);
+	}
 }

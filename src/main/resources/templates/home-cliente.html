@@ -493,7 +493,7 @@
 
         <div class="menu-section-title">MI CUENTA</div>
         <a class="menu-item" href="#"><i class="bi bi-calendar-event"></i> Mis visitas</a>
-        <a class="menu-item" href="#"><i class="bi bi-clock-history"></i> Mi historial</a>
+        <a class="menu-item" th:href="@{/historial}"><i class="bi bi-clock-history"></i> Mi historial</a>
         <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
 
         <div class="profile-box">
@@ -644,7 +644,7 @@
 
         <section class="bottom-grid">
             <article class="section-card small-box">
-                <div class="section-head"><h5>Mi historial</h5><a href="#">Ver →</a></div>
+                <div class="section-head"><h5>Mi historial</h5><a th:href="@{/historial}">Ver →</a></div>
                 <div class="small-empty">[Contenido]</div>
             </article>
 
