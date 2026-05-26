@@ -49,20 +49,25 @@ public class LlmChatService {
             return ChatResult.error("Escribe un mensaje para el asistente.");
         }
 
-        String contexto = contextService.construirContextoRag(idCliente);
+        if (!properties.isEnabled()) {
+            return ChatResult.error("El asistente está desactivado en la configuración.");
+        }
 
         if (!properties.tieneCredenciales()) {
-            return ChatResult.error(
-                    "El asistente LLM no está configurado. Define OPENAI_API_KEY o usa Ollama "
-                            + "(proptech.llm.provider=ollama) en application.properties."
-            );
+            return ChatResult.error(properties.mensajeConfiguracion());
         }
+
+        String contexto = contextService.construirContextoRag(idCliente);
 
         try {
             String respuesta = llamarLlm(contexto, mensajeUsuario.trim(), historial);
             return ChatResult.ok(respuesta);
         } catch (Exception e) {
-            return ChatResult.error("No se pudo contactar al modelo: " + e.getMessage());
+            String msg = e.getMessage() != null ? e.getMessage() : "Error desconocido";
+            if (msg.startsWith("Tu cuenta") || msg.startsWith("API key") || msg.startsWith("Error del proveedor")) {
+                return ChatResult.error(msg);
+            }
+            return ChatResult.error("No se pudo contactar al modelo: " + msg);
         }
     }
 
@@ -104,6 +109,7 @@ public class LlmChatService {
         body.addProperty("model", properties.getModel());
         body.add("messages", messages);
         body.addProperty("temperature", 0.3);
+        body.addProperty("max_tokens", properties.getMaxTokens());
 
         String url = properties.getBaseUrl().replaceAll("/$", "") + "/chat/completions";
 
@@ -122,7 +128,7 @@ public class LlmChatService {
         HttpResponse<String> response = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new IllegalStateException("HTTP " + response.statusCode() + ": " + recortar(response.body(), 300));
+            throw new IllegalStateException(mensajeErrorApi(response.statusCode(), response.body()));
         }
 
         JsonObject json = gson.fromJson(response.body(), JsonObject.class);
@@ -134,6 +140,39 @@ public class LlmChatService {
         }
 
         throw new IllegalStateException("Respuesta del modelo sin contenido.");
+    }
+
+    private String mensajeErrorApi(int status, String body) {
+        String tipo = "";
+        String detalle = "";
+        try {
+            JsonObject json = gson.fromJson(body, JsonObject.class);
+            if (json != null && json.has("error")) {
+                JsonObject err = json.getAsJsonObject("error");
+                if (err.has("type")) {
+                    tipo = err.get("type").getAsString();
+                }
+                if (err.has("message")) {
+                    detalle = err.get("message").getAsString();
+                }
+            }
+        } catch (Exception ignored) {
+            detalle = recortar(body, 120);
+        }
+
+        if (status == 429 || "insufficient_quota".equals(tipo)) {
+            return "Tu cuenta de OpenAI no tiene crédito o cuota disponible (HTTP 429). "
+                    + "Entra a https://platform.openai.com/settings/organization/billing "
+                    + "y agrega un método de pago o recarga saldo. "
+                    + "También puedes usar Ollama gratis (ver application-local.properties.example).";
+        }
+        if (status == 401) {
+            return "API key inválida o revocada (HTTP 401). Revisa application-local.properties.";
+        }
+        if (status == 403) {
+            return "Acceso denegado por OpenAI (HTTP 403). " + recortar(detalle, 100);
+        }
+        return "Error del proveedor (HTTP " + status + "): " + recortar(detalle, 150);
     }
 
     private String recortar(String texto, int max) {

@@ -1,12 +1,25 @@
-# Copia estas líneas a src/main/resources/application.properties o usa variables de entorno.
+# Guía de configuración del asistente (chatbot) PropTech
+#
+# 1) Copia src/main/resources/application-local.properties.example
+#    a src/main/resources/application-local.properties
+# 2) Pega tu API key de OpenAI O configura Ollama (ver abajo)
+# 3) Reinicia la aplicación
+#
+# Alternativa sin archivo local:
+#   PowerShell: $env:OPENAI_API_KEY="sk-tu-clave"
+#   Luego: .\mvnw.cmd spring-boot:run
 
-# OpenAI
+# --- OpenAI (recomendado) ---
+proptech.llm.enabled=true
 proptech.llm.provider=openai
-proptech.llm.api-key=TU_API_KEY_AQUI
+proptech.llm.api-key=sk-tu-clave-aqui
 proptech.llm.base-url=https://api.openai.com/v1
 proptech.llm.model=gpt-4o-mini
+proptech.llm.max-tokens=600
 
-# Ollama (sin API key)
+# --- Ollama local (gratis, sin API key) ---
+# Instala Ollama, ejecuta: ollama pull llama3.2
+# proptech.llm.enabled=true
 # proptech.llm.provider=ollama
 # proptech.llm.api-key=
 # proptech.llm.base-url=http://localhost:11434/v1

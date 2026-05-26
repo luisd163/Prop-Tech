@@ -1,0 +1,10 @@
+# Copia como application-local.properties (no se sube a Git).
+
+# --- OpenAI ---
+# proptech.llm.api-key=sk-tu-secret-key-completa
+
+# --- Ollama (local, gratis) ---
+proptech.llm.provider=ollama
+proptech.llm.api-key=
+proptech.llm.base-url=http://localhost:11434/v1
+proptech.llm.model=llama3.2
