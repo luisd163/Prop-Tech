@@ -27,6 +27,7 @@ public class Cliente implements Usuario {
 	private List<Inmueble> favoritos;
 	private ArrayList<Inmueble> intenciones;
 	private List<Inmueble> historialConsultas;
+	private Inmueble inmuebleAsignado;
 
 	@Override
 	public String getCorreo() {

@@ -352,12 +352,12 @@
 
         <div class="menu-section-title">PRINCIPAL</div>
         <a class="menu-item active" href="#"><i class="bi bi-grid"></i> Dashboard</a>
-        <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
+        <a class="menu-item" th:href="@{/operaciones}"><i class="bi bi-briefcase"></i> Operaciones</a>
         <a class="menu-item" th:href="@{/inmuebles/todos}"><i class="bi bi-house"></i> Inmuebles</a>
         <a class="menu-item" th:href="@{/clientes}"><i class="bi bi-people"></i> Clientes</a>
 
         <div class="menu-section-title">GESTIÓN</div>
-        <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Operaciones</a>
+        <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
         <a class="menu-item" href="#"><i class="bi bi-pie-chart"></i> Reportes</a>
         <a class="menu-item" href="#"><i class="bi bi-bell"></i> Alertas</a>
 
@@ -478,8 +478,30 @@
             </article>
 
             <article class="section-card">
-                <div class="section-head"><h5>Visitas por semana</h5><a href="#">Detalle →</a></div>
-                <div class="p-4 muted">[Espacio para gráfica o resumen semanal]</div>
+                <div class="section-head"><h5>Visitas</h5><a th:href="@{/visitas}">Detalle →</a></div>
+                <div class="list-item" th:each="visita : ${visitasProximas}">
+                    <div class="alert-dot"
+                         th:classappend="${visita.estado.name() == 'PENDIENTE' ? ' dot-warn' : (visita.estado.name() == 'CONFIRMADA' ? ' dot-info' : ' dot-danger')}"
+                    ></div>
+                    <div>
+                        <div class="fw-semibold">
+                            <span th:text="${visita.cliente != null ? visita.cliente.nombre : 'Cliente'}">Cliente</span>
+                            ·
+                            <span th:text="${visita.inmueble != null ? visita.inmueble.nombre : 'Inmueble'}">Inmueble</span>
+                        </div>
+                        <div class="muted">
+                            <span th:text="${visita.fecha != null ? visita.fecha : '-'}">Fecha</span>
+                            ·
+                            <span th:text="${visita.hora != null ? visita.hora : '-'}">Hora</span>
+                        </div>
+                    </div>
+                    <span class="status-badge"
+                          th:classappend="${visita.estado.name() == 'PENDIENTE' ? ' s-pendiente' : (visita.estado.name() == 'CONFIRMADA' ? ' s-confirmada' : ' s-no')}"
+                          th:text="${visita.estado}">Estado</span>
+                </div>
+                <div class="list-item" th:if="${visitasProximas == null || visitasProximas.isEmpty()}">
+                    <div class="muted">No tienes visitas agendadas.</div>
+                </div>
             </article>
 
             <article class="section-card">

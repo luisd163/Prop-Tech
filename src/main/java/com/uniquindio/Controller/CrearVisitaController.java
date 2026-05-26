@@ -8,6 +8,7 @@ import com.uniquindio.Repositorio.AsesorRepositorio;
 import com.uniquindio.Repositorio.ClienteRepositorio;
 import com.uniquindio.Repositorio.InmuebleRepositorio;
 import com.uniquindio.Service.AsesorHomeService;
+import com.uniquindio.Service.GrafoService;
 import com.uniquindio.Service.VisitaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -73,6 +74,16 @@ public class CrearVisitaController {
 					asesor.getIdentificacion(),
 					estado,
 					observaciones
+			);
+
+			// Registrar relación en el grafo
+
+			GrafoService grafoService =
+        	GrafoService.getInstancia();
+
+			grafoService.registrarVisita(
+        		cliente.getIdentificacion(),
+        		inmueble.getCodigo()
 			);
 
 			if (asesor.getClientes() == null) {

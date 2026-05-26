@@ -407,8 +407,15 @@
 					<thead>
 						<tr>
 							<th>INMUEBLE</th><th>TIPO</th><th>FINALIDAD</th><th>PRECIO</th><th>ÁREA</th><th>HAB.</th><th>ESTADO</th>
+							<th>CLIENTE</th>
 						</tr>
 					</thead>
+					<tr>
+    <td colspan="8" style="color:lime; font-size:10px">
+        Clientes disponibles: 
+        <span th:text="${clientesAsesor != null ? clientesAsesor.size() : 'NULL'}">?</span>
+    </td>
+</tr>
 					<tbody>
 						<tr th:each="inmueble : ${inmueblesAsesor}">
 							<td>
@@ -430,9 +437,50 @@
 							<td><span class="status"
 									th:classappend="${inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).DISPONIBLE ? ' s-disponible' : (inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).RESERVADO ? ' s-reservado' : ' s-nodisponible')}"
 									th:text="${inmueble.disponibilidad}">Estado</span></td>
+							<td>
+            <form th:action="@{/inmuebles/asignar-cliente}" method="post"
+                  style="display:flex; gap:6px; align-items:center">
+                <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}"/>
+                <select name="idCliente"
+                        style="height:30px; border-radius:6px;
+                               border:1px solid rgba(255,255,255,.12);
+                               background:#1e3354; color:#e8eef7;
+                               font-size:11px; padding:0 8px;
+                               font-family:inherit; outline:none; min-width:130px">
+                    <option value="">— Sin cliente —</option>
+                    <option th:each="cliente : ${clientesAsesor}"
+                            th:value="${cliente.getIdentificacion()}"
+                            th:text="${cliente.getNombre()}"
+                            th:selected="${cliente.getInmuebleAsignado() != null
+                                           and cliente.getInmuebleAsignado().getCodigo()
+                                               == inmueble.getCodigo()}">
+                    </option>
+                </select>
+                <button type="submit"
+                        style="height:30px; padding:0 10px; border-radius:6px;
+                               border:1px solid rgba(242,178,51,.5);
+                               background:rgba(242,178,51,.1); color:#f2b233;
+                               font-size:11px; font-weight:600;
+                               cursor:pointer; font-family:inherit">
+                    OK
+                </button>
+            </form>
+
+            <!-- Cliente actualmente asignado -->
+            <div th:with="clienteAsignado=${clientesAsesor != null ? clientesAsesor.stream()
+              .filter(c -> c.getInmuebleAsignado() != null
+                        and c.getInmuebleAsignado().getCodigo() == inmueble.getCodigo())
+              .findFirst().orElse(null) : null}"
+     th:if="${clienteAsignado != null}"
+     style="font-size:10px; color:#3be08f; margin-top:4px;
+            display:flex; align-items:center; gap:4px">
+    <i class="bi bi-check-circle-fill"></i>
+    <span th:text="${clienteAsignado.getNombre()}">Cliente</span>
+</div>
+        </td>
 						</tr>
 						<tr th:if="${inmueblesAsesor == null || inmueblesAsesor.isEmpty()}">
-							<td colspan="7" style="text-align:center; color:#93a6c5; padding:18px;">No hay inmuebles asignados para mostrar.</td>
+							<td colspan="8" style="text-align:center; color:#93a6c5; padding:18px;">No hay inmuebles asignados para mostrar.</td>
 						</tr>
 					</tbody>
 				</table>

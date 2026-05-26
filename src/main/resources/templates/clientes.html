@@ -302,12 +302,12 @@
 
         <div class="menu-section-title">PRINCIPAL</div>
         <a class="menu-item" th:href="@{/home}"><i class="bi bi-grid"></i> Dashboard</a>
-        <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
+        <a class="menu-item" th:href="@{/operaciones}"><i class="bi bi-briefcase"></i> Operaciones</a>
         <a class="menu-item" th:href="@{/inmuebles/todos}"><i class="bi bi-house"></i> Inmuebles</a>
         <a class="menu-item active" th:href="@{/clientes}"><i class="bi bi-people"></i> Clientes</a>
 
         <div class="menu-section-title">GESTIÓN</div>
-        <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Operaciones</a>
+        <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
         <a class="menu-item" href="#"><i class="bi bi-pie-chart"></i> Reportes</a>
         <a class="menu-item" href="#"><i class="bi bi-bell"></i> Alertas</a>
 
