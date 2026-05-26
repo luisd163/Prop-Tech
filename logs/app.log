@@ -1233,3 +1233,16 @@ org.springframework.expression.spel.SpelEvaluationException: EL1004E: Method cal
 2026-05-25T20:59:16.633-05:00  INFO 7180 --- [Prop-Tech] [http-nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-05-25T20:59:16.636-05:00  INFO 7180 --- [Prop-Tech] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-05-25T20:59:16.639-05:00  INFO 7180 --- [Prop-Tech] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-05-25T21:07:57.637-05:00  INFO 11836 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 11836 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in c:\Users\luisd\Downloads\Prop-Tech)
+2026-05-25T21:07:57.644-05:00  INFO 11836 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-25T21:08:00.921-05:00  INFO 14648 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Starting PropTechApplication using Java 21.0.8 with PID 14648 (C:\Users\luisd\Downloads\Prop-Tech\target\classes started by luisd in c:\Users\luisd\Downloads\Prop-Tech)
+2026-05-25T21:08:00.925-05:00  INFO 14648 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-05-25T21:08:02.218-05:00  INFO 14648 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-05-25T21:08:02.244-05:00  INFO 14648 --- [Prop-Tech] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-25T21:08:02.245-05:00  INFO 14648 --- [Prop-Tech] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-25T21:08:02.335-05:00  INFO 14648 --- [Prop-Tech] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1349 ms
+2026-05-25T21:08:02.889-05:00  INFO 14648 --- [Prop-Tech] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-05-25T21:08:02.894-05:00  INFO 14648 --- [Prop-Tech] [main] c.u.Prop_Tech.PropTechApplication        : Started PropTechApplication in 2.644 seconds (process running for 3.08)
+2026-05-25T21:08:05.734-05:00  INFO 14648 --- [Prop-Tech] [http-nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-25T21:08:05.737-05:00  INFO 14648 --- [Prop-Tech] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-25T21:08:05.741-05:00  INFO 14648 --- [Prop-Tech] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
