@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Logs y temporales locales ###
+logs/
+build.log
+cookies.txt
+tmp_cookies.txt

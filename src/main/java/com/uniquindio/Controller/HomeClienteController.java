@@ -405,14 +405,15 @@ public class HomeClienteController {
                 .anyMatch(i -> i.getCodigo() != null && i.getCodigo().trim().equals(codigoLimpio));
         
         if (yaEnFavoritos) {
-            // Remover de favoritos
             cliente.getFavoritos().removeIf(i -> i.getCodigo() != null && i.getCodigo().trim().equals(codigoLimpio));
         } else {
-            // Agregar a favoritos
             cliente.getFavoritos().add(inmueble);
+            if (cliente.getIdentificacion() != null) {
+                com.uniquindio.Service.GrafoService.getInstancia()
+                        .registrarFavorito(cliente.getIdentificacion(), codigoLimpio);
+            }
         }
-        
-        // Guardar cambios
+
         ClienteRepositorio clienteRepositorio = new ClienteRepositorio();
         clienteRepositorio.crearCliente(cliente);
         

@@ -156,6 +156,17 @@ public class VisitaService {
 
         visita.setEstado(estadoNuevo);
         repositorio.actualizarVisita(visita);
+
+        if (estadoNuevo == Visita.EstadoVisita.REALIZADA
+                && visita.getCliente() != null
+                && visita.getInmueble() != null
+                && visita.getCliente().getIdentificacion() != null
+                && visita.getInmueble().getCodigo() != null) {
+            GrafoService.getInstancia().registrarVisita(
+                    visita.getCliente().getIdentificacion(),
+                    visita.getInmueble().getCodigo()
+            );
+        }
     }
 
     // Crear visita

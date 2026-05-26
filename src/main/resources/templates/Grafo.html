@@ -86,7 +86,7 @@
 
         /* ── STATS ────────────────────────────────── */
         .stats-grid {
-            display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
+            display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 10px;
         }
         .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
         .stat-value { font-size: 1.65rem; font-weight: 700; line-height: 1; margin-bottom: 8px; }
@@ -237,8 +237,11 @@
         <!-- TOPBAR -->
         <div class="topbar">
             <div>
-                <h3>Locaciones cercanas</h3>
-                <div class="sub">Grafo de relaciones entre inmuebles y zonas de interés</div>
+                <h3 id="page-title" th:text="${tituloPagina ?: 'Locaciones cercanas'}">Locaciones cercanas</h3>
+                <div class="sub" id="page-subtitle"
+                     th:text="${subtituloPagina ?: 'Todos los inmuebles y zonas registrados en el sistema'}">
+                    Todos los inmuebles y zonas registrados en el sistema
+                </div>
             </div>
             <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
         </div>
@@ -264,6 +267,10 @@
                 <div class="stat-value" th:text="${totalDisponibles ?: '0'}">4</div>
                 <div class="stat-label">Disponibles</div>
             </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${totalReservados ?: '0'}">0</div>
+                <div class="stat-label">Reservados</div>
+            </article>
         </section>
 
         <div class="content-grid">
@@ -276,9 +283,8 @@
                 </div>
                 <div class="legend">
                     <div class="leg-item"><div class="leg-dot" style="background:#f6c23e"></div> Tu ubicación</div>
-                    <div class="leg-item"><div class="leg-dot" style="background:#4b8de8"></div> Disponible</div>
-                    <div class="leg-item"><div class="leg-dot" style="background:#2ecc8f"></div> Visitado</div>
                     <div class="leg-item"><div class="leg-dot" style="background:#9b6fe8"></div> Zona</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:#4b8de8"></div> Disponible</div>
                     <div class="leg-item"><div class="leg-dot" style="background:#e05c5c"></div> Reservado</div>
                 </div>
                 <div class="graph-area">
@@ -297,10 +303,10 @@
                           ]
                         }
                     -->
-                    <canvas id="graphCanvas"
-                            th:attr="data-grafo=${grafoJson},
-                                     data-radio=${radioActual}">
-                    </canvas>
+                    <canvas id="graphCanvas"></canvas>
+                    <script th:inline="javascript">
+                        window.__grafoJson = /*[[${grafoJson}]]*/ '{}';
+                    </script>
                     <div id="grafo-empty" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;display:grid;place-items:center;color:#7f96b8;text-align:center;padding:20px;">
                         <div>
                             <i class="bi bi-exclamation-triangle" style="font-size:2.5rem;margin-bottom:10px;display:block;opacity:0.5"></i>
@@ -329,27 +335,16 @@
                 </div>
 
                 <!-- FILTROS -->
-                <div class="filter-panel">
+                <div class="filter-panel" id="panel-filtros-cercanas">
                     <h6>Filtros del grafo</h6>
 
                     <div class="f-label">Tipo de nodo</div>
                     <select class="f-select" id="filterType">
                         <option value="todos">Todos</option>
                         <option value="disp">Solo disponibles</option>
-                        <option value="visitado">Visitados</option>
+                        <option value="reservado">Reservados</option>
                         <option value="zona">Zonas</option>
                     </select>
-
-                    <div class="f-label">Radio de distancia (km)</div>
-                    <input type="range" class="f-range" id="radiusRange"
-                           min="1" max="10" step="1"
-                           th:value="${radioActual ?: 5}"/>
-                    <div class="f-range-labels">
-                        <span>1 km</span>
-                        <span id="radiusVal"
-                              th:text="${radioActual ?: 5} + ' km'">5 km</span>
-                        <span>10 km</span>
-                    </div>
 
                     <!-- Estadísticas dinámicas (se actualizan con JS) -->
                     <div class="stats-mini">
@@ -373,12 +368,19 @@
                                  th:text="${totalDisponibles ?: 0}">4</div>
                             <div class="lbl">Disponibles</div>
                         </div>
+                        <div class="stat-mini">
+                            <div class="val" id="stat-reservados"
+                                 th:text="${totalReservados ?: 0}">0</div>
+                            <div class="lbl">Reservados</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 </div>
+
+<div th:replace="~{fragments/chat-asistente :: chatWidget}"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
@@ -387,12 +389,18 @@
 const canvas  = document.getElementById('graphCanvas');
 const ctx     = canvas.getContext('2d');
 
-// Leer datos del atributo data-grafo (viene de model.addAttribute("grafoJson",...))
-let grafoData  = {};
+// Datos del grafo (inyectados por Thymeleaf)
+let grafoData = {};
 try {
-    const raw = canvas.getAttribute('data-grafo');
-    if (raw && raw !== '{}') grafoData = JSON.parse(raw);
-} catch(e) { console.error('Error al parsear grafoJson:', e); }
+    const raw = window.__grafoJson;
+    if (typeof raw === 'string' && raw.trim() !== '' && raw !== '{}') {
+        grafoData = JSON.parse(raw);
+    } else if (raw && typeof raw === 'object') {
+        grafoData = raw;
+    }
+} catch (e) {
+    console.error('Error al parsear grafoJson:', e);
+}
 
 // Debug: mostrar estructura del grafoData
 console.log('grafoData:', grafoData);
@@ -410,7 +418,6 @@ let edges      = [];   // AristaDTO
 let selected   = null;
 let hovered    = null;
 let filterType = 'todos';
-let maxRadius  = parseFloat(canvas.getAttribute('data-radio') || '5');
 let animFrame  = 0;
 let W = 0, H = 0;
 
@@ -418,13 +425,12 @@ let W = 0, H = 0;
 const COLORS = {
     yo:        '#f6c23e',
     disp:      '#4b8de8',
-    visitado:  '#2ecc8f',
     zona:      '#9b6fe8',
     reservado: '#e05c5c'
 };
 
 const ICONS = {
-    yo: '★', disp: '▦', visitado: '▦', zona: '◎', reservado: '⌂'
+    yo: '★', disp: '▦', zona: '◎', reservado: '⌂'
 };
 
 // ─── Construir nodos con posición ─────────────────────────────────
@@ -501,8 +507,10 @@ function ny(n) { return n.y * H; }
 // ─── Visibilidad ──────────────────────────────────────────────────
 function esVisible(n) {
     if (n.tipo === 'yo') return true;
-    if (filterType !== 'todos' && n.tipo !== filterType) return false;
-    return (n.distancia || 0) <= maxRadius;
+    const sel = document.getElementById('filterType');
+    const filtro = sel ? sel.value : filterType;
+    if (filtro !== 'todos' && n.tipo !== filtro) return false;
+    return true;
 }
 
 function nodoById(id) {
@@ -635,7 +643,7 @@ function mostrarDetalle(n) {
 
     let html = `<div class="nd-avatar" style="color:${n.color}">${n.icon}</div>
                 <div class="nd-name">${n.label}</div>
-                <div class="nd-meta">${n.tipo === 'zona' ? 'Zona de interés' : (n.tipo === 'yo' ? 'Tu ubicación actual' : n.tipo)} · ${n.zona || ''}</div>`;
+                <div class="nd-meta">${etiquetaTipo(n)} · ${n.zona || ''}</div>`;
 
     // Precio — NodoDTO.precio viene de Inmueble.getPrecio()
     if (n.precio) {
@@ -650,7 +658,7 @@ function mostrarDetalle(n) {
     if (n.distancia)    html += fila('Distancia', parseFloat(n.distancia).toFixed(1) + ' km');
 
     // Acciones según tipo
-    if (n.tipo === 'disp') {
+    if (n.tipo === 'disp' || n.tipo === 'reservado') {
         html += `<div class="nd-actions">
             <button class="nd-btn"
                 onclick="agregarFavorito('${n.codigo}')">
@@ -668,16 +676,17 @@ function mostrarDetalle(n) {
                 Ver inmuebles ↗
             </button>
         </div>`;
-    } else if (n.tipo === 'visitado') {
-        html += `<div class="nd-actions">
-            <button class="nd-btn primary"
-                onclick="verDetalle('${n.codigo}')">
-                Ver detalle
-            </button>
-        </div>`;
     }
 
     document.getElementById('node-detail').innerHTML = html;
+}
+
+function etiquetaTipo(n) {
+    if (n.tipo === 'yo') return 'Tu ubicación actual';
+    if (n.tipo === 'zona') return 'Zona de interés';
+    if (n.tipo === 'disp') return 'Disponible';
+    if (n.tipo === 'reservado') return 'Reservado';
+    return n.tipo || '';
 }
 
 function fila(label, val) {
@@ -715,27 +724,13 @@ function verDetalle(codigo) {
 }
 
 // ─── Filtro por tipo de nodo ──────────────────────────────────────
-document.getElementById('filterType').addEventListener('change', function() {
-    filterType = this.value;
-    actualizarStats();
-});
-
-// ─── Slider de radio — llama al endpoint /api/grafo/locaciones ───
-document.getElementById('radiusRange').addEventListener('input', function() {
-    maxRadius = parseFloat(this.value);
-    document.getElementById('radiusVal').textContent = this.value + ' km';
-    actualizarStats();
-});
-
-document.getElementById('radiusRange').addEventListener('change', function() {
-    // Al soltar el slider hace fetch al GrafoController para obtener datos nuevos
-    fetch('/api/grafo/locaciones?radio=' + this.value)
-        .then(r => r.json())
-        .then(data => {
-            inicializar(data);
-        })
-        .catch(e => console.error('Error al actualizar grafo:', e));
-});
+const filterTypeEl = document.getElementById('filterType');
+if (filterTypeEl) {
+    filterTypeEl.addEventListener('change', function() {
+        filterType = this.value;
+        actualizarStats();
+    });
+}
 
 // ─── Actualizar contadores del panel derecho ──────────────────────
 function actualizarStats() {
@@ -744,13 +739,20 @@ function actualizarStats() {
         const a = nodoById(e.origenId), b = nodoById(e.destinoId);
         return a && b && esVisible(a) && esVisible(b);
     });
-    const zonas  = visibles.filter(n => n.tipo === 'zona').length;
-    const dispon = visibles.filter(n => n.tipo === 'disp').length;
+    const zonas     = visibles.filter(n => n.tipo === 'zona').length;
+    const dispon    = visibles.filter(n => n.tipo === 'disp').length;
+    const reservados = visibles.filter(n => n.tipo === 'reservado').length;
 
-    document.getElementById('stat-nodos').textContent      = visibles.length;
-    document.getElementById('stat-conexiones').textContent = conexiones.length;
-    document.getElementById('stat-zonas').textContent      = zonas;
-    document.getElementById('stat-disp').textContent       = dispon;
+    const statNodos = document.getElementById('stat-nodos');
+    const statConex = document.getElementById('stat-conexiones');
+    const statZonas = document.getElementById('stat-zonas');
+    const statDisp  = document.getElementById('stat-disp');
+    const statRes   = document.getElementById('stat-reservados');
+    if (statNodos) statNodos.textContent = visibles.length;
+    if (statConex) statConex.textContent = conexiones.length;
+    if (statZonas) statZonas.textContent = zonas;
+    if (statDisp)  statDisp.textContent  = dispon;
+    if (statRes)   statRes.textContent   = reservados;
 }
 
 // ─── Arranque ─────────────────────────────────────────────────────

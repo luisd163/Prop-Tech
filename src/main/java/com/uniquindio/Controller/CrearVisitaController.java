@@ -76,15 +76,12 @@ public class CrearVisitaController {
 					observaciones
 			);
 
-			// Registrar relación en el grafo
-
-			GrafoService grafoService =
-        	GrafoService.getInstancia();
-
-			grafoService.registrarVisita(
-        		cliente.getIdentificacion(),
-        		inmueble.getCodigo()
-			);
+			if (estado == Visita.EstadoVisita.REALIZADA) {
+				GrafoService.getInstancia().registrarVisita(
+						cliente.getIdentificacion(),
+						inmueble.getCodigo()
+				);
+			}
 
 			if (asesor.getClientes() == null) {
 				asesor.setClientes(new ArrayList<>());
