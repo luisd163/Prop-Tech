@@ -348,15 +348,16 @@
         }
 
         .recomendado-item {
-            display: grid;
-            grid-template-columns: 80px 1fr auto auto;
-            gap: 12px;
+            display: flex;
             align-items: center;
+            gap: 12px;
             padding: 12px;
             background: rgba(255,255,255,.03);
             border: 1px solid rgba(255,255,255,.08);
             border-radius: 10px;
             transition: background 0.2s;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .recomendado-item:hover {
@@ -375,6 +376,8 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            min-width: 0;
+            flex: 1 1 auto;
         }
 
         .recomendado-title {
@@ -389,11 +392,13 @@
             display: flex;
             gap: 4px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .recomendado-status {
             display: flex;
             justify-content: center;
+            flex: 0 0 auto;
         }
 
         .badge-status {
@@ -409,6 +414,7 @@
 
         .recomendado-action {
             padding: 0 8px;
+            flex: 0 0 auto;
         }
 
         .btn-ver {
@@ -470,6 +476,15 @@
             .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .content-grid { grid-template-columns: 1fr; }
             .bottom-grid { grid-template-columns: 1fr; }
+            .recomendado-item {
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .recomendado-status,
+            .recomendado-action {
+                margin-left: auto;
+            }
         }
     </style>
     <script>
@@ -661,7 +676,6 @@
         </section>
     </main>
 </div>
-
 <div th:replace="~{fragments/chat-asistente :: chatWidget}"></div>
 </body>
 </html>
