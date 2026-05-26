@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PropTech · Mis Favoritos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+
+      .prop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    padding: 14px;
+}
+
+.card-inmueble {
+    background: #10284a;
+    border: 1px solid #1d3d69;
+    border-radius: 14px;
+    overflow: hidden;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-cover {
+    height: 96px;
+    background: linear-gradient(135deg, #214476 0%, #16335d 100%);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--gold);
+    font-size: 1.8rem;
+    overflow: hidden;
+}
+
+.card-image {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+}
+
+.card-image-placeholder {
+    width: 100%; height: 100%;
+    display: grid; place-items: center;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #214476 0%, #16335d 100%);
+}
+
+.badge-top {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(173,126,255,.9);
+    color: #fff; border-radius: 8px;
+    padding: 3px 10px; font-size: .75rem;
+}
+
+.fav-icon {
+    position: absolute; top: 8px; right: 10px;
+    color: var(--gold); font-size: .9rem;
+}
+
+.card-body {
+    padding: 12px;
+    display: flex; flex-direction: column;
+    gap: 8px; flex: 1;
+}
+
+.card-title { font-size: 1.05rem; line-height: 1.2; font-weight: 500; }
+.card-sub, .card-code { color: var(--muted); font-size: .92rem; line-height: 1.2; }
+
+.meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    color: var(--muted); font-size: .88rem; margin: 4px 0;
+}
+
+.price      { color: var(--gold); font-size: 1.8rem; line-height: 1; font-weight: 700; margin: 4px 0; }
+.price-note { color: var(--gold); font-size: 1.05rem; font-weight: 600; }
+.prop-fav-date { color: var(--muted); font-size: .78rem; }
+
+.card-actions {
+    margin-top: auto;
+    border-top: 1px solid rgba(255,255,255,.10);
+    padding-top: 10px;
+    display: grid;
+    grid-template-columns: auto 44px 1fr;
+    gap: 8px; align-items: center;
+}
+
+.state {
+    border: 1px solid rgba(0,208,140,.45);
+    color: #2dd9a1;
+    background: rgba(0,208,140,.12);
+    border-radius: 8px; font-size: .78rem;
+    padding: 2px 8px; width: max-content;
+}
+.state.reservado { border-color: rgba(240,168,48,.45); color: #f0a830; background: rgba(240,168,48,.12); }
+.state.negociando { border-color: rgba(75,141,232,.45); color: #4b8de8; background: rgba(75,141,232,.12); }
+.state.no-disponible { border-color: rgba(224,92,92,.45); color: #e05c5c; background: rgba(224,92,92,.12); }
+
+.icon-btn, .view-btn {
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: transparent;
+    color: #dbe7f8; height: 44px;
+}
+
+.icon-btn.active {
+    border-color: rgba(246,194,62,.55);
+    background: rgba(246,194,62,.16);
+    color: var(--gold);
+}
+
+.view-btn {
+    font-size: 1.05rem; font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+}
+
+/* Estado vacío */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+.empty-state i { font-size: 40px; color: rgba(246,194,62,.3); display: block; margin-bottom: 12px; }
+.empty-state a { color: var(--gold); }
+
+        /* ── VARIABLES (idénticas al home-cliente) ───────── */
+        :root {
+            --bg:       #071429;
+            --bg-soft:  #0b1f3d;
+            --panel:    #10284a;
+            --panel-2:  #132f57;
+            --line:     rgba(255,255,255,.10);
+            --text:     #e8eef7;
+            --muted:    #7f96b8;
+            --gold:     #f6c23e;
+            --active:   #1d3658;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #203d63 0%, #0a1f3d 55%, #071429 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ── LAYOUT ──────────────────────────────────────── */
+        .layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        /* ══════════════════════════════════════════════════
+           SIDEBAR — estructura idéntica al home-cliente.html
+           Solo cambia el .active al ítem correspondiente.
+           Para reutilizar en todas las vistas extrae esto a:
+             src/main/resources/templates/fragments/sidebar.html
+           y en cada vista usa:
+             <div th:replace="fragments/sidebar :: sidebar(activeItem='favoritos')"></div>
+        ══════════════════════════════════════════════════ */
+        .sidebar {
+            background: linear-gradient(180deg, #061a33 0%, #031228 100%);
+            border-right: 1px solid #17365e;
+            padding: 22px 0 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 0 22px 18px;
+            border-bottom: 1px solid #17365e;
+            margin-bottom: 12px;
+        }
+        .brand h4 { margin: 0; color: var(--gold); font-size: 1.45rem; font-weight: 700; }
+        .brand p  { margin: 2px 0 0; color: var(--muted); font-size: .82rem; letter-spacing: .8px; }
+
+        .menu-section-title {
+            color: var(--muted);
+            font-size: .76rem;
+            letter-spacing: 1.4px;
+            margin: 16px 22px 8px;
+        }
+
+        .menu-item {
+            color: #b5c7df;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px;
+            border-left: 3px solid transparent;
+            font-size: .95rem;
+            transition: .2s;
+        }
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--active);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .profile-box {
+            margin: auto 14px 0;
+            border: 1px solid #1f416e;
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,.03);
+        }
+        .avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--gold);
+            display: grid; place-items: center;
+            color: var(--gold);
+            font-size: .8rem;
+            flex: 0 0 auto;
+        }
+
+        /* ── MAIN ────────────────────────────────────────── */
+        .main { padding: 16px; overflow: auto; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1d3d69;
+            margin-bottom: 14px;
+        }
+        .topbar h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+        .topbar .sub { color: var(--muted); font-size: .9rem; }
+
+        .btn-logout {
+            border: 1px solid rgba(255,77,77,.25);
+            background: rgba(255,77,77,.08);
+            color: #ff4d4d;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .btn-logout:hover { background: #ff4d4d; color: #fff; }
+
+        /* ── STATS ───────────────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0,1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .stat-value { font-size: 1.65rem; font-weight: 700; line-height: 1; margin-bottom: 8px; }
+        .stat-label { color: var(--muted); font-size: .92rem; }
+
+        /* ── SECTION CARD ────────────────────────────────── */
+        .section-card {
+            background: var(--panel-2);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+        .section-head h5 { margin: 0; color: var(--gold); font-weight: 600; font-size: 1rem; }
+        .section-head a  { color: var(--muted); text-decoration: none; font-size: .88rem; }
+
+        /* ── FILTROS ─────────────────────────────────────── */
+        .filter-wrap { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+
+        .search-row {
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .search-row i {
+            position: absolute;
+            left: 12px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+        .search-row input,
+        .search-row select {
+            width: 100%; height: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.12);
+            background: #3b392f;
+            color: #f4f4f4;
+            padding: 0 14px 0 38px;
+            font-size: .93rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .search-row select { padding-left: 14px; appearance: none; }
+
+        .filter-tags {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+        .ftag {
+            border: 1px solid rgba(255,255,255,.12);
+            background: rgba(255,255,255,.03);
+            color: #b9c9e4;
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: .8rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: .2s;
+        }
+        .ftag:hover, .ftag.active {
+            background: rgba(246,194,62,.15);
+            border-color: rgba(246,194,62,.4);
+            color: var(--gold);
+        }
+
+        .result-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--line);
+            font-size: .88rem;
+            color: var(--muted);
+        }
+        .sort-select {
+            background: #0e2040;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 6px;
+            padding: 3px 9px;
+            color: var(--muted);
+            font-size: .82rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+
+
+        /* Paginación */
+        .pag-wrap { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; }
+        .pag-info { font-size: .85rem; color: var(--muted); }
+        .pag-btn {
+            border: 1px solid rgba(255,255,255,.14);
+            background: transparent; color: #b9c9e4;
+            border-radius: 8px; padding: 4px 11px;
+            font-size: .82rem; cursor: pointer;
+            font-family: inherit; transition: .15s;
+        }
+        .pag-btn:hover, .pag-btn.active {
+            background: rgba(246,194,62,.15);
+            border-color: rgba(246,194,62,.4);
+            color: var(--gold);
+        }
+        .pag-btn.disabled { opacity: .35; pointer-events: none; }
+
+        @media (max-width: 1100px) {
+            .layout     { grid-template-columns: 1fr; }
+            .sidebar    { display: none; }
+            .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .prop-grid  { grid-template-columns: repeat(2, minmax(0,1fr)); }
+        }
+        @media (max-width: 700px) {
+            .prop-grid  { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- ══════════════════════════════════════════════════
+         SIDEBAR — idéntica al home-cliente.html
+         El único cambio entre vistas es qué .menu-item
+         tiene la clase "active".
+    ══════════════════════════════════════════════════ -->
+    <aside class="sidebar">
+        <div class="brand">
+            <h4>PropTech</h4>
+            <p>PORTAL CLIENTE</p>
+        </div>
+
+        <div class="menu-section-title">EXPLORAR</div>
+        <a class="menu-item"        th:href="@{/home-cliente}">
+            <i class="bi bi-grid-3x3-gap"></i> Inicio
+        </a>
+        <a class="menu-item"        th:href="@{/inmuebles-cliente}">
+            <i class="bi bi-house"></i> Inmuebles
+        </a>
+        <a class="menu-item active" th:href="@{/favoritos}">
+            <i class="bi bi-star-fill"></i> Favoritos
+        </a>
+        <a class="menu-item"        href="#">
+            <i class="bi bi-hand-index-thumb"></i> Locaciones Cercanas
+        </a>
+
+        <div class="menu-section-title">MI CUENTA</div>
+        <a class="menu-item" href="#">
+            <i class="bi bi-calendar-event"></i> Mis visitas
+        </a>
+        <a class="menu-item" th:href="@{/historial}">
+            <i class="bi bi-clock-history"></i> Mi historial
+        </a>
+        <a class="menu-item" href="#">
+            <i class="bi bi-journal-text"></i> Mis operaciones
+        </a>
+
+        <div class="profile-box">
+            <div class="avatar" th:text="${inicialesCliente ?: 'CL'}">CL</div>
+            <div>
+                <div class="fw-semibold" th:text="${nombreCliente ?: 'Perfil'}">Perfil</div>
+                <div class="small" style="color:#8aa2c2"
+                     th:text="${rolCliente ?: 'Cliente'}">Cliente</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════════════════
+         MAIN CONTENT
+    ══════════════════════════════════════════════════ -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <h3>Mis favoritos</h3>
+                <div class="sub"
+                     th:text="${favoritosTotal} + ' inmuebles guardados · ' + ${favoritosDisponibles} + ' disponibles'">
+                    4 inmuebles guardados · 2 disponibles
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+                <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-value" th:text="${favoritosTotal ?: '--'}">4</div>
+                <div class="stat-label">Total favoritos</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${favoritosDisponibles ?: '--'}">2</div>
+                <div class="stat-label">Disponibles</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${favoritosNegociacion ?: '--'}">1</div>
+                <div class="stat-label">En negociación</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${favoritosReservados ?: '--'}">1</div>
+                <div class="stat-label">Reservados</div>
+            </article>
+        </section>
+
+        <!-- PANEL PRINCIPAL -->
+        <div class="section-card">
+            <div class="section-head">
+                <h5>Inmuebles guardados</h5>
+                <a th:href="@{/inmuebles-cliente}">Explorar más →</a>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filter-wrap">
+                <form th:action="@{/favoritos}" method="get">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="search-row flex-grow-1" style="margin-bottom:0">
+                            <i class="bi bi-search"></i>
+                            <input type="text" name="q"
+                                   placeholder="Buscar en mis favoritos…"
+                                   th:value="${param.q != null ? param.q[0] : ''}"/>
+                        </div>
+                        <button type="submit"
+                                style="border:1px solid rgba(246,194,62,.35);background:rgba(246,194,62,.12);color:var(--gold);border-radius:8px;padding:0 16px;font-weight:600;cursor:pointer;font-family:inherit">
+                            Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- BARRA RESULTADO -->
+            <div class="result-bar">
+                <span th:text="${favoritosTotal} + ' inmuebles favoritos'">4 inmuebles favoritos</span>
+            </div>
+
+            
+
+           <div class="prop-grid" th:unless="${#lists.isEmpty(favoritos)}">
+
+    <article class="card-inmueble"
+                     th:each="inmueble : ${favoritos}"
+                     th:classappend="${inmueble.disponibilidad.name() == 'NO_DISPONIBLE'} ? ' en-negociacion' : ''">
+
+    <!-- COVER -->
+    <div class="card-cover">
+      <img class="card-image"
+           th:if="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}"
+           th:src="${inmueble.fotoPortada}"
+           th:alt="${inmueble.nombre}"/>
+      <div class="card-image-placeholder"
+           th:unless="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}">
+        <i class="bi"
+           th:classappend="${inmueble.tipoInmueble.name() == 'CASA'}         ? 'bi-house-fill'  :
+                           (${inmueble.tipoInmueble.name() == 'APARTAMENTO'} ? 'bi-building'    :
+                           (${inmueble.tipoInmueble.name() == 'LOCAL'}        ? 'bi-shop'        :
+                           (${inmueble.tipoInmueble.name() == 'OFICINA'}      ? 'bi-briefcase'   : 'bi-grid')))"></i>
+      </div>
+      <!-- Etiqueta finalidad -->
+      <span class="badge-top"
+            th:text="${inmueble.finalidad != null ? inmueble.finalidad.name() : 'INMUEBLE'}">
+        INMUEBLE
+      </span>
+      <!-- Corazón fijo (ya es favorito) -->
+      <i class="bi bi-heart-fill fav-icon"></i>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body">
+      <div class="card-title"
+           th:text="${inmueble.nombre ?: (inmueble.tipoInmueble.name() + ' · ' + inmueble.barrio)}">
+        Apartamento · El Poblado
+      </div>
+      <div class="card-sub"
+           th:text="${inmueble.direccion} + ' · ' + ${inmueble.ciudad}">
+        Cll 10 #43-20 · Medellín
+      </div>
+      <div class="card-code" th:text="${inmueble.codigo}">COD-002</div>
+
+            <div class="meta">
+                <span th:text="${inmueble.area} + ' m²'">68 m²</span>
+                <span th:text="${inmueble.numeroHabitaciones} + ' hab'">2 hab</span>
+                <span th:text="${inmueble.numeroBanos} + ' baños'">2 baños</span>
+            </div>
+
+      <div class="price"
+           th:text="'$' + ${#numbers.formatDecimal(inmueble.precio, 0, 'POINT', 0, 'COMMA')}">
+        $1.200.000
+      </div>
+      <div class="price-note"
+           th:text="${inmueble.finalidad != null ? inmueble.finalidad.name() : '—'}">
+        ARRIENDO
+      </div>
+
+            <!-- ACCIONES -->
+      <div class="card-actions">
+          <!-- Badge disponibilidad -->
+          <span class="state"
+              th:classappend="${inmueble.disponibilidad.name() == 'RESERVADO'}    ? ' reservado'     :
+                        (${inmueble.disponibilidad.name() == 'NO_DISPONIBLE'}  ? ' negociando'    :
+                        (${inmueble.disponibilidad.name() == 'DISPONIBLE'} ? '' : ''))"
+              th:text="${inmueble.disponibilidad.name()}">DISPONIBLE</span>
+
+        <!-- Botón quitar favorito -->
+        <form th:action="@{/favoritos/quitar}" method="post">
+          <input type="hidden" name="codigoInmueble" th:value="${inmueble.codigo}"/>
+          <button type="submit" class="icon-btn active" title="Quitar de favoritos">
+            <i class="bi bi-heart-fill"></i>
+          </button>
+        </form>
+
+        <!-- Ver detalle -->
+        <a class="view-btn"
+           th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}">Ver</a>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+            <!-- PAGINACIÓN -->
+            <div class="pag-wrap" th:unless="${#lists.isEmpty(favoritos)}">
+                <div class="pag-info"
+                     th:text="'Mostrando ' + ${favoritosTotal} + ' favoritos'">
+                    Mostrando 4 favoritos
+                </div>
+                <div class="d-flex gap-1">
+                    <a class="pag-btn"
+                       th:classappend="${paginaActual == 0} ? ' disabled' : ''"
+                       th:href="@{/favoritos(pagina=${paginaActual - 1})}">‹</a>
+                    <th:block th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+                        <a class="pag-btn"
+                           th:classappend="${i == paginaActual} ? ' active' : ''"
+                           th:href="@{/favoritos(pagina=${i})}"
+                           th:text="${i + 1}">1</a>
+                    </th:block>
+                    <a class="pag-btn"
+                       th:classappend="${paginaActual == totalPaginas - 1} ? ' disabled' : ''"
+                       th:href="@{/favoritos(pagina=${paginaActual + 1})}">›</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

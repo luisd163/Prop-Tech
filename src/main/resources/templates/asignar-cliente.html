@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar cliente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b2140;
+            --panel: #132f57;
+            --line: #214372;
+            --text: #e8eef7;
+            --muted: #8aa2c2;
+            --gold: #f6c23e;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #203d63 0%, #0a1f3d 55%, #071429 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+        }
+
+        .card-modal {
+            width: 100%;
+            max-width: 760px;
+            background: #102849;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+            font-weight: 700;
+        }
+
+        .content { padding: 14px 16px 16px; }
+
+        .search-box {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #0f2a4f;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,.15);
+            background: #3f3b32;
+            color: var(--text);
+            border-radius: 8px;
+            height: 40px;
+            padding: 0 12px;
+            font-weight: 600;
+        }
+
+        .result-text {
+            color: var(--muted);
+            font-size: .9rem;
+            margin-bottom: 8px;
+        }
+
+        .client-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: #0d2548;
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-decoration: none;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .client-item.selected { border-color: #f6c23e; }
+        .client-item.disabled { opacity: .55; pointer-events: none; }
+
+        .left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            border: 1px solid #3d7ecb;
+            color: #9ac0ff;
+            font-size: .78rem;
+            flex: 0 0 auto;
+        }
+
+        .name { font-weight: 700; line-height: 1.1; }
+        .meta { color: var(--muted); font-size: .85rem; }
+
+        .status {
+            border-radius: 999px;
+            border: 1px solid transparent;
+            padding: 3px 10px;
+            font-size: .75rem;
+            white-space: nowrap;
+        }
+
+        .s-free { color: #38de97; background: rgba(56,222,151,.14); border-color: rgba(56,222,151,.35); }
+        .s-own { color: #6fb5ff; background: rgba(111,181,255,.14); border-color: rgba(111,181,255,.35); }
+        .s-assigned { color: #c7d1df; background: rgba(199,209,223,.14); border-color: rgba(199,209,223,.35); }
+
+        .summary {
+            margin-top: 12px;
+            background: #0a213f;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .summary-title { color: var(--muted); margin-bottom: 8px; font-size: .92rem; }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            font-size: .94rem;
+        }
+
+        .summary-row:last-child { border-bottom: 0; }
+        .label { color: var(--muted); }
+        .value { font-weight: 600; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn-soft,
+        .btn-main {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,.24);
+            background: transparent;
+            color: var(--text);
+        }
+
+        .btn-main {
+            border-color: rgba(246, 194, 62, .45);
+            color: var(--gold);
+            background: rgba(246, 194, 62, 0.08);
+        }
+
+        .btn-main:disabled { opacity: .45; cursor: not-allowed; }
+
+        .msg-ok { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<div class="card-modal">
+    <div class="head">
+        <span>Asignar cliente</span>
+        <a th:href="@{/clientes}" style="color:#8aa2c2;text-decoration:none;">×</a>
+    </div>
+
+    <div class="content">
+        <div class="alert alert-success msg-ok py-2" th:if="${ok != null}" th:text="${ok}"></div>
+        <div class="alert alert-danger py-2" th:if="${error != null}" th:text="${error}"></div>
+
+        <form class="search-box" th:action="@{/clientes/asignar}" method="get">
+            <input type="text" name="codigo" th:value="${codigo}" placeholder="Búsqueda por código de cliente">
+        </form>
+
+        <div class="result-text" th:text="${'Resultados · ' + (clientes != null ? clientes.size() : 0) + ' clientes encontrados'}">Resultados</div>
+
+        <div th:each="cliente : ${clientes}">
+            <a class="client-item"
+               th:classappend="${(clienteSeleccionado != null and clienteSeleccionado.identificacion == cliente.identificacion) ? ' selected' : ''} + ${(clientesAsignadosOtros != null and clientesAsignadosOtros.contains(cliente.identificacion)) ? ' disabled' : ''}"
+               th:href="@{/clientes/asignar(codigo=${codigo}, selectedId=${cliente.identificacion})}">
+                <div class="left">
+                    <div class="avatar" th:text="${cliente.nombre != null && cliente.nombre.length() >= 2 ? #strings.substring(cliente.nombre,0,2).toUpperCase() : 'CL'}">CL</div>
+                    <div>
+                        <div class="name" th:text="${cliente.nombre}">Nombre cliente</div>
+                        <div class="meta" th:text="${'CC ' + cliente.identificacion}">CC</div>
+                    </div>
+                </div>
+                <span class="status"
+                      th:classappend="${(clientesDelAsesor != null and clientesDelAsesor.contains(cliente.identificacion)) ? ' s-own' : ((clientesAsignadosOtros != null and clientesAsignadosOtros.contains(cliente.identificacion)) ? ' s-assigned' : ' s-free')}"
+                      th:text="${(clientesDelAsesor != null and clientesDelAsesor.contains(cliente.identificacion)) ? 'En tu cartera' : ((clientesAsignadosOtros != null and clientesAsignadosOtros.contains(cliente.identificacion)) ? 'Asignado' : 'Sin asesor')}">
+                    Estado
+                </span>
+            </a>
+        </div>
+
+        <div class="summary">
+            <div class="summary-title">Resumen de asignación</div>
+            <div class="summary-row">
+                <span class="label">Cliente</span>
+                <span class="value" th:text="${clienteSeleccionado != null ? clienteSeleccionado.nombre : 'Sin selección'}">Sin selección</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Asesor asignado</span>
+                <span class="value"
+                      th:text="${clienteSeleccionado == null ? '-' : ((clientesDelAsesor != null and clientesDelAsesor.contains(clienteSeleccionado.identificacion)) ? nombreAsesor : ((clientesAsignadosOtros != null and clientesAsignadosOtros.contains(clienteSeleccionado.identificacion)) ? 'Otro asesor' : 'Sin asesor'))}">Asesor</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Presupuesto</span>
+                <span class="value" th:text="${clienteSeleccionado != null ? ('$' + #numbers.formatDecimal(clienteSeleccionado.presupuesto,1,'POINT',0,'COMMA')) : '-'}">-</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Estado</span>
+                <span class="value"
+                      th:text="${clienteSeleccionado != null ? ((clientesDelAsesor != null and clientesDelAsesor.contains(clienteSeleccionado.identificacion)) ? 'En tu cartera' : ((clientesAsignadosOtros != null and clientesAsignadosOtros.contains(clienteSeleccionado.identificacion)) ? 'Asignado' : 'Disponible')) : '-'}">-</span>
+            </div>
+        </div>
+
+        <form class="actions" th:action="@{/clientes/asignar}" method="post">
+            <input type="hidden" name="clienteId" th:value="${clienteSeleccionado != null ? clienteSeleccionado.identificacion : ''}">
+            <input type="hidden" name="codigo" th:value="${codigo}">
+            <input type="hidden" name="selectedId" th:value="${clienteSeleccionado != null ? clienteSeleccionado.identificacion : ''}">
+            <a class="btn-soft" th:href="@{/clientes}">Cancelar</a>
+            <button class="btn-main" type="submit"
+                    th:disabled="${clienteSeleccionado == null || (clientesAsignadosOtros != null and clienteSeleccionado != null and clientesAsignadosOtros.contains(clienteSeleccionado.identificacion))}">
+                Asignar cliente
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

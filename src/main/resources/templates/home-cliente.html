@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} ?: 'Inicio'">Inicio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #071429;
+            --bg-soft: #0b1f3d;
+            --panel: #10284a;
+            --panel-2: #132f57;
+            --line: rgba(255,255,255,.10);
+            --text: #e8eef7;
+            --muted: #7f96b8;
+            --gold: #f6c23e;
+            --active: #1d3658;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #203d63 0%, #0a1f3d 55%, #071429 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #061a33 0%, #031228 100%);
+            border-right: 1px solid #17365e;
+            padding: 22px 0 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 0 22px 18px;
+            border-bottom: 1px solid #17365e;
+            margin-bottom: 12px;
+        }
+
+        .brand h4 {
+            margin: 0;
+            color: var(--gold);
+            font-size: 1.45rem;
+            font-weight: 700;
+        }
+
+        .brand p {
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: .82rem;
+            letter-spacing: .8px;
+        }
+
+        .menu-section-title {
+            color: var(--muted);
+            font-size: .76rem;
+            letter-spacing: 1.4px;
+            margin: 16px 22px 8px;
+        }
+
+        .menu-item {
+            color: #b5c7df;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px;
+            border-left: 3px solid transparent;
+            font-size: .95rem;
+            transition: .2s;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--active);
+            color: #f6c23e;
+            border-left-color: #f6c23e;
+        }
+
+        .profile-box {
+            margin: auto 14px 0;
+            border: 1px solid #1f416e;
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #f6c23e;
+            display: grid;
+            place-items: center;
+            color: #f6c23e;
+            font-size: .8rem;
+            flex: 0 0 auto;
+        }
+
+        .main {
+            padding: 16px;
+            overflow: auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1d3d69;
+            margin-bottom: 14px;
+        }
+
+        .topbar h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .topbar .sub {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .pill {
+            border: 1px solid rgba(255,255,255,.12);
+            background: rgba(255,255,255,.04);
+            color: #b9c9e4;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: .85rem;
+        }
+
+        .btn-logout {
+            border: 1px solid rgba(255,77,77,0.25);
+            background: rgba(255,77,77,0.08);
+            color: #ff4d4d;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-logout:hover {
+            background: #ff4d4d;
+            color: #ffffff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+            min-height: 86px;
+        }
+
+        .stat-value {
+            font-size: 1.65rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: .92rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(260px, .9fr);
+            gap: 12px;
+        }
+
+        .section-card {
+            background: var(--panel-2);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .section-head h5 {
+            margin: 0;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .section-head a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: .88rem;
+        }
+
+        .search-card {
+            padding: 12px 14px 14px;
+        }
+
+        .search-box {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255,255,255,.03);
+            padding: 10px 12px;
+            margin-bottom: 10px;
+        }
+
+        .search-row {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .search-row i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+
+        .search-row input,
+        .search-row select {
+            width: 100%;
+            height: 46px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.12);
+            background: #3b392f;
+            color: #f4f4f4;
+            padding: 0 14px 0 40px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-row select {
+            padding-left: 14px;
+            appearance: none;
+        }
+
+        .list-item {
+            display: grid;
+            grid-template-columns: 64px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-top: 1px solid rgba(255,255,255,.05);
+        }
+
+        .list-icon {
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            min-height: 64px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            display: grid;
+            place-items: center;
+            color: var(--gold);
+            font-size: 1.2rem;
+            overflow: hidden;
+        }
+        
+        .list-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .list-title {
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .list-sub {
+            color: var(--muted);
+            font-size: .88rem;
+            line-height: 1.2;
+        }
+
+        .tag {
+            border-radius: 999px;
+            padding: 3px 10px;
+            border: 1px solid rgba(255,255,255,.12);
+            color: #c7d1df;
+            font-size: .75rem;
+            white-space: nowrap;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-soft {
+            border: 1px solid rgba(255,255,255,.28);
+            color: #eaf1ff;
+            background: transparent;
+            border-radius: 10px;
+            padding: 7px 14px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .placeholder-box {
+            height: 100%;
+            min-height: 370px;
+            padding: 14px;
+        }
+
+        .recomendados-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .recomendado-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+
+        .recomendado-item:hover {
+            background: rgba(255,255,255,.05);
+        }
+
+        .recomendado-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #214476 0%, #16335d 100%);
+        }
+
+        .recomendado-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .recomendado-title {
+            font-weight: 600;
+            color: #e8eef7;
+            font-size: 0.95rem;
+        }
+
+        .recomendado-meta {
+            font-size: 0.85rem;
+            color: #7f96b8;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .recomendado-status {
+            display: flex;
+            justify-content: center;
+        }
+
+        .badge-status {
+            background: rgba(0, 208, 140, .15);
+            border: 1px solid rgba(0, 208, 140, .35);
+            color: #2dd9a1;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .recomendado-action {
+            padding: 0 8px;
+        }
+
+        .btn-ver {
+            background: rgba(246,194,62,.12);
+            border: 1px solid rgba(246,194,62,.35);
+            color: #f6c23e;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn-ver:hover {
+            background: rgba(246,194,62,.2);
+            color: #ffd966;
+        }
+
+        .placeholder-area {
+            height: calc(100% - 46px);
+            border: 1px dashed rgba(255,255,255,.16);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            text-align: center;
+            padding: 16px;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .small-box {
+            min-height: 160px;
+            padding: 14px;
+        }
+
+        .small-empty {
+            height: calc(100% - 34px);
+            border: 1px dashed rgba(255,255,255,.14);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: .92rem;
+            text-align: center;
+            padding: 14px;
+        }
+
+        @media (max-width: 1100px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .content-grid { grid-template-columns: 1fr; }
+            .bottom-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script>
+        // Los filtros ahora se manejan en el servidor
+        // El formulario enviará los parámetros a /home-cliente
+    </script>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <h4>PropTech</h4>
+            <p>PORTAL CLIENTE</p>
+        </div>
+
+        <div class="menu-section-title">EXPLORAR</div>
+        <a class="menu-item active" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
+        <a class="menu-item" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
+        <a class="menu-item" th:href="@{/favoritos}"><i class="bi bi-star"></i> Favoritos</a>
+        <a class="menu-item" th:href="@{/locaciones-cercanas}"><i class="bi bi-hand-index-thumb"></i> Locaciones Cercanas</a>
+
+        <div class="menu-section-title">MI CUENTA</div>
+        <a class="menu-item" href="#"><i class="bi bi-calendar-event"></i> Mis visitas</a>
+        <a class="menu-item" th:href="@{/historial}"><i class="bi bi-clock-history"></i> Mi historial</a>
+        <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
+
+        <div class="profile-box">
+            <div class="avatar" th:text="${inicialesCliente ?: 'CL'}">CL</div>
+            <div>
+                <div class="fw-semibold" th:text="${nombreCliente ?: 'Perfil'}">Perfil</div>
+                <div class="small" style="color:#8aa2c2" th:text="${rolCliente ?: 'Cliente'}">Cliente</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <h3 th:text="${saludo ?: 'Bienvenida, [Nombre]'}">Bienvenida, [Nombre]</h3>
+                <div class="sub" th:text="${subtitulo ?: 'Tienes [n] inmuebles recomendados nuevos hoy'}">Tienes [n] inmuebles recomendados nuevos hoy</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <div class="pill" th:text="${infoDerecha ?: 'Presupuesto: $[valor]/mes'}">Presupuesto: $[valor]/mes</div>
+                <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
+            </div>
+        </div>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric1 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric1Label ?: 'Consultados'}">Consultados</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric2 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric2Label ?: 'Favoritos'}">Favoritos</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric3 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric3Label ?: 'Visitas agendadas'}">Visitas agendadas</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${metric4 ?: '--'}">--</div>
+                <div class="stat-label" th:text="${metric4Label ?: 'En negociación'}">En negociación</div>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="section-card search-card">
+                <div class="section-head">
+                    <h5>Buscar inmuebles</h5>
+                    <a th:href="@{/inmuebles-cliente}">Ver todos →</a>
+                </div>
+                <form method="get" th:action="@{/home-cliente}" class="search-box">
+                    <div class="search-row">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="busquedaZona" name="zona" placeholder="Zona, barrio o ciudad..." autocomplete="off" th:value="${filtroZona ?: ''}">
+                    </div>
+                    <div class="search-row">
+                        <select name="tipo" th:value="${filtroTipo ?: ''}">
+                            <option value="">Todos los tipos</option>
+                            <option th:each="t : ${tiposDisponibles}" th:value="${t}" th:text="${t}" th:selected="${filtroTipo == t}">Tipo</option>
+                        </select>
+                    </div>
+                    <div class="search-row">
+                        <input type="number" name="precioMax" placeholder="Precio máx." th:value="${filtroPrecioMax ?: ''}">
+                    </div>
+                    <div class="search-row">
+                        <input type="number" name="habMin" placeholder="Hab. mín." th:value="${filtroHabMin ?: ''}">
+                    </div>
+                    <button type="submit" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.12); background:rgba(246,194,62,0.2); color:#f6c23e; font-weight:600; cursor:pointer;">Buscar</button>
+                </form>
+
+                <div class="list-item" th:each="item : ${itemsPrincipales}" data-inmueble="true" th:attr="data-nombre=${item.nombre ?: ''}, data-barrio=${item.barrio ?: ''}, data-ciudad=${item.ciudad ?: ''}">
+                    <div class="list-icon" th:if="${item.fotoPortada}">
+                        <img th:src="${item.fotoPortada}" alt="Foto inmueble">
+                    </div>
+                    <div class="list-icon" th:unless="${item.fotoPortada}">
+                        <i class="bi bi-folder2"></i>
+                    </div>
+                    <div>
+                        <div class="list-title" th:text="${item.nombre ?: 'Inmueble'}">Título</div>
+                        <div class="list-sub">
+                            <span th:text="${item.tipoInmueble ?: 'Tipo'}">Tipo</span>
+                            <span> · </span>
+                            <span th:text="${item.barrio ?: 'Zona'}">Zona</span>
+                            <span> · </span>
+                            <span th:text="${item.precio}">Precio</span>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <span class="tag" th:text="${item.disponibilidad ?: 'Estado'}">Estado</span>
+                        <a class="btn-soft" th:href="@{/detalle-inmueble/{codigo}(codigo=${item.codigo})}">Ver</a>
+                    </div>
+                </div>
+
+                <div class="list-item" th:if="${itemsPrincipales == null || itemsPrincipales.isEmpty()}">
+                    <div class="list-icon"><i class="bi bi-folder2-open"></i></div>
+                    <div>
+                        <div class="list-title">[Inmueble]</div>
+                        <div class="list-sub">[Tipo] · [Zona] · [Precio]</div>
+                    </div>
+                    <div class="actions">
+                            <span class="tag">[Estado]</span>
+                        <a class="btn-soft" href="#">Ver</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="section-card placeholder-box">
+                <div class="section-head">
+                    <h5>Recomendados</h5>
+                    <a th:href="@{/inmuebles-cliente}">Ver todos →</a>
+                </div>
+                <div th:if="${recomendados != null and !recomendados.isEmpty()}" class="recomendados-list">
+                    <div class="recomendado-item" th:each="inmueble : ${recomendados}">
+                        <div class="recomendado-img">
+                            <img th:if="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}"
+                                 th:src="${inmueble.fotoPortada}"
+                                 th:alt="${inmueble.nombre}"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                            <div th:unless="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}"
+                                 style="width: 100%; height: 100%; display: grid; place-items: center; background: linear-gradient(135deg, #214476 0%, #16335d 100%); color: #f6c23e; font-size: 1.5rem;">
+                                <i class="bi bi-house"></i>
+                            </div>
+                        </div>
+                        <div class="recomendado-content">
+                            <div class="recomendado-title" th:text="${inmueble.nombre}">Nombre</div>
+                            <div class="recomendado-meta">
+                                <span th:text="${inmueble.tipoInmueble != null ? inmueble.tipoInmueble.name() : 'Inmueble'}">TIPO</span>
+                                <span>·</span>
+                                <span th:text="${inmueble.ciudad}">Ciudad</span>
+                                <span>·</span>
+                                <span th:text="${#numbers.formatDecimal(inmueble.precio, 0, 'POINT', 0, 'COMMA')}">Precio</span>
+                            </div>
+                        </div>
+                        <div class="recomendado-status">
+                            <span class="badge-status" th:text="${inmueble.disponibilidad != null ? inmueble.disponibilidad.name() : 'DISPONIBLE'}">DISPONIBLE</span>
+                        </div>
+                        <div class="recomendado-action">
+                            <a class="btn-ver" th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}">Ver</a>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${recomendados == null or recomendados.isEmpty()}" class="placeholder-area">
+                    <div>
+                        <div class="fw-semibold mb-2">Sin recomendaciones</div>
+                        <div>No hay inmuebles disponibles dentro de tu presupuesto</div>
+                    </div>
+                </div>
+            </article>
+            
+
+        <section class="bottom-grid">
+            <article class="section-card small-box">
+                <div class="section-head"><h5>Mi historial</h5><a th:href="@{/historial}">Ver →</a></div>
+                <div class="small-empty">[Contenido]</div>
+            </article>
+
+            <article class="section-card small-box">
+                <div class="section-head"><h5>[Bloque]</h5><a href="#">Ver →</a></div>
+                <div class="small-empty">[Contenido]</div>
+            </article>
+
+            <article class="section-card small-box">
+                <div class="section-head"><h5>[Bloque]</h5><a href="#">Ver →</a></div>
+                <div class="small-empty">[Contenido]</div>
+            </article>
+
+        </section>
+    </main>
+</div>
+
+<div th:replace="~{fragments/chat-asistente :: chatWidget}"></div>
+</body>
+</html>

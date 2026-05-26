@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PropTech · Locaciones Cercanas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg:      #071429;
+            --bg-soft: #0b1f3d;
+            --panel:   #10284a;
+            --panel-2: #132f57;
+            --line:    rgba(255,255,255,.10);
+            --text:    #e8eef7;
+            --muted:   #7f96b8;
+            --gold:    #f6c23e;
+            --active:  #1d3658;
+            --input:   #38372f;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #203d63 0%, #0a1f3d 55%, #071429 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ── LAYOUT ───────────────────────────────── */
+        .layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        /* ── SIDEBAR ──────────────────────────────── */
+        .sidebar {
+            background: linear-gradient(180deg, #061a33 0%, #031228 100%);
+            border-right: 1px solid #17365e;
+            padding: 22px 0 18px;
+            display: flex;
+            flex-direction: column;
+        }
+        .brand { padding: 0 22px 18px; border-bottom: 1px solid #17365e; margin-bottom: 12px; }
+        .brand h4 { margin: 0; color: var(--gold); font-size: 1.45rem; font-weight: 700; }
+        .brand p  { margin: 2px 0 0; color: var(--muted); font-size: .82rem; letter-spacing: .8px; }
+        .menu-section-title { color: var(--muted); font-size: .76rem; letter-spacing: 1.4px; margin: 16px 22px 8px; }
+        .menu-item {
+            color: #b5c7df; text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 22px; border-left: 3px solid transparent;
+            font-size: .95rem; transition: .2s;
+        }
+        .menu-item:hover, .menu-item.active {
+            background: var(--active); color: var(--gold); border-left-color: var(--gold);
+        }
+        .profile-box {
+            margin: auto 14px 0; border: 1px solid #1f416e; border-radius: 12px;
+            padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,.03);
+        }
+        .avatar {
+            width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--gold);
+            display: grid; place-items: center; color: var(--gold); font-size: .8rem; flex: 0 0 auto;
+        }
+
+        /* ── MAIN ─────────────────────────────────── */
+        .main { padding: 16px; overflow: auto; display: flex; flex-direction: column; gap: 14px; }
+
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 12px; border-bottom: 1px solid #1d3d69;
+        }
+        .topbar h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+        .topbar .sub { color: var(--muted); font-size: .9rem; margin-top: 2px; }
+        .btn-logout {
+            border: 1px solid rgba(255,77,77,.25); background: rgba(255,77,77,.08);
+            color: #ff4d4d; border-radius: 999px; padding: 7px 12px;
+            font-weight: 700; text-decoration: none; font-size: .85rem;
+        }
+        .btn-logout:hover { background: #ff4d4d; color: #fff; }
+
+        /* ── STATS ────────────────────────────────── */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
+        }
+        .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+        .stat-value { font-size: 1.65rem; font-weight: 700; line-height: 1; margin-bottom: 8px; }
+        .stat-label { color: var(--muted); font-size: .92rem; }
+
+        /* ── CONTENT GRID ─────────────────────────── */
+        .content-grid { display: grid; grid-template-columns: 1fr 290px; gap: 14px; }
+
+        /* ── GRAPH PANEL ──────────────────────────── */
+        .graph-panel {
+            background: var(--panel-2); border: 1px solid var(--line);
+            border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .panel-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 16px; border-bottom: 1px solid var(--line);
+        }
+        .panel-head h5 { margin: 0; color: var(--gold); font-weight: 600; font-size: 1rem; }
+        .panel-head .sub { color: var(--muted); font-size: .82rem; }
+
+        .legend {
+            display: flex; gap: 16px; padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,.06); flex-wrap: wrap;
+        }
+        .leg-item { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); }
+        .leg-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        .graph-area { flex: 1; position: relative; min-height: 380px; background: #0a1e38; }
+        #graphCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        /* ── RIGHT COL ────────────────────────────── */
+        .right-col { display: flex; flex-direction: column; gap: 12px; }
+
+        .info-panel { background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+        .info-head {
+            padding: 11px 14px; border-bottom: 1px solid var(--line);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .info-head h6 { margin: 0; color: var(--gold); font-size: .92rem; font-weight: 600; }
+        .node-detail  { padding: 14px; }
+
+        .nd-avatar {
+            width: 44px; height: 44px; border-radius: 10px;
+            background: #16335d; display: flex; align-items: center;
+            justify-content: center; font-size: 1.4rem; margin-bottom: 10px;
+        }
+        .nd-name  { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+        .nd-meta  { font-size: .82rem; color: var(--muted); margin-bottom: 10px; }
+        .nd-price { font-size: 1.3rem; font-weight: 700; color: var(--gold); margin-bottom: 12px; }
+        .nd-row {
+            display: flex; justify-content: space-between;
+            padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: .82rem;
+        }
+        .nd-row:last-of-type { border-bottom: none; }
+        .nd-label { color: var(--muted); }
+        .nd-val   { color: var(--text); font-weight: 500; }
+        .nd-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .nd-btn {
+            flex: 1; padding: 8px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.2); background: transparent;
+            color: #dbe7f8; font-size: .82rem; font-weight: 600;
+            cursor: pointer; font-family: inherit; transition: .15s;
+        }
+        .nd-btn.primary { border-color: rgba(246,194,62,.4); background: rgba(246,194,62,.12); color: var(--gold); }
+        .nd-btn:hover         { background: rgba(255,255,255,.06); }
+        .nd-btn.primary:hover { background: rgba(246,194,62,.2); }
+
+        /* ── FILTER PANEL ─────────────────────────── */
+        .filter-panel { background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+        .filter-panel h6 { margin: 0 0 12px; color: var(--gold); font-size: .92rem; font-weight: 600; }
+        .f-label  { font-size: .78rem; color: var(--muted); margin-bottom: 5px; }
+        .f-select {
+            width: 100%; padding: 7px 10px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.12); background: var(--input);
+            color: var(--text); font-size: .82rem; font-family: inherit; outline: none; margin-bottom: 12px;
+        }
+        .f-range { width: 100%; margin-bottom: 4px; accent-color: var(--gold); }
+        .f-range-labels {
+            display: flex; justify-content: space-between;
+            font-size: .72rem; color: var(--muted); margin-bottom: 12px;
+        }
+        .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-mini  { background: #0a1e38; border-radius: 8px; padding: 9px 11px; border: 1px solid rgba(255,255,255,.06); }
+        .stat-mini .val { font-size: 1.2rem; font-weight: 700; color: var(--gold); line-height: 1; }
+        .stat-mini .lbl { font-size: .72rem; color: var(--muted); margin-top: 3px; }
+
+        /* ── PLACEHOLDER ──────────────────────────── */
+        .placeholder-msg {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 28px 16px;
+            color: var(--muted); font-size: .88rem; gap: 8px; text-align: center;
+        }
+        .placeholder-msg i { font-size: 2rem; opacity: .35; }
+
+        /* ── ERROR BANNER ─────────────────────────── */
+        .error-banner {
+            background: rgba(224,92,92,.1); border: 1px solid rgba(224,92,92,.3);
+            border-radius: 10px; padding: 10px 14px; color: #e05c5c; font-size: .88rem;
+        }
+
+        @media (max-width: 1100px) {
+            .layout       { grid-template-columns: 1fr; }
+            .sidebar      { display: none; }
+            .stats-grid   { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="sidebar">
+        <div class="brand">
+            <h4>PropTech</h4>
+            <p>PORTAL CLIENTE</p>
+        </div>
+        <div class="menu-section-title">EXPLORAR</div>
+        <a class="menu-item"        th:href="@{/home-cliente}">
+            <i class="bi bi-grid-3x3-gap"></i> Inicio
+        </a>
+        <a class="menu-item"        th:href="@{/inmuebles-cliente}">
+            <i class="bi bi-house"></i> Inmuebles
+        </a>
+        <a class="menu-item"        th:href="@{/favoritos}">
+            <i class="bi bi-star"></i> Favoritos
+        </a>
+        <a class="menu-item active" th:href="@{/locaciones-cercanas}">
+            <i class="bi bi-geo-alt"></i> Locaciones cercanas
+        </a>
+        <div class="menu-section-title">MI CUENTA</div>
+        <a class="menu-item" href="#"><i class="bi bi-calendar-event"></i> Mis visitas</a>
+        <a class="menu-item" th:href="@{/historial}"><i class="bi bi-clock-history"></i> Mi historial</a>
+        <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
+        <div class="profile-box">
+            <div class="avatar" th:text="${inicialesCliente ?: 'CL'}">CL</div>
+            <div>
+                <div class="fw-semibold" th:text="${nombreCliente ?: 'Perfil'}">Perfil</div>
+                <div class="small" style="color:#8aa2c2"
+                     th:text="${rolCliente ?: 'Cliente'}">Cliente</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══════════════ MAIN ══════════════ -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <h3 id="page-title" th:text="${tituloPagina ?: 'Locaciones cercanas'}">Locaciones cercanas</h3>
+                <div class="sub" id="page-subtitle"
+                     th:text="${subtituloPagina ?: 'Grafo de inmuebles y zonas según tu radio de búsqueda'}">
+                    Grafo de relaciones entre inmuebles y zonas de interés
+                </div>
+            </div>
+            <a class="btn-logout" th:href="@{/login}">Cerrar sesión</a>
+        </div>
+
+        <div class="d-flex gap-2 mb-1" id="modo-tabs" style="flex-wrap:wrap;">
+            <a class="btn btn-sm"
+               th:classappend="${modoGrafo == 'cercanas' or modoGrafo == null} ? ' btn-warning' : ' btn-outline-light'"
+               th:href="@{/locaciones-cercanas(modo='cercanas', radio=${radioActual})}"
+               id="tab-cercanas">Locaciones cercanas</a>
+            <a class="btn btn-sm"
+               th:classappend="${modoGrafo == 'relaciones'} ? ' btn-warning' : ' btn-outline-light'"
+               th:href="@{/locaciones-cercanas(modo='relaciones')}"
+               id="tab-relaciones">Mis visitas (grafo)</a>
+            <a class="btn btn-sm"
+               th:classappend="${modoGrafo == 'guardadas'} ? ' btn-warning' : ' btn-outline-light'"
+               th:href="@{/locaciones-cercanas(modo='guardadas')}"
+               id="tab-guardadas"><i class="bi bi-heart-fill"></i> Ver todas las guardadas</a>
+        </div>
+
+        <!-- ERROR (si el controller lo pasa) -->
+        <div class="error-banner" th:if="${error}" th:text="${error}"></div>
+
+        <!-- STATS — vienen del GrafoController -->
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-value" th:text="${totalNodos ?: '0'}">9</div>
+                <div class="stat-label">Nodos activos</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${totalAristas ?: '0'}">12</div>
+                <div class="stat-label">Conexiones</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${totalZonas ?: '0'}">3</div>
+                <div class="stat-label">Zonas</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-value" th:text="${totalDisponibles ?: '0'}">4</div>
+                <div class="stat-label">Disponibles</div>
+            </article>
+            <article class="stat-card" th:if="${modoGrafo == 'guardadas'}">
+                <div class="stat-value" th:text="${totalGuardados ?: '0'}">0</div>
+                <div class="stat-label">Guardados</div>
+            </article>
+        </section>
+
+        <div class="content-grid">
+
+            <!-- PANEL GRAFO -->
+            <div class="graph-panel">
+                <div class="panel-head">
+                    <h5>Mapa de relaciones</h5>
+                    <div class="sub" id="graph-subtitle">Haz clic en un nodo para ver detalles</div>
+                </div>
+                <div class="legend">
+                    <div class="leg-item"><div class="leg-dot" style="background:#f6c23e"></div> Tu ubicación</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:#4b8de8"></div> Disponible</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:#2ecc8f"></div> Visitado</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:#9b6fe8"></div> Zona</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:#e05c5c"></div> Reservado</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:#ff9f43"></div> Guardado (favorito)</div>
+                </div>
+                <div class="graph-area">
+                    <!--
+                        grafoJson viene del GrafoController serializado como String JSON.
+                        Ejemplo de lo que contiene:
+                        {
+                          "nodos": [
+                            {"id":"yo-001","label":"Mi ubicación","tipo":"yo","distancia":0.0},
+                            {"id":"INM-COD01","label":"Apto · Poblado","tipo":"disp","distancia":1.8,
+                             "precio":1200000,"area":68,"habitaciones":2,"zona":"El Poblado",
+                             "codigo":"COD01","estado":"DISPONIBLE"}
+                          ],
+                          "aristas": [
+                            {"origen":"yo-001","destino":"INM-COD01","peso":1.8}
+                          ]
+                        }
+                    -->
+                    <canvas id="graphCanvas"
+                            th:attr="data-radio=${radioActual},
+                                     data-modo=${modoGrafo}">
+                    </canvas>
+                    <script th:inline="javascript">
+                        window.__grafoJson = /*[[${grafoJson}]]*/ '{}';
+                    </script>
+                    <div id="grafo-empty" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;display:grid;place-items:center;color:#7f96b8;text-align:center;padding:20px;">
+                        <div>
+                            <i class="bi bi-exclamation-triangle" style="font-size:2.5rem;margin-bottom:10px;display:block;opacity:0.5"></i>
+                            <p style="margin:0;">No hay nodos que mostrar</p>
+                            <small style="display:block;margin-top:8px;opacity:0.7;">Verifica la consola del navegador para más detalles (F12)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA -->
+            <div class="right-col">
+
+                <!-- DETALLE DEL NODO -->
+                <div class="info-panel">
+                    <div class="info-head">
+                        <h6 id="detail-title">Selecciona un nodo</h6>
+                        <span style="font-size:.75rem;color:var(--muted)" id="detail-dist"></span>
+                    </div>
+                    <div class="node-detail" id="node-detail">
+                        <div class="placeholder-msg">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Haz clic en cualquier nodo del grafo para ver sus detalles</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILTROS -->
+                <div class="filter-panel" id="panel-filtros-cercanas"
+                     th:style="${modoGrafo == 'relaciones' or modoGrafo == 'guardadas'} ? 'display:none' : ''">
+                    <h6>Filtros del grafo</h6>
+
+                    <div class="f-label">Tipo de nodo</div>
+                    <select class="f-select" id="filterType">
+                        <option value="todos">Todos</option>
+                        <option value="disp">Solo disponibles</option>
+                        <option value="visitado">Visitados</option>
+                        <option value="guardado">Guardados (favoritos)</option>
+                        <option value="reservado">Reservados</option>
+                        <option value="zona">Zonas</option>
+                    </select>
+
+                    <div class="f-label">Radio de distancia (km)</div>
+                    <input type="range" class="f-range" id="radiusRange"
+                           min="1" max="10" step="1"
+                           th:value="${radioActual ?: 5}"/>
+                    <div class="f-range-labels">
+                        <span>1 km</span>
+                        <span id="radiusVal"
+                              th:text="${radioActual ?: 5} + ' km'">5 km</span>
+                        <span>10 km</span>
+                    </div>
+
+                    <!-- Estadísticas dinámicas (se actualizan con JS) -->
+                    <div class="stats-mini">
+                        <div class="stat-mini">
+                            <div class="val" id="stat-nodos"
+                                 th:text="${totalNodos ?: 0}">9</div>
+                            <div class="lbl">Nodos</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="val" id="stat-conexiones"
+                                 th:text="${totalAristas ?: 0}">12</div>
+                            <div class="lbl">Conexiones</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="val" id="stat-zonas"
+                                 th:text="${totalZonas ?: 0}">3</div>
+                            <div class="lbl">Zonas</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="val" id="stat-disp"
+                                 th:text="${totalDisponibles ?: 0}">4</div>
+                            <div class="lbl">Disponibles</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-panel" id="panel-filtros-guardadas" th:style="${modoGrafo != 'guardadas'} ? 'display:none' : ''">
+                    <h6>Mis inmuebles guardados</h6>
+                    <p style="font-size:.8rem;color:var(--muted);margin:0 0 10px;">
+                        Muestra <strong>todos</strong> los favoritos sin límite de distancia.
+                        El color indica: naranja = guardado, verde = visitado, rojo = reservado, azul = disponible.
+                    </p>
+                    <div class="f-label">Filtrar por tipo</div>
+                    <select class="f-select" id="filterTypeGuardadas">
+                        <option value="todos">Todos los guardados</option>
+                        <option value="guardado">Solo favoritos</option>
+                        <option value="visitado">Visitados</option>
+                        <option value="disp">Disponibles</option>
+                        <option value="reservado">Reservados</option>
+                    </select>
+                    <div class="stats-mini" style="margin-top:10px;">
+                        <div class="stat-mini">
+                            <div class="val" id="stat-guardados-total" th:text="${totalGuardados ?: 0}">0</div>
+                            <div class="lbl">Guardados</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="val"><a th:href="@{/favoritos}" style="color:#f6c23e;text-decoration:none;font-size:.9rem;">Ver lista →</a></div>
+                            <div class="lbl">Favoritos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-panel" id="panel-filtros-relaciones" th:style="${modoGrafo != 'relaciones'} ? 'display:none' : ''">
+                    <h6>Red cliente ↔ inmuebles</h6>
+                    <p style="font-size:.8rem;color:var(--muted);margin:0 0 10px;">
+                        Nodos verdes: visitas <strong>realizadas</strong>. Azules: sugeridos por clientes con perfil similar.
+                    </p>
+                    <div class="stats-mini">
+                        <div class="stat-mini">
+                            <div class="val" id="stat-visitados">0</div>
+                            <div class="lbl">Visitados</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="val" id="stat-sugeridos">0</div>
+                            <div class="lbl">Sugeridos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/chat-asistente :: chatWidget}"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// GRAFO — lee el JSON que inyectó GrafoController via th:attr
+// ═══════════════════════════════════════════════════════════════════
+const canvas  = document.getElementById('graphCanvas');
+const ctx     = canvas.getContext('2d');
+
+// Datos del grafo (inyectados por Thymeleaf)
+let grafoData = {};
+try {
+    const raw = window.__grafoJson;
+    if (typeof raw === 'string' && raw.trim() !== '' && raw !== '{}') {
+        grafoData = JSON.parse(raw);
+    } else if (raw && typeof raw === 'object') {
+        grafoData = raw;
+    }
+} catch (e) {
+    console.error('Error al parsear grafoJson:', e);
+}
+
+// Debug: mostrar estructura del grafoData
+console.log('grafoData:', grafoData);
+if (grafoData.nodos) {
+    console.log('Total nodos:', grafoData.nodos.length);
+    console.log('Primer nodo:', grafoData.nodos[0]);
+}
+if (grafoData.aristas) {
+    console.log('Total aristas:', grafoData.aristas.length);
+}
+
+// ─── Estado ──────────────────────────────────────────────────────
+let nodes      = [];   // NodoDTO mapeados a objetos de render
+let edges      = [];   // AristaDTO
+let selected   = null;
+let hovered    = null;
+let filterType = 'todos';
+let maxRadius  = parseFloat(canvas.getAttribute('data-radio') || '5');
+let modoGrafo  = canvas.getAttribute('data-modo') || 'cercanas';
+let animFrame  = 0;
+let W = 0, H = 0;
+
+// ─── Colores por tipo (coinciden con GrafoService.NodoDTO.tipo) ──
+const COLORS = {
+    yo:        '#f6c23e',
+    disp:      '#4b8de8',
+    visitado:  '#2ecc8f',
+    zona:      '#9b6fe8',
+    reservado: '#e05c5c',
+    guardado:  '#ff9f43'
+};
+
+const ICONS = {
+    yo: '★', disp: '▦', visitado: '▦', zona: '◎', reservado: '⌂', guardado: '♥'
+};
+
+// ─── Construir nodos con posición ─────────────────────────────────
+function construirNodos(data) {
+    if (!data || !data.nodos || !data.nodos.length) {
+        console.warn('No hay nodos en data:', data);
+        return [];
+    }
+
+    // Nodo yo siempre al centro
+    const posiciones = generarPosiciones(data.nodos.length);
+    return data.nodos.map((n, i) => ({
+        ...n,
+        // GrafoService.NodoDTO fields: id, label, tipo, distancia, precio, area, habitaciones, zona, codigo, estado
+        id: n.id || ('nodo-' + i),
+        x: n.tipo === 'yo' ? 0.5 : posiciones[i].x,
+        y: n.tipo === 'yo' ? 0.5 : posiciones[i].y,
+        r: n.tipo === 'yo' ? 18 : (n.tipo === 'zona' ? 16 : 14),
+        color: COLORS[n.tipo] || '#4b8de8',
+        icon:  ICONS[n.tipo]  || '▦'
+    }));
+}
+
+function generarPosiciones(total) {
+    const pos = [];
+    for (let i = 0; i < total; i++) {
+        const angulo  = (2 * Math.PI * i) / total;
+        const radio   = 0.28 + Math.random() * 0.12;
+        pos.push({
+            x: 0.5 + radio * Math.cos(angulo),
+            y: 0.5 + radio * Math.sin(angulo)
+        });
+    }
+    return pos;
+}
+
+function construirAristas(data) {
+    if (!data.aristas) return [];
+    // AristaDTO fields: origen, destino, peso
+    return data.aristas.map(a => ({
+        origenId:  a.origen,
+        destinoId: a.destino,
+        peso:      a.peso
+    }));
+}
+
+function inicializar(data) {
+    nodes = construirNodos(data);
+    edges = construirAristas(data);
+    console.log('Nodos inicializados:', nodes.length);
+    console.log('Aristas inicializadas:', edges.length);
+    
+    // Mostrar mensaje si no hay nodos
+    const emptyMsg = document.getElementById('grafo-empty');
+    if (nodes.length === 0 && emptyMsg) {
+        emptyMsg.style.display = 'grid';
+    } else if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+    }
+    
+    actualizarStats();
+}
+
+// ─── Resize ───────────────────────────────────────────────────────
+function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width  = rect.width  || 600;
+    H = canvas.height = rect.height || 380;
+}
+
+function nx(n) { return n.x * W; }
+function ny(n) { return n.y * H; }
+
+// ─── Visibilidad ──────────────────────────────────────────────────
+function obtenerFiltroActivo() {
+    if (modoGrafo === 'guardadas') {
+        const sel = document.getElementById('filterTypeGuardadas');
+        return sel ? sel.value : 'todos';
+    }
+    const sel = document.getElementById('filterType');
+    return sel ? sel.value : filterType;
+}
+
+function esVisible(n) {
+    if (n.tipo === 'yo') return true;
+    const filtro = obtenerFiltroActivo();
+    if (filtro !== 'todos' && n.tipo !== filtro) return false;
+    if (modoGrafo === 'relaciones' || modoGrafo === 'guardadas') {
+        return true;
+    }
+    return (n.distancia || 0) <= maxRadius;
+}
+
+function nodoById(id) {
+    return nodes.find(n => n.id === id);
+}
+
+// ─── Dibujo ───────────────────────────────────────────────────────
+function drawEdge(e) {
+    const a = nodoById(e.origenId);
+    const b = nodoById(e.destinoId);
+    if (!a || !b || !esVisible(a) || !esVisible(b)) return;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(nx(a), ny(a));
+    ctx.lineTo(nx(b), ny(b));
+    ctx.strokeStyle = (a.tipo === 'yo' || b.tipo === 'yo')
+        ? 'rgba(246,194,62,.35)'
+        : 'rgba(75,141,232,.2)';
+    ctx.lineWidth   = (a.tipo === 'yo' || b.tipo === 'yo') ? 1.5 : 1;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+
+    if (e.peso) {
+        const mx = (nx(a) + nx(b)) / 2;
+        const my = (ny(a) + ny(b)) / 2;
+        ctx.setLineDash([]);
+        ctx.font      = '10px Segoe UI';
+        ctx.fillStyle = 'rgba(127,150,184,.7)';
+        ctx.textAlign = 'center';
+        ctx.fillText(parseFloat(e.peso).toFixed(1) + 'km', mx, my - 4);
+    }
+    ctx.restore();
+}
+
+function drawNode(n) {
+    if (!esVisible(n)) return;
+    const x = nx(n), y = ny(n), r = n.r;
+
+    ctx.save();
+
+    // Pulso animado para nodo "yo"
+    if (n.tipo === 'yo') {
+        ctx.beginPath();
+        ctx.arc(x, y, r + 8 + Math.sin(animFrame * .08) * 4, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(246,194,62,.15)';
+        ctx.lineWidth   = 2;
+        ctx.stroke();
+    }
+
+    // Halo de selección
+    if (n === selected || n === hovered) {
+        ctx.beginPath();
+        ctx.arc(x, y, r + 7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,.07)';
+        ctx.fill();
+    }
+
+    // Relleno
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = n.color + '22';
+    ctx.fill();
+
+    // Borde
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.strokeStyle = n.color;
+    ctx.lineWidth   = n === selected ? 2.5 : 1.5;
+    ctx.stroke();
+
+    // Ícono
+    ctx.font          = `${r * .9}px Segoe UI`;
+    ctx.fillStyle     = n.color;
+    ctx.textAlign     = 'center';
+    ctx.textBaseline  = 'middle';
+    ctx.fillText(n.icon, x, y);
+
+    // Etiqueta
+    ctx.font         = '10px Segoe UI';
+    ctx.fillStyle    = '#b5c7df';
+    ctx.textBaseline = 'top';
+    ctx.fillText(n.label, x, y + r + 4);
+
+    // Distancia
+    if (n.tipo !== 'yo' && n.distancia) {
+        ctx.font      = '9px Segoe UI';
+        ctx.fillStyle = 'rgba(127,150,184,.6)';
+        ctx.fillText(parseFloat(n.distancia).toFixed(1) + 'km', x, y + r + 16);
+    }
+    ctx.restore();
+}
+
+function draw() {
+    animFrame++;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a1e38';
+    ctx.fillRect(0, 0, W, H);
+    edges.forEach(drawEdge);
+    nodes.forEach(drawNode);
+    requestAnimationFrame(draw);
+}
+
+// ─── Interacción ──────────────────────────────────────────────────
+function nodeAt(px, py) {
+    return [...nodes].reverse().find(n => {
+        if (!esVisible(n)) return false;
+        return Math.hypot(nx(n) - px, ny(n) - py) <= n.r + 6;
+    });
+}
+
+canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    const n = nodeAt(e.clientX - rect.left, e.clientY - rect.top);
+    if (n) mostrarDetalle(n);
+});
+
+canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    hovered = nodeAt(e.clientX - rect.left, e.clientY - rect.top);
+    canvas.style.cursor = hovered ? 'pointer' : 'default';
+});
+
+// ─── Panel de detalle ─────────────────────────────────────────────
+function mostrarDetalle(n) {
+    selected = n;
+    document.getElementById('detail-title').textContent = n.label;
+    document.getElementById('detail-dist').textContent  =
+        n.distancia ? parseFloat(n.distancia).toFixed(1) + ' km de distancia' : '';
+
+    let html = `<div class="nd-avatar" style="color:${n.color}">${n.icon}</div>
+                <div class="nd-name">${n.label}</div>
+                <div class="nd-meta">${n.tipo === 'zona' ? 'Zona de interés' : (n.tipo === 'yo' ? 'Tu ubicación actual' : n.tipo)} · ${n.zona || ''}</div>`;
+
+    // Precio — NodoDTO.precio viene de Inmueble.getPrecio()
+    if (n.precio) {
+        html += `<div class="nd-price">$${Number(n.precio).toLocaleString('es-CO')}/mes</div>`;
+    }
+
+    // Filas de detalle
+    if (n.zona)         html += fila('Zona', n.zona);
+    if (n.area)         html += fila('Área', n.area + ' m²');
+    if (n.habitaciones) html += fila('Habitaciones', n.habitaciones + ' hab');
+    if (n.estado)       html += fila('Estado', n.estado);
+    if (n.distancia)    html += fila('Distancia', parseFloat(n.distancia).toFixed(1) + ' km');
+
+    // Acciones según tipo
+    if (n.tipo === 'disp' || n.tipo === 'guardado' || n.tipo === 'reservado') {
+        html += `<div class="nd-actions">
+            <button class="nd-btn"
+                onclick="agregarFavorito('${n.codigo}')">
+                <i class="bi bi-heart"></i> Favorito
+            </button>
+            <button class="nd-btn primary"
+                onclick="agendarVisita('${n.codigo}')">
+                Agendar visita
+            </button>
+        </div>`;
+    } else if (n.tipo === 'zona') {
+        html += `<div class="nd-actions">
+            <button class="nd-btn primary"
+                onclick="verInmueblesZona('${n.zona}')">
+                Ver inmuebles ↗
+            </button>
+        </div>`;
+    } else if (n.tipo === 'visitado') {
+        html += `<div class="nd-actions">
+            <button class="nd-btn primary"
+                onclick="verDetalle('${n.codigo}')">
+                Ver detalle
+            </button>
+        </div>`;
+    }
+
+    document.getElementById('node-detail').innerHTML = html;
+}
+
+function fila(label, val) {
+    return `<div class="nd-row">
+        <span class="nd-label">${label}</span>
+        <span class="nd-val">${val}</span>
+    </div>`;
+}
+
+// ─── Acciones de los botones del panel ───────────────────────────
+function agregarFavorito(codigo) {
+    fetch('/favoritos/agregar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'codigoInmueble=' + encodeURIComponent(codigo)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.exito) alert('¡Agregado a favoritos!');
+        else alert('Error: ' + data.error);
+    })
+    .catch(() => alert('Error al agregar favorito'));
+}
+
+function agendarVisita(codigo) {
+    window.location.href = '/visitas/agendar?codigoInmueble=' + encodeURIComponent(codigo);
+}
+
+function verInmueblesZona(zona) {
+    window.location.href = '/inmuebles-cliente?ciudad=' + encodeURIComponent(zona);
+}
+
+function verDetalle(codigo) {
+    window.location.href = '/detalle-inmueble/' + encodeURIComponent(codigo);
+}
+
+// ─── Filtro por tipo de nodo ──────────────────────────────────────
+const filterTypeEl = document.getElementById('filterType');
+if (filterTypeEl) {
+    filterTypeEl.addEventListener('change', function() {
+        filterType = this.value;
+        actualizarStats();
+    });
+}
+
+const filterGuardadasEl = document.getElementById('filterTypeGuardadas');
+if (filterGuardadasEl) {
+    filterGuardadasEl.addEventListener('change', function() {
+        actualizarStats();
+    });
+}
+
+// ─── Slider de radio — llama al endpoint /api/grafo/locaciones ───
+document.getElementById('radiusRange').addEventListener('input', function() {
+    maxRadius = parseFloat(this.value);
+    document.getElementById('radiusVal').textContent = this.value + ' km';
+    actualizarStats();
+});
+
+const radiusRange = document.getElementById('radiusRange');
+if (radiusRange) {
+    radiusRange.addEventListener('change', function() {
+        if (modoGrafo === 'relaciones') return;
+        fetch('/api/grafo/locaciones?modo=' + encodeURIComponent(modoGrafo) + '&radio=' + this.value)
+            .then(r => r.json())
+            .then(data => inicializar(data))
+            .catch(e => console.error('Error al actualizar grafo:', e));
+    });
+}
+
+// ─── Actualizar contadores del panel derecho ──────────────────────
+function actualizarStats() {
+    const visibles    = nodes.filter(esVisible);
+    const conexiones  = edges.filter(e => {
+        const a = nodoById(e.origenId), b = nodoById(e.destinoId);
+        return a && b && esVisible(a) && esVisible(b);
+    });
+    const zonas  = visibles.filter(n => n.tipo === 'zona').length;
+    const dispon = visibles.filter(n => n.tipo === 'disp').length;
+
+    const statNodos = document.getElementById('stat-nodos');
+    const statConex = document.getElementById('stat-conexiones');
+    const statZonas = document.getElementById('stat-zonas');
+    const statDisp  = document.getElementById('stat-disp');
+    if (statNodos) statNodos.textContent = visibles.length;
+    if (statConex) statConex.textContent = conexiones.length;
+    if (statZonas) statZonas.textContent = zonas;
+    if (statDisp)  statDisp.textContent  = dispon;
+
+    const statVisitados = document.getElementById('stat-visitados');
+    const statSugeridos = document.getElementById('stat-sugeridos');
+    if (statVisitados) statVisitados.textContent = visibles.filter(n => n.tipo === 'visitado').length;
+    if (statSugeridos) statSugeridos.textContent = visibles.filter(n => n.tipo === 'disp').length;
+
+    const statGuardadosTotal = document.getElementById('stat-guardados-total');
+    if (statGuardadosTotal) {
+        statGuardadosTotal.textContent = nodes.filter(n =>
+            n.tipo === 'guardado' || n.tipo === 'visitado' || n.tipo === 'disp' || n.tipo === 'reservado'
+        ).length;
+    }
+}
+
+// ─── Arranque ─────────────────────────────────────────────────────
+inicializar(grafoData);
+
+const ro = new ResizeObserver(() => resize());
+ro.observe(canvas.parentElement);
+resize();
+draw();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

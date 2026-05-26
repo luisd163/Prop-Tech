@@ -1,0 +1,13 @@
+# Copia estas líneas a src/main/resources/application.properties o usa variables de entorno.
+
+# OpenAI
+proptech.llm.provider=openai
+proptech.llm.api-key=TU_API_KEY_AQUI
+proptech.llm.base-url=https://api.openai.com/v1
+proptech.llm.model=gpt-4o-mini
+
+# Ollama (sin API key)
+# proptech.llm.provider=ollama
+# proptech.llm.api-key=
+# proptech.llm.base-url=http://localhost:11434/v1
+# proptech.llm.model=llama3.2
