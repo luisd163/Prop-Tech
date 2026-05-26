@@ -18,16 +18,8 @@ public class GrafoController {
     private final GrafoService grafoService = GrafoService.getInstancia();
     private final Gson gson = new Gson();
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 1. VISTA — Locaciones cercanas (carga la página Thymeleaf)
-    // ═══════════════════════════════════════════════════════════════════════════
-
     @GetMapping({"/locaciones-cercanas", "/grafo"})
-    public String locacionesCercanas(
-            @RequestParam(defaultValue = "5.0") double radio,
-            @RequestParam(defaultValue = "cercanas") String modo,
-            Model model,
-            HttpSession session) {
+    public String locacionesCercanas(Model model, HttpSession session) {
 
         String idCliente = obtenerIdClienteSesion(session);
 
@@ -35,10 +27,9 @@ public class GrafoController {
             return "redirect:/login";
         }
 
-        String modoNormalizado = normalizarModo(modo);
-        agregarTextosVista(model, modoNormalizado);
-        model.addAttribute("modoGrafo", modoNormalizado);
-        model.addAttribute("radioActual", radio);
+        model.addAttribute("tituloPagina", "Locaciones cercanas");
+        model.addAttribute("subtituloPagina",
+                "Todos los inmuebles y zonas registrados en el sistema");
         model.addAttribute("paginaActual", "grafo");
 
         Cliente clienteSesion = obtenerClienteSesion(session);
@@ -55,28 +46,25 @@ public class GrafoController {
         model.addAttribute("rolCliente", "Cliente");
 
         try {
-            GrafoService.GrafoDTO grafo = obtenerGrafoPorModo(idCliente, modoNormalizado, radio);
+            GrafoService.GrafoDTO grafo = grafoService.obtenerLocacionesCercanas(idCliente, 0);
 
-            // Serializar a JSON para que el Canvas de la vista lo consuma
             String grafoJson = gson.toJson(grafo);
-            System.out.println("DEBUG GrafoController: grafoJson=" + grafoJson);
 
-            // Estadísticas para las tarjetas del panel derecho
-            long totalNodos      = grafo.getNodos().size();
-            long totalAristas    = grafo.getAristas().size();
-            long totalZonas      = grafo.getNodos().stream()
-                                        .filter(n -> "zona".equals(n.getTipo())).count();
+            long totalNodos = grafo.getNodos().size();
+            long totalAristas = grafo.getAristas().size();
+            long totalZonas = grafo.getNodos().stream()
+                    .filter(n -> "zona".equals(n.getTipo())).count();
             long totalDisponibles = grafo.getNodos().stream()
-                                        .filter(n -> "disp".equals(n.getTipo())).count();
-            long totalGuardados = grafo.getNodos().stream()
-                                        .filter(n -> "guardado".equals(n.getTipo())).count();
+                    .filter(n -> "disp".equals(n.getTipo())).count();
+            long totalReservados = grafo.getNodos().stream()
+                    .filter(n -> "reservado".equals(n.getTipo())).count();
 
-            model.addAttribute("grafoJson",        grafoJson);
-            model.addAttribute("totalGuardados",   totalGuardados);
-            model.addAttribute("totalNodos",        totalNodos);
-            model.addAttribute("totalAristas",      totalAristas);
-            model.addAttribute("totalZonas",        totalZonas);
-            model.addAttribute("totalDisponibles",  totalDisponibles);
+            model.addAttribute("grafoJson", grafoJson);
+            model.addAttribute("totalNodos", totalNodos);
+            model.addAttribute("totalAristas", totalAristas);
+            model.addAttribute("totalZonas", totalZonas);
+            model.addAttribute("totalDisponibles", totalDisponibles);
+            model.addAttribute("totalReservados", totalReservados);
 
         } catch (Exception e) {
             model.addAttribute("grafoJson", "{}");
@@ -84,7 +72,7 @@ public class GrafoController {
             model.addAttribute("totalAristas", 0);
             model.addAttribute("totalZonas", 0);
             model.addAttribute("totalDisponibles", 0);
-            model.addAttribute("totalGuardados", 0);
+            model.addAttribute("totalReservados", 0);
             model.addAttribute("error", "No se pudo cargar el grafo: " + e.getMessage());
             e.printStackTrace();
         }
@@ -92,68 +80,18 @@ public class GrafoController {
         return "Grafo";
     }
 
-    private void agregarTextosVista(Model model, String modo) {
-        switch (modo) {
-            case "guardadas" -> {
-                model.addAttribute("tituloPagina", "Mis guardadas");
-                model.addAttribute("subtituloPagina",
-                        "Todos tus inmuebles favoritos en el grafo (disponibles, reservados y visitados)");
-            }
-            case "relaciones" -> {
-                model.addAttribute("tituloPagina", "Red de visitas");
-                model.addAttribute("subtituloPagina",
-                        "Inmuebles que visitaste y conexiones sugeridas por el grafo");
-            }
-            default -> {
-                model.addAttribute("tituloPagina", "Locaciones cercanas");
-                model.addAttribute("subtituloPagina",
-                        "Grafo de inmuebles y zonas según tu radio de búsqueda");
-            }
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 2. API REST — Actualizar grafo al cambiar el radio (llamado desde JS)
-    // ═══════════════════════════════════════════════════════════════════════════
-
     @GetMapping("/api/grafo/locaciones")
     @ResponseBody
-    public ResponseEntity<GrafoService.GrafoDTO> obtenerGrafo(
-            @RequestParam(defaultValue = "5.0") double radio,
-            @RequestParam(defaultValue = "cercanas") String modo,
-            HttpSession session) {
+    public ResponseEntity<GrafoService.GrafoDTO> obtenerGrafo(HttpSession session) {
 
         String idCliente = obtenerIdClienteSesion(session);
         if (idCliente == null) {
             return ResponseEntity.status(401).build();
         }
 
-        GrafoService.GrafoDTO grafo = obtenerGrafoPorModo(idCliente, normalizarModo(modo), radio);
+        GrafoService.GrafoDTO grafo = grafoService.obtenerLocacionesCercanas(idCliente, 0);
         return ResponseEntity.ok(grafo);
     }
-
-    private GrafoService.GrafoDTO obtenerGrafoPorModo(String idCliente, String modo, double radio) {
-        return switch (modo) {
-            case "relaciones" -> grafoService.obtenerGrafoRelacionesCliente(idCliente);
-            case "guardadas" -> grafoService.obtenerGrafoGuardados(idCliente);
-            default -> grafoService.obtenerLocacionesCercanas(idCliente, radio);
-        };
-    }
-
-    private String normalizarModo(String modo) {
-        if (modo == null) {
-            return "cercanas";
-        }
-        return switch (modo.toLowerCase()) {
-            case "relaciones" -> "relaciones";
-            case "guardadas" -> "guardadas";
-            default -> "cercanas";
-        };
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 3. API REST — Recomendaciones basadas en el grafo
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @GetMapping("/api/grafo/recomendaciones")
     @ResponseBody
@@ -167,10 +105,6 @@ public class GrafoController {
         return ResponseEntity.ok(recomendados);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 4. API REST — Ranking de zonas por actividad
-    // ═══════════════════════════════════════════════════════════════════════════
-
     @GetMapping("/api/grafo/zonas-ranking")
     @ResponseBody
     public ResponseEntity<Map<String, Integer>> rankingZonas(HttpSession session) {
@@ -183,10 +117,6 @@ public class GrafoController {
         return ResponseEntity.ok(ranking);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 5. API REST — Registrar visita en el grafo (llamado desde VisitaController)
-    // ═══════════════════════════════════════════════════════════════════════════
-
     @PostMapping("/api/grafo/registrar-visita")
     @ResponseBody
     public ResponseEntity<Void> registrarVisita(
@@ -196,10 +126,6 @@ public class GrafoController {
         grafoService.registrarVisita(idCliente, codigoInmueble);
         return ResponseEntity.ok().build();
     }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 6. API REST — Inmuebles visitados por un cliente
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @GetMapping("/api/grafo/visitados")
     @ResponseBody

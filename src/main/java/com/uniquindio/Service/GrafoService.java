@@ -338,7 +338,7 @@ public class GrafoService {
                 continue;
             }
 
-            String tipo = determinarTipoNodo(inm, visitados, favoritosCodigos);
+            String tipo = determinarTipoNodo(inm);
             String etiqueta = (inm.getNombre() != null ? inm.getNombre() : codigo)
                     + " · " + etiquetaEstado(inm);
 
@@ -386,10 +386,10 @@ public class GrafoService {
                 continue;
             }
 
-            String tipo = determinarTipoNodo(inm, visitados, favoritosCodigos);
+            String tipo = determinarTipoNodo(inm);
             NodoDTO nodo = new NodoDTO(
                     "INM-" + codigo,
-                    (inm.getNombre() != null ? inm.getNombre() : codigo) + " · guardado",
+                    (inm.getNombre() != null ? inm.getNombre() : codigo) + " · " + etiquetaEstado(inm),
                     tipo,
                     1.2 + (idx * 0.1)
             );
@@ -402,24 +402,32 @@ public class GrafoService {
     }
 
     private void agregarZonasDeNodosInmueble(GrafoDTO dto, String nodoYoId) {
-        Set<String> zonasAgregadas = new HashSet<>();
-        for (NodoDTO nodo : new ArrayList<>(dto.getNodos())) {
-            if (nodo.getZona() == null || nodo.getTipo().equals("yo") || nodo.getTipo().equals("zona")) {
+        Map<String, Double> distanciaMinimaPorZona = new HashMap<>();
+        for (NodoDTO nodo : dto.getNodos()) {
+            if (nodo.getZona() == null || "yo".equals(nodo.getTipo()) || "zona".equals(nodo.getTipo())) {
                 continue;
             }
-            if (zonasAgregadas.contains(nodo.getZona())) {
+            double dist = nodo.getDistancia() > 0 ? nodo.getDistancia() : 1.0;
+            distanciaMinimaPorZona.merge(nodo.getZona(), dist, Math::min);
+        }
+
+        for (Map.Entry<String, Double> entry : distanciaMinimaPorZona.entrySet()) {
+            String zona = entry.getKey();
+            String idZona = "ZON-" + zona;
+            if (dto.getNodos().stream().anyMatch(n -> idZona.equals(n.getId()))) {
                 continue;
             }
-            NodoDTO nodoZona = new NodoDTO(
-                    "ZON-" + nodo.getZona(),
-                    "Zona " + nodo.getZona(),
-                    "zona",
-                    nodo.getDistancia() + 0.4
-            );
-            nodoZona.setZona(nodo.getZona());
+            NodoDTO nodoZona = new NodoDTO(idZona, "Zona " + zona, "zona", entry.getValue() + 0.3);
+            nodoZona.setZona(zona);
             dto.agregarNodo(nodoZona);
+            dto.agregarArista(new AristaDTO(nodoYoId, idZona, entry.getValue() + 0.2));
+        }
+
+        for (NodoDTO nodo : dto.getNodos()) {
+            if (nodo.getZona() == null || "yo".equals(nodo.getTipo()) || "zona".equals(nodo.getTipo())) {
+                continue;
+            }
             dto.agregarArista(new AristaDTO(nodo.getId(), "ZON-" + nodo.getZona(), 0.3));
-            zonasAgregadas.add(nodo.getZona());
         }
     }
 
@@ -466,81 +474,64 @@ public class GrafoService {
         }
     }
 
+    /**
+     * Grafo con todos los inmuebles registrados (persistencia JSON), zonas y el nodo del cliente.
+     * El parámetro radioKm se ignora (compatibilidad con llamadas antiguas).
+     */
     public GrafoDTO obtenerLocacionesCercanas(String idCliente, double radioKm) {
         asegurarGrafoCargado();
         GrafoDTO dto = new GrafoDTO();
 
-        // Buscar cliente usando ClienteRepositorio (que carga desde JSON)
         Map<String, Cliente> clientesMap = clienteRepositorio.obtenerClientes();
         Cliente cliente = clientesMap.get(idCliente);
-        
+
+        String nodoYoId = "yo-" + idCliente;
+        dto.agregarNodo(new NodoDTO(nodoYoId, "Mi ubicación", "yo", 0.0));
+
         if (cliente == null) {
-            System.out.println("DEBUG GrafoService: Cliente no encontrado con id=" + idCliente);
-            System.out.println("DEBUG GrafoService: Clientes disponibles: " + clientesMap.keySet());
-            return dto;  // Retorna DTO vacío si no hay cliente
+            System.out.println("DEBUG GrafoService: Cliente no encontrado id=" + idCliente
+                    + ", se muestran inmuebles igualmente.");
         }
 
-        System.out.println("DEBUG GrafoService: Cliente encontrado: " + cliente.getNombre());
+        Collection<Inmueble> inmuebles = inmuebleRepositorio.obtenerInmuebles().values();
+        System.out.println("DEBUG GrafoService: Inmuebles en JSON: " + inmuebles.size());
 
-        // Nodo raíz: ubicación del cliente
-        NodoDTO nodoYo = new NodoDTO(
-            "yo-" + idCliente,
-            "Mi ubicación",
-            "yo",
-            0.0
-        );
-        dto.agregarNodo(nodoYo);
+        for (Inmueble inm : inmuebles) {
+            if (inm == null || inm.getCodigo() == null || inm.getCodigo().isBlank()) {
+                continue;
+            }
 
-        List<String> visitados = obtenerInmueblesVisitadosPor(idCliente);
-        Set<String> favoritosCodigos = obtenerCodigosFavoritos(cliente);
-        List<Inmueble> cercanos = controlador.listarInmuebles();
-        System.out.println("DEBUG GrafoService: Total inmuebles en sistema: " + (cercanos != null ? cercanos.size() : 0));
+            double distancia = cliente != null
+                    ? calcularDistanciaSimulada(cliente, inm)
+                    : 1.0;
+            String tipo = determinarTipoNodo(inm);
+            String zona = inm.getBarrio() != null && !inm.getBarrio().isBlank()
+                    ? inm.getBarrio()
+                    : (inm.getCiudad() != null ? inm.getCiudad() : "General");
+            String tipoLabel = inm.getTipoInmueble() != null
+                    ? inm.getTipoInmueble().name()
+                    : "Inmueble";
+            String nombre = inm.getNombre() != null && !inm.getNombre().isBlank()
+                    ? inm.getNombre()
+                    : inm.getCodigo();
 
-        if (cercanos != null) {
-            for (Inmueble inm : cercanos) {
-                double distancia = calcularDistanciaSimulada(cliente, inm);
-                if (distancia > radioKm) continue;
-
-                String tipo = determinarTipoNodo(inm, visitados, favoritosCodigos);
-
-                NodoDTO nodo = new NodoDTO(
-                    "INM-" + inm.getCodigo(),
-                    inm.getTipoInmueble() + " · " + inm.getBarrio(),
+            NodoDTO nodo = new NodoDTO(
+                    "INM-" + inm.getCodigo().trim(),
+                    tipoLabel + " · " + nombre,
                     tipo,
                     distancia
-                );
-                nodo.setPrecio(inm.getPrecio());
-                nodo.setArea(inm.getArea());
-                nodo.setHabitaciones(inm.getNumeroHabitaciones());
-                nodo.setZona(inm.getBarrio());
-                nodo.setCodigo(inm.getCodigo());
-                nodo.setEstado(inm.getDisponibilidad().name());
+            );
+            enriquecerNodoInmueble(nodo, inm);
+            nodo.setZona(zona);
 
-                dto.agregarNodo(nodo);
-                dto.agregarArista(new AristaDTO("yo-" + idCliente, "INM-" + inm.getCodigo(), distancia));
-            }
+            dto.agregarNodo(nodo);
+            dto.agregarArista(new AristaDTO(nodoYoId, nodo.getId(), distancia));
         }
 
-        // Agregar nodos de zona
-        Set<String> zonasAgregadas = new HashSet<>();
-        for (NodoDTO nodo : dto.getNodos()) {
-            if (nodo.getZona() != null && !zonasAgregadas.contains(nodo.getZona())) {
-                NodoDTO nodoZona = new NodoDTO(
-                    "ZON-" + nodo.getZona(),
-                    "Zona " + nodo.getZona(),
-                    "zona",
-                    nodo.getDistancia()
-                );
-                nodoZona.setZona(nodo.getZona());
-                dto.agregarNodo(nodoZona);
-                dto.agregarArista(new AristaDTO("INM-" + nodo.getCodigo(), "ZON-" + nodo.getZona(), 0.3));
-                zonasAgregadas.add(nodo.getZona());
-            }
-        }
+        agregarZonasDeNodosInmueble(dto, nodoYoId);
 
-        agregarFavoritosAlGrafo(dto, cliente, idCliente, "yo-" + idCliente, visitados, cercanos != null ? cercanos.size() : 0);
-
-        System.out.println("DEBUG GrafoService: DTO final con " + dto.getNodos().size() + " nodos y " + dto.getAristas().size() + " aristas");
+        System.out.println("DEBUG GrafoService: DTO con " + dto.getNodos().size()
+                + " nodos y " + dto.getAristas().size() + " aristas");
 
         return dto;
     }
@@ -646,24 +637,15 @@ public class GrafoService {
     // 4. MÉTODOS AUXILIARES
     // ═══════════════════════════════════════════════════════════════════════════
 
-    private String determinarTipoNodo(Inmueble inm, List<String> visitados, Set<String> favoritosCodigos) {
-        String codigo = inm.getCodigo() != null ? inm.getCodigo().trim() : "";
-        if (!codigo.isEmpty() && visitados.contains(codigo)) {
-            return "visitado";
-        }
-        if (inm.getDisponibilidad() != null) {
-            if (inm.getDisponibilidad() == Inmueble.Disponibilidad.RESERVADO
-                    || inm.getDisponibilidad() == Inmueble.Disponibilidad.NO_DISPONIBLE) {
-                return "reservado";
-            }
-        }
-        if (!codigo.isEmpty() && favoritosCodigos.contains(codigo)) {
-            return "guardado";
-        }
+    /** Tipo visual del nodo según disponibilidad: disponible o reservado/no disponible. */
+    private String determinarTipoNodo(Inmueble inm) {
         if (inm.getDisponibilidad() == null) {
             return "disp";
         }
-        return inm.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE ? "disp" : "reservado";
+        return switch (inm.getDisponibilidad()) {
+            case DISPONIBLE -> "disp";
+            case RESERVADO, NO_DISPONIBLE -> "reservado";
+        };
     }
 
     /**
