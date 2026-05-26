@@ -17,6 +17,8 @@ public class LlmProperties {
 
     private boolean enabled = true;
 
+    private int maxTokens = 600;
+
     public String getProvider() {
         return provider;
     }
@@ -26,7 +28,10 @@ public class LlmProperties {
     }
 
     public String getApiKey() {
-        return apiKey;
+        if (apiKey == null) {
+            return "";
+        }
+        return apiKey.trim();
     }
 
     public void setApiKey(String apiKey) {
@@ -57,6 +62,14 @@ public class LlmProperties {
         this.enabled = enabled;
     }
 
+    public int getMaxTokens() {
+        return maxTokens;
+    }
+
+    public void setMaxTokens(int maxTokens) {
+        this.maxTokens = maxTokens > 0 ? maxTokens : 600;
+    }
+
     public boolean tieneCredenciales() {
         if (!enabled) {
             return false;
@@ -64,6 +77,31 @@ public class LlmProperties {
         if ("ollama".equalsIgnoreCase(provider)) {
             return baseUrl != null && !baseUrl.isBlank();
         }
-        return apiKey != null && !apiKey.isBlank();
+        String key = getApiKey();
+        if (key.isBlank() || key.length() < 20) {
+            return false;
+        }
+        if (key.startsWith("PEGA_") || key.startsWith("key_") || key.contains("TU_CLAVE")
+                || key.contains("secret-key")) {
+            return false;
+        }
+        return key.startsWith("sk-");
+    }
+
+    /** Listo para atender mensajes en la UI. */
+    public boolean estaOperativo() {
+        return tieneCredenciales();
+    }
+
+    public String mensajeConfiguracion() {
+        if (!enabled) {
+            return "El asistente está desactivado (proptech.llm.enabled=false).";
+        }
+        if ("ollama".equalsIgnoreCase(provider)) {
+            return "Configura Ollama: ejecuta 'ollama serve' y el modelo "
+                    + model + " en " + baseUrl;
+        }
+        return "Configura tu API key: copia application-local.properties.example "
+                + "a application-local.properties o define OPENAI_API_KEY.";
     }
 }

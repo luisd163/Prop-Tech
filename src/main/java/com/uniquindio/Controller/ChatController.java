@@ -1,5 +1,6 @@
 package com.uniquindio.Controller;
 
+import com.uniquindio.Config.LlmProperties;
 import com.uniquindio.Model.Cliente;
 import com.uniquindio.Service.LlmChatService;
 import jakarta.servlet.http.HttpSession;
@@ -15,9 +16,11 @@ import java.util.Map;
 public class ChatController {
 
     private final LlmChatService chatService;
+    private final LlmProperties llmProperties;
 
-    public ChatController(LlmChatService chatService) {
+    public ChatController(LlmChatService chatService, LlmProperties llmProperties) {
         this.chatService = chatService;
+        this.llmProperties = llmProperties;
     }
 
     @PostMapping("/mensaje")
@@ -57,8 +60,21 @@ public class ChatController {
     }
 
     @GetMapping("/estado")
-    public ResponseEntity<Map<String, Object>> estado() {
-        return ResponseEntity.ok(Map.of("disponible", true));
+    public ResponseEntity<Map<String, Object>> estado(HttpSession session) {
+        boolean sesionCliente = obtenerIdClienteSesion(session) != null;
+        boolean operativo = llmProperties.estaOperativo();
+
+        return ResponseEntity.ok(Map.of(
+                "disponible", operativo && sesionCliente,
+                "configurado", operativo,
+                "habilitado", llmProperties.isEnabled(),
+                "provider", llmProperties.getProvider() != null ? llmProperties.getProvider() : "openai",
+                "model", llmProperties.getModel() != null ? llmProperties.getModel() : "",
+                "sesionCliente", sesionCliente,
+                "ayuda", operativo
+                        ? (sesionCliente ? "Listo para chatear." : "Inicia sesión como cliente.")
+                        : llmProperties.mensajeConfiguracion()
+        ));
     }
 
     private String obtenerIdClienteSesion(HttpSession session) {

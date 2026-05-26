@@ -18,6 +18,7 @@
             cursor: pointer;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
         }
+        #chat-toggle.offline { border-color: rgba(224, 92, 92, 0.5); color: #e88; }
         #chat-panel {
             display: none;
             position: fixed;
@@ -40,7 +41,11 @@
             background: #0a1e38;
         }
         .chat-head h6 { margin: 0; color: #f6c23e; font-size: 0.95rem; }
-        .chat-head small { color: #7f96b8; }
+        .chat-head small { color: #7f96b8; display: block; margin-top: 2px; }
+        #chat-status { font-size: 0.72rem; color: #5a7a9e; margin-top: 4px; }
+        #chat-status.ok { color: #2ecc8f; }
+        #chat-status.warn { color: #f6c23e; }
+        #chat-status.err { color: #e88; }
         #chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -75,6 +80,11 @@
             border: 1px solid rgba(224, 92, 92, 0.3);
             color: #f0b0b0;
         }
+        .chat-bubble.loading {
+            align-self: flex-start;
+            color: #7f96b8;
+            font-style: italic;
+        }
         #chat-form {
             display: flex;
             gap: 8px;
@@ -94,6 +104,7 @@
             min-height: 38px;
             max-height: 80px;
         }
+        #chat-input:disabled { opacity: 0.5; }
         #chat-send {
             border: none;
             border-radius: 8px;
@@ -113,13 +124,14 @@
     <div id="chat-panel" role="dialog" aria-label="Asistente PropTech">
         <div class="chat-head">
             <h6><i class="bi bi-robot"></i> Asistente PropTech</h6>
-            <small>IA con datos reales de tu perfil e inmuebles</small>
+            <small>IA con datos reales de tu perfil, favoritos e inmuebles</small>
+            <div id="chat-status">Comprobando configuración…</div>
         </div>
         <div id="chat-messages"></div>
         <form id="chat-form">
             <textarea id="chat-input" rows="1" placeholder="Pregunta por inmuebles, visitas, zonas..."
-                      maxlength="800"></textarea>
-            <button type="submit" id="chat-send">Enviar</button>
+                      maxlength="800" disabled></textarea>
+            <button type="submit" id="chat-send" disabled>Enviar</button>
         </form>
     </div>
 
@@ -131,7 +143,10 @@
         const form = document.getElementById('chat-form');
         const input = document.getElementById('chat-input');
         const sendBtn = document.getElementById('chat-send');
+        const statusEl = document.getElementById('chat-status');
         const historial = [];
+        let chatListo = false;
+        let loadingBubble = null;
 
         if (!panel || !toggle) return;
 
@@ -141,28 +156,88 @@
             div.textContent = texto;
             messagesEl.appendChild(div);
             messagesEl.scrollTop = messagesEl.scrollHeight;
+            return div;
         }
 
-        if (historial.length === 0) {
-            agregarBubble(
-                'Hola, soy tu asistente PropTech. Puedo ayudarte con inmuebles recomendados, '
-                + 'visitas y zonas según tu perfil. ¿En qué te ayudo?',
-                'bot'
-            );
+        function quitarLoading() {
+            if (loadingBubble && loadingBubble.parentNode) {
+                loadingBubble.remove();
+            }
+            loadingBubble = null;
+        }
+
+        function setChatActivo(activo) {
+            chatListo = activo;
+            input.disabled = !activo;
+            sendBtn.disabled = !activo;
+            if (activo) {
+                input.placeholder = 'Pregunta por inmuebles, visitas, zonas...';
+            }
+        }
+
+        async function cargarEstado() {
+            try {
+                const res = await fetch('/api/chat/estado');
+                const data = await res.json();
+
+                if (data.disponible) {
+                    statusEl.textContent = 'Conectado · ' + (data.model || data.provider);
+                    statusEl.className = 'ok';
+                    toggle.classList.remove('offline');
+                    setChatActivo(true);
+                    if (messagesEl.children.length === 0) {
+                        agregarBubble(
+                            'Hola, soy tu asistente PropTech. Puedo ayudarte con inmuebles, '
+                            + 'favoritos, visitas y zonas según tu perfil. ¿En qué te ayudo?',
+                            'bot'
+                        );
+                    }
+                } else if (data.configurado && !data.sesionCliente) {
+                    statusEl.textContent = 'Inicia sesión como cliente';
+                    statusEl.className = 'warn';
+                    toggle.classList.add('offline');
+                    setChatActivo(false);
+                    agregarBubble('Inicia sesión para usar el asistente.', 'error');
+                } else {
+                    statusEl.textContent = 'Sin configurar';
+                    statusEl.className = 'err';
+                    toggle.classList.add('offline');
+                    setChatActivo(false);
+                    agregarBubble(data.ayuda || 'Configura el asistente LLM en application-local.properties', 'error');
+                }
+            } catch (e) {
+                statusEl.textContent = 'Error al verificar estado';
+                statusEl.className = 'err';
+                setChatActivo(false);
+            }
         }
 
         toggle.addEventListener('click', function() {
             panel.classList.toggle('open');
+            if (panel.classList.contains('open') && messagesEl.children.length === 0) {
+                cargarEstado();
+            }
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.requestSubmit();
+            }
         });
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            if (!chatListo) return;
+
             const texto = input.value.trim();
             if (!texto) return;
 
             agregarBubble(texto, 'user');
             input.value = '';
             sendBtn.disabled = true;
+            input.disabled = true;
+            loadingBubble = agregarBubble('Pensando…', 'loading');
 
             try {
                 const res = await fetch('/api/chat/mensaje', {
@@ -171,6 +246,7 @@
                     body: JSON.stringify({ mensaje: texto, historial: historial })
                 });
                 const data = await res.json();
+                quitarLoading();
 
                 if (data.exito) {
                     agregarBubble(data.respuesta, 'bot');
@@ -183,12 +259,18 @@
                     agregarBubble(data.error || 'Error desconocido', 'error');
                 }
             } catch (err) {
+                quitarLoading();
                 agregarBubble('Error de conexión con el asistente.', 'error');
             } finally {
-                sendBtn.disabled = false;
-                input.focus();
+                if (chatListo) {
+                    sendBtn.disabled = false;
+                    input.disabled = false;
+                    input.focus();
+                }
             }
         });
+
+        cargarEstado();
     })();
     </script>
 </th:block>

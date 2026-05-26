@@ -43,6 +43,20 @@ public class ChatContextService {
                 cliente.getEstadoBusqueda() != null ? cliente.getEstadoBusqueda().name() : "N/D"
         ).append('\n');
 
+        sb.append("\n=== FAVORITOS DEL CLIENTE ===\n");
+        if (cliente.getFavoritos() == null || cliente.getFavoritos().isEmpty()) {
+            sb.append("Sin favoritos guardados.\n");
+        } else {
+            for (Inmueble fav : cliente.getFavoritos()) {
+                if (fav != null) {
+                    sb.append("- ").append(describirInmueble(fav)).append('\n');
+                }
+            }
+        }
+
+        sb.append("\n=== RESUMEN DEL CATÁLOGO ===\n");
+        sb.append(resumirCatalogo());
+
         sb.append("\n=== INMUEBLES RECOMENDADOS (máx. 5, grafo + presupuesto) ===\n");
         List<Inmueble> top5 = obtenerTop5Inmuebles(idCliente, cliente);
         if (top5.isEmpty()) {
@@ -165,5 +179,39 @@ public class ChatContextService {
 
     private String valor(String s) {
         return s == null || s.isBlank() ? "N/D" : s.trim();
+    }
+
+    private String resumirCatalogo() {
+        int total = 0;
+        int disponibles = 0;
+        int reservados = 0;
+        StringBuilder zonas = new StringBuilder();
+
+        for (Inmueble inm : inmuebleRepositorio.obtenerInmuebles().values()) {
+            if (inm == null) {
+                continue;
+            }
+            total++;
+            if (inm.getDisponibilidad() == Inmueble.Disponibilidad.DISPONIBLE) {
+                disponibles++;
+            } else if (inm.getDisponibilidad() == Inmueble.Disponibilidad.RESERVADO
+                    || inm.getDisponibilidad() == Inmueble.Disponibilidad.NO_DISPONIBLE) {
+                reservados++;
+            }
+            String zona = inm.getBarrio() != null && !inm.getBarrio().isBlank()
+                    ? inm.getBarrio()
+                    : inm.getCiudad();
+            if (zona != null && !zona.isBlank() && zonas.indexOf(zona) < 0) {
+                if (zonas.length() > 0) {
+                    zonas.append(", ");
+                }
+                zonas.append(zona);
+            }
+        }
+
+        return "Total inmuebles: " + total
+                + " | Disponibles: " + disponibles
+                + " | Reservados/no disponibles: " + reservados
+                + "\nZonas en catálogo: " + (zonas.length() > 0 ? zonas : "N/D") + "\n";
     }
 }

@@ -32,6 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Config local (API keys del chatbot) ###
+src/main/resources/application-local.properties
+
 ### Logs y temporales locales ###
 logs/
 build.log
