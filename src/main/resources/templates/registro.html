@@ -278,10 +278,14 @@
         </div>
 
         <!-- Messages -->
-        <div class="error-message" id="errorMessage" th:if="${error}">
+        <div class="error-message" id="errorMessage"
+             th:if="${error}"
+             th:classappend="${error} ? ' show' : ''">
             <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
         </div>
-        <div class="success-message" id="successMessage" th:if="${message}">
+        <div class="success-message" id="successMessage"
+             th:if="${message}"
+             th:classappend="${message} ? ' show' : ''">
             <i class="bi bi-check-circle"></i> <span th:text="${message}"></span>
         </div>
 
@@ -579,20 +583,31 @@
             if (passwordInput.value !== confirmPasswordInput.value) {
                 e.preventDefault();
                 const errorDiv = document.getElementById('errorMessage');
-                errorDiv.textContent = 'Las contraseñas no coinciden';
-                errorDiv.className = 'error-message show';
+                if (errorDiv) {
+                    const errorSpan = errorDiv.querySelector('span');
+                    if (errorSpan) {
+                        errorSpan.textContent = 'Las contraseñas no coinciden';
+                    } else {
+                        errorDiv.textContent = 'Las contraseñas no coinciden';
+                    }
+                    errorDiv.className = 'error-message show';
+                }
                 return false;
             }
         });
 
-        // Auto-hide success messages
+        // Mostrar alertas y auto-ocultar
         document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
-            if (successMessage && successMessage.classList.contains('show')) {
+
+            [errorMessage, successMessage].forEach(el => {
+                if (!el) return;
+                if (!el.classList.contains('show')) el.classList.add('show');
                 setTimeout(() => {
-                    successMessage.classList.remove('show');
+                    el.classList.remove('show');
                 }, 5000);
-            }
+            });
         });
     </script>
 </body>
