@@ -358,14 +358,14 @@
 
         <div class="menu-section-title">GESTIÓN</div>
         <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
-        <a class="menu-item" href="#"><i class="bi bi-pie-chart"></i> Reportes</a>
+        <a class="menu-item" th:href="@{/reportes-asesor}"><i class="bi bi-pie-chart"></i> Reportes</a>
         <a class="menu-item" th:href="@{/alertas-asesor}"><i class="bi bi-bell"></i> Alertas</a>
 
         <div class="profile-box">
             <div class="avatar" th:text="${inicialesAsesor ?: '--'}">--</div>
             <div>
                 <div class="fw-semibold" th:text="${nombreAsesor ?: 'Nombre del asesor'}">Nombre del asesor</div>
-                <div class="muted small" th:text="${rolAsesor ?: 'Rol del asesor'}">Rol del asesor</div>
+                <div class="muted small">Asesor Inmobiliario</div>
             </div>
         </div>
     </aside>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alertas</title>
+    <title>Reportes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -121,58 +121,30 @@
             color: #1c2635;
             background: #f6c23e;
         }
-        .kpis { display:none; }
-        .inmuebles-list { display:grid; gap:12px; }
-        .inmueble-item { 
-            background:var(--card); 
-            border:1px solid var(--line); 
-            border-radius:10px; 
-            padding:16px; 
-            display:grid;
-            grid-template-columns: 120px 1fr 100px;
-            gap: 16px;
-            align-items: center;
-        }
-        .inmueble-item img { 
-            width:120px; 
-            height:120px; 
-            object-fit:cover; 
-            border-radius:8px;
-            border: 1px solid var(--line);
-        }
-        .inmueble-info { display:grid; gap:6px; }
-        .inmueble-nombre { font-weight:600; font-size:1.05rem; color:var(--txt); }
-        .inmueble-ubicacion { color:var(--muted); font-size:.9rem; }
-        .inmueble-detalles { display:flex; gap:20px; color:var(--text-soft); font-size:.85rem; }
-        .inmueble-precio { 
-            text-align:right; 
-            display:flex; 
-            flex-direction:column; 
-            align-items:flex-end; 
-            gap:8px;
-        }
-        .precio-valor { font-size:1.2rem; font-weight:700; color:#f6c23e; }
-        .precio-label { color:var(--muted); font-size:.75rem; }
-        @media (max-width: 768px){ 
-            .inmueble-item { 
-                grid-template-columns: 1fr;
-            }
-            .inmueble-precio { 
-                text-align:left;
-                flex-direction:row;
-                justify-content:space-between;
-            }
-        }
-        .filters { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:12px; }
-        .visit-card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:8px; }
+        .kpis { display:grid; grid-template-columns:repeat(1,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+        .kpi { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px; }
+        .kpi .n { font-size:1.4rem; font-weight:700; }
+        .kpi .l { color:var(--muted); font-size:.85rem; }
+        .report-card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:8px; }
         .muted { color:var(--muted); }
         .badge-state { border-radius:999px; padding:3px 10px; border:1px solid transparent; font-size:.75rem; }
-        .st-p { color:#f7c14a; background:rgba(247,193,74,.13); border-color:rgba(247,193,74,.4); }
-        .st-c { color:#36d39f; background:rgba(54,211,159,.13); border-color:rgba(54,211,159,.35); }
-        .st-r { color:#66a9ff; background:rgba(102,169,255,.13); border-color:rgba(102,169,255,.35); }
-        .st-x { color:#ff7a7a; background:rgba(255,122,122,.13); border-color:rgba(255,122,122,.35); }
-        .actions { display:flex; gap:8px; margin-top:8px; }
-        .btn-mini { font-size:.78rem; padding:3px 10px; }
+        .st-asignado { color:#36d39f; background:rgba(54,211,159,.13); border-color:rgba(54,211,159,.35); }
+        .inmueble-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:8px; }
+        .inmueble-meta { display:flex; flex-direction:column; gap:4px; }
+        .acciones-reportes { display:flex; justify-content:flex-end; margin-top:12px; }
+        .btn-cancelar-contrato {
+            border: 1px solid rgba(255,122,122,.4);
+            background: rgba(255,122,122,.08);
+            color: #ff8d8d;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-weight: 700;
+            font-size: .85rem;
+        }
+        .btn-cancelar-contrato:hover {
+            background: #ff6b6b;
+            color: #fff;
+        }
         @media (max-width: 1024px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr));} .layout{grid-template-columns:1fr;} .sidebar{display:none;} }
     </style>
 </head>
@@ -192,14 +164,14 @@
 
         <div class="menu-section-title">GESTIÓN</div>
         <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
-        <a class="menu-item" th:href="@{/reportes-asesor}"><i class="bi bi-pie-chart"></i> Reportes</a>
-        <a class="menu-item active" th:href="@{/alertas-asesor}"><i class="bi bi-bell"></i> Alertas</a>
+        <a class="menu-item active" href="#"><i class="bi bi-pie-chart"></i> Reportes</a>
+        <a class="menu-item" th:href="@{/alertas-asesor}"><i class="bi bi-bell"></i> Alertas</a>
 
         <div class="profile-box">
             <div class="avatar" th:text="${inicialesAsesor ?: '--'}">--</div>
             <div>
                 <div class="fw-semibold" th:text="${nombreAsesor ?: 'Nombre del asesor'}">Nombre del asesor</div>
-                <div class="muted small">Asesor Inmobiliario</div>
+                <div class="muted small" th:text="${rolAsesor ?: 'Rol del asesor'}">Rol del asesor</div>
             </div>
         </div>
     </aside>
@@ -207,44 +179,36 @@
     <main class="main">
         <div class="top">
             <div>
-                <h3 class="m-0">Alertas</h3>
-                <small class="muted">Inmuebles sin visitas asignadas</small>
+                <h3 class="m-0">Reportes</h3>
+                <small class="muted">inmuebles con cliente asignado</small>
             </div>
         </div>
 
-        <form class="filters" th:action="@{/alertas-asesor}" method="get">
-            <div class="row g-2">
-                <div class="col-md-12">
-                    <input class="form-control" type="text" name="q" th:value="${query}" placeholder="Buscar por nombre, ubicación o características...">
-                </div>
-            </div>
-        </form>
-
-        <section class="inmuebles-list">
-            <article class="inmueble-item" th:each="inmueble : ${inmuebles}">
-                <img th:src="${inmueble.fotoPortada != null and inmueble.fotoPortada != '' ? inmueble.fotoPortada : 'https://via.placeholder.com/120?text=Sin+foto'}" 
-                     th:alt="${inmueble.nombre}">
-                
-                <div class="inmueble-info">
-                    <div class="inmueble-nombre" th:text="${inmueble.nombre}">Nombre del inmueble</div>
-                    <div class="inmueble-ubicacion" th:text="${inmueble.direccion + ', ' + inmueble.ciudad}">Ubicación</div>
-                    <div class="inmueble-detalles">
-                        <span th:if="${inmueble.area}" th:text="${inmueble.area + ' m²'}">Área</span>
-                        <span th:if="${inmueble.numeroHabitaciones}" th:text="${inmueble.numeroHabitaciones + ' hab'}">Habitaciones</span>
-                        <span th:if="${inmueble.numeroBanos}" th:text="${inmueble.numeroBanos + ' baños'}">Baños</span>
-                    </div>
-                </div>
-
-                <div class="inmueble-precio">
-                    <div class="precio-valor" th:text="${'$' + #numbers.formatInteger(inmueble.precio, 1, 'COMMA')}">$0</div>
-                    <div class="precio-label">Precio</div>
-                </div>
-            </article>
-
-            <div class="visit-card text-center muted" th:if="${inmuebles == null || inmuebles.isEmpty()}">
-                No hay inmuebles para mostrar con los criterios de búsqueda.
-            </div>
+        <section class="kpis">
+            <article class="kpi"><div class="n" th:text="${kpiTotalMes}">0</div><div class="l">Total asignados</div></article>
         </section>
+
+        <section class="inmueble-grid" th:if="${clientesConInmuebleAsignado != null && !clientesConInmuebleAsignado.isEmpty()}">
+            <article class="report-card" th:each="cliente : ${clientesConInmuebleAsignado}">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div class="inmueble-meta">
+                        <div class="fw-bold" th:text="${cliente.inmuebleAsignado.nombre}">Inmueble</div>
+                        <div class="muted" th:text="${cliente.inmuebleAsignado.direccion != null ? cliente.inmuebleAsignado.direccion : 'Sin dirección'}">Dirección</div>
+                        <small class="muted" th:text="${(cliente.inmuebleAsignado.ciudad != null ? cliente.inmuebleAsignado.ciudad : '') + (cliente.inmuebleAsignado.barrio != null ? ' · ' + cliente.inmuebleAsignado.barrio : '')}">Ciudad · Barrio</small>
+                        <small class="muted" th:text="${'Cliente: ' + cliente.nombre}">Cliente</small>
+                    </div>
+                    <span class="badge-state st-asignado">Asignado</span>
+                </div>
+                <form class="acciones-reportes" th:action="@{/reportes-asesor/cancelar-contrato}" method="post">
+                    <input type="hidden" name="clienteId" th:value="${cliente.identificacion}">
+                    <button class="btn-cancelar-contrato" type="submit">Cancelar contrato</button>
+                </form>
+            </article>
+        </section>
+
+        <div class="report-card text-center muted" th:if="${clientesConInmuebleAsignado == null || clientesConInmuebleAsignado.isEmpty()}">
+            No hay inmuebles con cliente asignado.
+        </div>
     </main>
 </div>
 </body>
