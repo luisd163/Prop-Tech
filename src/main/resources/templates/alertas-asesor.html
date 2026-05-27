@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inmuebles</title>
+    <title>Alertas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -186,14 +186,14 @@
 
         <div class="menu-section-title">PRINCIPAL</div>
         <a class="menu-item" th:href="@{/home}"><i class="bi bi-grid"></i> Dashboard</a>
-        <a class="menu-item active" th:href="@{/operaciones}"><i class="bi bi-briefcase"></i> Operaciones</a>
+        <a class="menu-item" th:href="@{/operaciones}"><i class="bi bi-briefcase"></i> Operaciones</a>
         <a class="menu-item" th:href="@{/inmuebles/todos}"><i class="bi bi-house"></i> Inmuebles</a>
         <a class="menu-item" th:href="@{/clientes}"><i class="bi bi-people"></i> Clientes</a>
 
         <div class="menu-section-title">GESTIÓN</div>
         <a class="menu-item" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
         <a class="menu-item" href="#"><i class="bi bi-pie-chart"></i> Reportes</a>
-        <a class="menu-item active" th:href="@{/alertas-asesor}"><i class="bi bi-bell"></i> Inmuebles</a>
+        <a class="menu-item active" th:href="@{/alertas-asesor}"><i class="bi bi-bell"></i> Alertas</a>
 
         <div class="profile-box">
             <div class="avatar" th:text="${inicialesAsesor ?: '--'}">--</div>
@@ -207,8 +207,8 @@
     <main class="main">
         <div class="top">
             <div>
-                <h3 class="m-0">Inmuebles</h3>
-                <small class="muted">Catálogo completo</small>
+                <h3 class="m-0">Alertas</h3>
+                <small class="muted">Inmuebles sin visitas asignadas</small>
             </div>
         </div>
 

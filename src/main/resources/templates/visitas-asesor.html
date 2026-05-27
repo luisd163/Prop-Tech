@@ -155,7 +155,7 @@
         <div class="menu-section-title">GESTIÓN</div>
         <a class="menu-item active" th:href="@{/visitas}"><i class="bi bi-calendar-check"></i> Mis visitas</a>
         <a class="menu-item" href="#"><i class="bi bi-pie-chart"></i> Reportes</a>
-        <a class="menu-item" href="#"><i class="bi bi-bell"></i> Alertas</a>
+        <a class="menu-item" th:href="@{/alertas-asesor}"><i class="bi bi-bell"></i> Alertas</a>
 
         <div class="profile-box">
             <div class="avatar" th:text="${inicialesAsesor ?: '--'}">--</div>

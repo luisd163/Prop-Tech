@@ -1,0 +1,61 @@
+{
+  "37373fe9-3b36-419f-9dfe-f0370a2cd215": {
+    "id": "37373fe9-3b36-419f-9dfe-f0370a2cd215",
+    "cliente": {
+      "identificacion": "456",
+      "nombre": "Laura Osorio",
+      "correo": "lauras.osoriom@uqvirtual.edu.co",
+      "telefono": "3156885637",
+      "contrasena": "321",
+      "tipoCliente": "PERSONA_NATURAL",
+      "presupuesto": 1.0E24,
+      "zonasDeInteres": [
+        "Armenia"
+      ],
+      "tipoInmuebleDeseado": "APARTAMENTO",
+      "cantidadMinimaHabitaciones": 3,
+      "estadoBusqueda": "ACTIVA",
+      "inmuebleAsignado": {
+        "codigo": "4891",
+        "nombre": "Casa sevilla",
+        "direccion": "calle 60 #48-20",
+        "ciudad": "Sevilla",
+        "barrio": "Obrero",
+        "codigoAsesorResponsable": "1020302622",
+        "tipoInmueble": "CASA",
+        "finalidad": "VENTA",
+        "precio": 1000.0,
+        "area": 100.0,
+        "numeroHabitaciones": 5,
+        "numeroBanos": 1,
+        "estadoInmueble": "USADO",
+        "disponibilidad": "DISPONIBLE",
+        "fotoPortada": "/uploads/inmuebles/portada_f572ca64-e26e-4fd8-ba12-473e50b9e636.jpeg",
+        "fotosGaleria": []
+      }
+    },
+    "inmueble": {
+      "codigo": "4891",
+      "nombre": "Casa sevilla",
+      "direccion": "calle 60 #48-20",
+      "ciudad": "Sevilla",
+      "barrio": "Obrero",
+      "codigoAsesorResponsable": "1020302622",
+      "tipoInmueble": "CASA",
+      "finalidad": "VENTA",
+      "precio": 1000.0,
+      "area": 100.0,
+      "numeroHabitaciones": 5,
+      "numeroBanos": 1,
+      "estadoInmueble": "USADO",
+      "disponibilidad": "DISPONIBLE",
+      "fotoPortada": "/uploads/inmuebles/portada_f572ca64-e26e-4fd8-ba12-473e50b9e636.jpeg",
+      "fotosGaleria": []
+    },
+    "fecha": "2026-05-30",
+    "hora": "13:00",
+    "asesorId": "1020302622",
+    "estado": "PENDIENTE",
+    "observaciones": ""
+  }
+}
