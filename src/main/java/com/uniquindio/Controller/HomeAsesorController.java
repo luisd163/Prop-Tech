@@ -5,6 +5,7 @@ import com.uniquindio.Model.Cliente;
 import com.uniquindio.Model.Inmueble;
 import com.uniquindio.Model.Visita;
 import com.uniquindio.Service.AsesorHomeService;
+import com.uniquindio.Service.InmuebleService;
 import com.uniquindio.Service.VisitaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,11 +37,36 @@ public class HomeAsesorController {
             return "redirect:/login";
         }
 
-        int totalAlertas = asesorHomeService.cantidadAlertas(asesor);
         int cantidadInmuebles = asesorHomeService.cantidadInmueblesAsociados(asesor);
         int cierresMes = asesorHomeService.cantidadCierresMes(asesor);
         List<Inmueble> inmueblesAsesor = asesorHomeService.obtenerInmueblesAsesor(asesor);
         List<Inmueble> inmueblesLimitados = inmueblesAsesor.stream().limit(2).collect(Collectors.toList());
+
+        // obtener inmuebles que están en alertas (inmuebles del asesor sin visitas) y limitar a 2
+        InmuebleService inmuebleService = new InmuebleService();
+        List<Inmueble> inmueblesParaAlertas = inmuebleService.obtenerInmueblesPorAsesor(asesor.getIdentificacion());
+        VisitaService visitaServiceParaAlertas = new VisitaService();
+        List<Visita> visitasAsesorTodas = visitaServiceParaAlertas.obtenerVisitasPorAsesor(asesor.getIdentificacion());
+        java.util.Set<String> inmueblesConVisita = visitasAsesorTodas.stream()
+            .filter(Objects::nonNull)
+            .map(Visita::getInmueble)
+            .filter(Objects::nonNull)
+            .map(i -> i.getCodigo())
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        // calcular total de alertas (inmuebles del asesor sin visitas)
+        long totalAlertasLong = inmueblesParaAlertas.stream()
+            .filter(Objects::nonNull)
+            .filter(inm -> !inmueblesConVisita.contains(inm.getCodigo()))
+            .count();
+        int totalAlertas = (int) totalAlertasLong;
+
+        List<Inmueble> inmueblesEnAlertaLimitados = inmueblesParaAlertas.stream()
+            .filter(Objects::nonNull)
+            .filter(inm -> !inmueblesConVisita.contains(inm.getCodigo()))
+            .limit(2)
+            .collect(Collectors.toList());
         List<Cliente> clientesActivos = (asesor.getClientes() == null ? List.<Cliente>of() : asesor.getClientes())
             .stream()
             .filter(c -> c != null)
@@ -70,6 +97,7 @@ public class HomeAsesorController {
         model.addAttribute("kpiVisitasSemana", visitasSemana);
         model.addAttribute("kpiCierresMes", cierresMes);
         model.addAttribute("inmueblesLimitados", inmueblesLimitados);
+        model.addAttribute("inmueblesEnAlertaLimitados", inmueblesEnAlertaLimitados);
         model.addAttribute("visitasProximas", visitasProximas);
         model.addAttribute("clientesActivos", clientesActivos);
         return "home-asesor";

@@ -465,15 +465,24 @@
             <article class="section-card">
                 <div class="section-head">
                     <h5>Alertas</h5>
-                    <a href="#">Ver todas →</a>
+                    <a th:href="@{/alertas-asesor}">Ver todas →</a>
                 </div>
-                <div class="list-item">
-                    <div class="alert-dot dot-danger"></div>
+                <div th:if="${inmueblesEnAlertaLimitados != null && !inmueblesEnAlertaLimitados.isEmpty()}" th:each="inmueble : ${inmueblesEnAlertaLimitados}" class="list-item">
                     <div>
-                        <div>[Mensaje de alerta]</div>
-                        <small class="muted">[Nivel] · [Tiempo]</small>
+                        <img class="foto-inmueble"
+                             th:src="${inmueble.fotoPortada != null ? inmueble.fotoPortada : (inmueble.fotosGaleria != null and !inmueble.fotosGaleria.isEmpty() ? inmueble.fotosGaleria[0] : '/img/casa-default.svg')}"
+                             alt="Foto inmueble">
                     </div>
-                    <span></span>
+                    <div>
+                        <div class="fw-semibold" th:text="${inmueble.nombre}">Inmueble</div>
+                        <div class="muted"><span th:text="${inmueble.ciudad != null ? inmueble.ciudad : inmueble.direccion}">Ubicación</span></div>
+                    </div>
+                    <span class="status-badge"
+                          th:classappend="${inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).DISPONIBLE ? ' s-disponible' : (inmueble.disponibilidad == T(com.uniquindio.Model.Inmueble.Disponibilidad).RESERVADO ? ' s-reservado' : ' s-no')}"
+                          th:text="${inmueble.disponibilidad}">Estado</span>
+                </div>
+                <div class="list-item" th:if="${inmueblesEnAlertaLimitados == null || inmueblesEnAlertaLimitados.isEmpty()}">
+                    <div class="muted">No hay inmuebles en alerta.</div>
                 </div>
             </article>
 

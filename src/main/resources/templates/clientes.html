@@ -361,7 +361,6 @@
                 <span class="badge-state"
                       th:classappend="${cliente.estadoBusqueda != null && cliente.estadoBusqueda.name() == 'ACTIVA' ? ' s-active' : (cliente.estadoBusqueda != null && cliente.estadoBusqueda.name() == 'PAUSADA' ? ' s-pause' : ' s-close')}"
                       th:text="${cliente.estadoBusqueda != null ? cliente.estadoBusqueda : 'ACTIVA'}">Estado</span>
-                <a class="btn-mini" href="#">Ver</a>
                 <a class="btn-mini" th:href="@{/visitas/crear}">Visita</a>
             </article>
 

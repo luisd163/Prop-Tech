@@ -10,6 +10,7 @@ import java.time.YearMonth;
 import com.uniquindio.Model.Asesor;
 import com.uniquindio.Model.Inmueble;
 import com.uniquindio.Model.Operacion;
+import com.uniquindio.Estructuras.ArrayListPropio;
 import com.uniquindio.Model.Alerta;
 import com.uniquindio.Repositorio.AlertaRepositorio;
 import com.uniquindio.Repositorio.InmuebleRepositorio;
@@ -54,6 +55,33 @@ public class AsesorHomeService {
     // Devuelve la cantidad de inmuebles asociados a un asesor
     public int cantidadInmueblesAsociados(Asesor asesor){
         return obtenerInmueblesAsesor(asesor).size();
+    }
+
+    // Obtiene los inmuebles que están relacionados en alertas del asesor
+    public java.util.List<Inmueble> obtenerInmueblesEnAlerta(Asesor asesor) {
+        java.util.List<Inmueble> resultado = new java.util.ArrayList<>();
+        if (asesor == null) return resultado;
+
+        ArrayListPropio<Alerta> alertas = alertaRepositorio.obtenerAlertas();
+        java.util.Map<String, Inmueble> todos = inmuebleRepositorio.obtenerInmuebles();
+
+        for (Alerta alerta : alertas) {
+            if (alerta == null) continue;
+            if (!Objects.equals(alerta.getAsesorId(), asesor.getIdentificacion())) continue;
+            String entidad = alerta.getEntidadRelacionada();
+            if (entidad == null) continue;
+            Inmueble inm = todos.get(entidad);
+            if (inm != null) {
+                // evitar duplicados
+                boolean existe = false;
+                for (Inmueble i : resultado) {
+                    if (i != null && Objects.equals(i.getCodigo(), inm.getCodigo())) { existe = true; break; }
+                }
+                if (!existe) resultado.add(inm);
+            }
+        }
+
+        return resultado;
     }
 
     // Devuelve la cantidad de operaciones finalizadas del mes actual asociadas al asesor

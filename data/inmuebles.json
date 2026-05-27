@@ -52,5 +52,23 @@
     "disponibilidad": "DISPONIBLE",
     "fotoPortada": "/uploads/inmuebles/portada_2def5b53-8e88-432f-ac8a-937307cb2b00.jpeg",
     "fotosGaleria": []
+  },
+  "7815": {
+    "codigo": "7815",
+    "nombre": "Apartamento Armenia",
+    "direccion": "calle 58 #17-22",
+    "ciudad": "Armenia",
+    "barrio": "La fogata",
+    "codigoAsesorResponsable": "1020302622",
+    "tipoInmueble": "APARTAMENTO",
+    "finalidad": "VENTA",
+    "precio": 500000.0,
+    "area": 100.0,
+    "numeroHabitaciones": 5,
+    "numeroBanos": 2,
+    "estadoInmueble": "NUEVO",
+    "disponibilidad": "NO_DISPONIBLE",
+    "fotoPortada": "/uploads/inmuebles/portada_cac96a51-4332-4b7b-be96-af05f5006afa.jpeg",
+    "fotosGaleria": []
   }
 }
