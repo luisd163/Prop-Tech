@@ -457,12 +457,12 @@
 
         <div class="menu-section-title">EXPLORAR</div>
         <a class="menu-item" th:href="@{/home-cliente}"><i class="bi bi-grid-3x3-gap"></i> Inicio</a>
-        <a class="menu-item active" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
+        <a class="menu-item" th:href="@{/inmuebles-cliente}"><i class="bi bi-house"></i> Inmuebles</a>
         <a class="menu-item" th:href="@{/favoritos}"><i class="bi bi-star"></i> Favoritos</a>
         <a class="menu-item" href="#"><i class="bi bi-hand-index-thumb"></i> Locaciones Cercanas</a>
 
         <div class="menu-section-title">MI CUENTA</div>
-        <a class="menu-item" th:href="@{/visitas-cliente}"><i class="bi bi-calendar-event"></i> Mis visitas</a>
+        <a class="menu-item active" th:href="@{/visitas-cliente}"><i class="bi bi-calendar-event"></i> Mis visitas</a>
         <a class="menu-item" th:href="@{/historial}"><i class="bi bi-clock-history"></i> Mi historial</a>
         <a class="menu-item" href="#"><i class="bi bi-journal-text"></i> Mis operaciones</a>
         <a class="menu-item" href="#"><i class="bi bi-bell"></i> Notificaciones</a>
@@ -479,168 +479,63 @@
     <main class="main">
         <div class="topbar">
             <div class="title">
-                <h3>Inmuebles</h3>
-            </div>
-            <div class="view-switch">
-                <button class="switch-btn active"><i class="bi bi-grid"></i> Tarjetas</button>
-                <button class="switch-btn"><i class="bi bi-list"></i> Lista</button>
+                <h3>Mis visitas</h3>
+                <p>Inmuebles con visitas programadas</p>
             </div>
         </div>
 
         <section class="filter-panel">
-            <form method="get" th:action="@{/inmuebles-cliente}">
-            <div class="filter-row">
-                <div class="search-wrap">
-                    <i class="bi bi-search"></i>
-                    <input class="search-input" name="ciudad" type="text" placeholder="[Buscar por zona o barrio]" th:value="${searchCiudad}">
+            <form method="get" th:action="@{/visitas-cliente}">
+                <div class="filter-row" style="grid-template-columns: 1fr; margin-bottom: 0;">
+                    <div class="search-wrap">
+                        <i class="bi bi-search"></i>
+                        <input class="search-input" name="q" type="text" placeholder="Buscar por inmueble, dirección o ciudad" th:value="${query}">
+                    </div>
                 </div>
-                <select class="select" name="tipo">
-                    <option value="" th:selected="${selectedTipo == null or selectedTipo == ''}">Tipo de inmueble</option>
-                    <option th:each="t : ${tiposDisponibles}" th:value="${t}" th:text="${t}" th:selected="${t == selectedTipo}"></option>
-                </select>
-                <select class="select" name="finalidad">
-                    <option value="" th:selected="${selectedFinalidad == null or selectedFinalidad == ''}">Finalidad</option>
-                    <option th:each="f : ${finalidadesDisponibles}" th:value="${f}" th:text="${f}" th:selected="${f == selectedFinalidad}"></option>
-                </select>
-                <!-- Rango de precio eliminado para simplificar filtros -->
-            </div>
-
-            <div class="filter-row second">
-                <select class="select" name="habMin">
-                    <option value="" th:selected="${selectedHabMin == null or selectedHabMin == ''}">Habitaciones mínimas</option>
-                    <option th:each="h : ${habitacionesDisponibles}" th:value="${h}" th:text="${h}" th:selected="${h == selectedHabMin}"></option>
-                </select>
-                <select class="select" name="baMin">
-                    <option value="" th:selected="${selectedBaMin == null or selectedBaMin == ''}">Baños mínimos</option>
-                    <option th:each="b : ${banosDisponibles}" th:value="${b}" th:text="${b}" th:selected="${b == selectedBaMin}"></option>
-                </select>
-                <button class="btn-search" type="submit">Buscar</button>
-            </div>
             </form>
         </section>
 
-        <div class="list-head">
-            <div class="list-count" th:text="${totalInmuebles} + ' inmuebles encontrados'">0 inmuebles encontrados</div>
-            <div class="sort-box">
-                <span>Ordenar por</span>
-                <form method="get" th:action="@{/inmuebles-cliente}" style="display:inline; margin:0;">
-                    <input type="hidden" name="ciudad" th:value="${searchCiudad}">
-                    <input type="hidden" name="tipo" th:value="${selectedTipo}">
-                    <input type="hidden" name="finalidad" th:value="${selectedFinalidad}">
-                    <input type="hidden" name="habMin" th:value="${selectedHabMin}">
-                    <input type="hidden" name="baMin" th:value="${selectedBaMin}">
-                    <select class="sort-select" name="sortBy" onchange="this.form.submit()">
-                        <option value="" th:selected="${selectedSortBy == null or selectedSortBy == ''}">Criterio de orden</option>
-                        <option value="precio" th:selected="${selectedSortBy == 'precio'}">Precio</option>
-                        <option value="metros" th:selected="${selectedSortBy == 'metros'}">Metros cuadrados</option>
-                        <option value="banos" th:selected="${selectedSortBy == 'banos'}">Baños</option>
-                        <option value="habitaciones" th:selected="${selectedSortBy == 'habitaciones'}">Habitaciones</option>
-                    </select>
-                </form>
-            </div>
-        </div>
-
-        <section class="cards" th:if="${itemsPrincipales != null and !itemsPrincipales.isEmpty()}">
-            <article class="card-inmueble" th:each="inmueble : ${itemsPrincipales}">
+        <section class="cards" th:if="${visitasProgramadas != null and !visitasProgramadas.isEmpty()}">
+            <article class="card-inmueble" th:each="visita : ${visitasProgramadas}">
                 <div class="card-cover">
                     <img class="card-image"
-                         th:if="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}"
-                         th:src="${inmueble.fotoPortada}"
-                         th:alt="${inmueble.nombre != null ? inmueble.nombre : 'Inmueble'}">
+                         th:if="${visita.inmueble != null and visita.inmueble.fotoPortada != null and !#strings.isEmpty(visita.inmueble.fotoPortada)}"
+                         th:src="${visita.inmueble.fotoPortada}"
+                         th:alt="${visita.inmueble != null ? visita.inmueble.nombre : 'Inmueble'}">
                     <div class="card-image-placeholder"
-                         th:unless="${inmueble.fotoPortada != null and !#strings.isEmpty(inmueble.fotoPortada)}">
-                        <i class="bi bi-house"></i>
+                         th:unless="${visita.inmueble != null and visita.inmueble.fotoPortada != null and !#strings.isEmpty(visita.inmueble.fotoPortada)}">
+                        <i class="bi bi-calendar-event"></i>
                     </div>
-                    <span class="badge-top" th:text="${inmueble.finalidad != null ? inmueble.finalidad.name() : 'INMUEBLE'}">INMUEBLE</span>
-                    <i class="bi bi-heart-fill favorite"></i>
+                    <span class="badge-top" th:text="${visita.estado != null ? visita.estado.name() : 'PROGRAMADA'}">PROGRAMADA</span>
                 </div>
                 <div class="card-body">
-                    <div class="card-title" th:text="${inmueble.nombre}">[Título del inmueble]</div>
-                    <div class="card-sub" th:text="${(inmueble.direccion != null ? inmueble.direccion : '') + ' · ' + (inmueble.ciudad != null ? inmueble.ciudad : '')}">[Dirección y ciudad]</div>
-                    <div class="card-code" th:text="${inmueble.codigo}">[Código del inmueble]</div>
+                    <div class="card-title" th:text="${visita.inmueble != null ? visita.inmueble.nombre : 'Inmueble'}">Inmueble</div>
+                    <div class="card-sub" th:text="${visita.inmueble != null && visita.inmueble.direccion != null ? visita.inmueble.direccion : 'Sin dirección'}">Dirección</div>
+                    <div class="card-code" th:text="${visita.inmueble != null && visita.inmueble.ciudad != null ? visita.inmueble.ciudad : 'Sin ciudad'}">Ciudad</div>
                     <div class="meta">
-                        <span th:text="${inmueble.area + ' m²'}">[Área]</span>
-                        <span th:text="${inmueble.numeroHabitaciones + ' hab'}">[Habitaciones]</span>
-                        <span th:text="${inmueble.numeroBanos + ' baños'}">[Baños]</span>
+                        <span th:text="${visita.inmueble != null ? visita.inmueble.area + ' m²' : '--'}">Área</span>
+                        <span th:text="${visita.fecha != null ? visita.fecha : '--'}">Fecha</span>
+                        <span th:text="${visita.hora != null ? visita.hora : '--'}">Hora</span>
                     </div>
-                    <div class="price" th:text="${#numbers.formatDecimal(inmueble.precio, 0, 'POINT', 0, 'COMMA')}">[Precio]</div>
-                    <div class="price-note" th:text="${inmueble.finalidad != null ? inmueble.finalidad.name() : '—'}">[Período]</div>
-                    <div class="card-actions" th:with="esFavorito=${favoritosCodigos != null and inmueble.codigo != null and favoritosCodigos.contains(inmueble.codigo.trim())}">
-                        <span class="state" th:text="${inmueble.disponibilidad != null ? inmueble.disponibilidad.name() : '—'}">[Estado]</span>
-                        <button class="icon-btn"
-                                type="button"
-                                th:attr="data-codigo=${inmueble.codigo}"
-                                th:classappend="${esFavorito} ? ' active' : ''">
-                            <i class="bi" th:classappend="${esFavorito} ? ' bi-heart-fill' : ' bi-heart'"></i>
-                        </button>
-                        <a class="view-btn" th:href="@{/detalle-inmueble/{codigo}(codigo=${inmueble.codigo})}">Ver</a>
+                    <div class="price-note" th:text="${visita.inmueble != null && visita.inmueble.barrio != null ? visita.inmueble.barrio : 'Sin barrio'}">Barrio</div>
+                    <div class="card-actions">
+                        <span class="state" th:text="${visita.estado != null ? visita.estado.name() : '—'}">Estado</span>
+                        <span></span>
+                        <span class="view-btn" style="cursor: default;">Programada</span>
                     </div>
                 </div>
             </article>
         </section>
 
-        <section class="cards" th:if="${itemsPrincipales == null or itemsPrincipales.isEmpty()}">
+        <section class="cards" th:if="${visitasProgramadas == null or visitasProgramadas.isEmpty()}">
             <div class="card-inmueble" style="grid-column: 1 / -1; text-align:center; padding: 2rem;">
                 <div class="card-body">
-                    <div class="card-title">No hay inmuebles registrados</div>
-                    <div class="card-sub">Cuando se creen inmuebles, aparecerán aquí automáticamente.</div>
+                    <div class="card-title">No tienes visitas programadas</div>
+                    <div class="card-sub">Cuando tengas una visita programada, aparecerá aquí automáticamente.</div>
                 </div>
             </div>
         </section>
     </main>
 </div>
-
-<script>
-    // Toggle de favoritos en tarjetas
-    document.querySelectorAll('.icon-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const codigoInmueble = (this.dataset.codigo || '').trim();
-            
-            if (!codigoInmueble) {
-                alert('No se pudo identificar el inmueble');
-                return;
-            }
-            
-            fetch('/favoritos/agregar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'codigoInmueble=' + encodeURIComponent(codigoInmueble)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error HTTP ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.exito) {
-                    const icon = this.querySelector('i');
-                    if (data.enFavoritos) {
-                        icon.classList.remove('bi-heart');
-                        icon.classList.add('bi-heart-fill');
-                        this.classList.add('active');
-                    } else {
-                        icon.classList.remove('bi-heart-fill');
-                        icon.classList.add('bi-heart');
-                        this.classList.remove('active');
-                    }
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al procesar favorito: ' + error.message);
-            });
-        });
-    });
-</script>
-
-<div th:replace="~{fragments/chat-asistente :: chatWidget}"></div>
 </body>
 </html>
